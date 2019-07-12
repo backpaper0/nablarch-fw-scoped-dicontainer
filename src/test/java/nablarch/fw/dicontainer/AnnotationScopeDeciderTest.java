@@ -11,14 +11,14 @@ import org.junit.Test;
 
 public class AnnotationScopeDeciderTest {
 
-    private final AnnotationScopeDecider decider = new AnnotationScopeDecider();
+    private AnnotationScopeDecider decider;
     private Scope defaultScope;
 
     @Before
     public void setUp() throws Exception {
         defaultScope = (Scope) Proxy.newProxyInstance(getClass().getClassLoader(),
                 new Class<?>[] { Scope.class }, (a, b, c) -> null);
-        decider.setDefaultScope(defaultScope);
+        decider = AnnotationScopeDecider.builder().defaultScope(defaultScope).build();
     }
 
     @Test

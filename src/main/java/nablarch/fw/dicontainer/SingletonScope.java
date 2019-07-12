@@ -11,36 +11,36 @@ import javax.inject.Provider;
 
 public final class SingletonScope implements Scope {
 
-    private final ConcurrentMap<ComponentKey<?>, Instance> instances = new ConcurrentHashMap<>();
+    private final ConcurrentMap<ComponentKey<?>, InstanceHolder> instances = new ConcurrentHashMap<>();
 
     @Override
     public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
             final Set<DestroyMethod> destroyMethods) {
-        Instance instance = instances.get(key);
-        if (instance == null) {
-            instance = new Instance(destroyMethods);
-            final Instance previous = instances.putIfAbsent(key, instance);
-            if (previous != null && instance != previous) {
-                instance = previous;
+        InstanceHolder instanceHolder = instances.get(key);
+        if (instanceHolder == null) {
+            instanceHolder = new InstanceHolder(destroyMethods);
+            final InstanceHolder previous = instances.putIfAbsent(key, instanceHolder);
+            if (previous != null && instanceHolder != previous) {
+                instanceHolder = previous;
             }
         }
-        return instance.get(provider);
+        return instanceHolder.get(provider);
     }
 
     @Observes
     public void destroy(final ContainerDestroy event) {
-        for (final Instance instance : instances.values()) {
+        for (final InstanceHolder instance : instances.values()) {
             instance.destroy();
         }
     }
 
-    private static class Instance {
+    private static class InstanceHolder {
 
         Object instance;
         final Lock lock = new ReentrantLock();
         private final Set<DestroyMethod> destroyMethods;
 
-        Instance(final Set<DestroyMethod> destroyMethods) {
+        InstanceHolder(final Set<DestroyMethod> destroyMethods) {
             this.destroyMethods = Objects.requireNonNull(destroyMethods);
         }
 

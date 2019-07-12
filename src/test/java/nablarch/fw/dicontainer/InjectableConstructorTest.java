@@ -34,8 +34,16 @@ public class InjectableConstructorTest {
         final UUID uuid1 = UUID.randomUUID();
         final UUID uuid2 = UUID.randomUUID();
         final Container container = new TinyContainer()
-                .register(new ComponentKey<>(Ccc.class, Collections.singleton(Qualifier.fromAnnotation(new NamedImpl("first")))), new Ccc(uuid1))
-                .register(new ComponentKey<>(Ccc.class, Collections.singleton(Qualifier.fromAnnotation(new NamedImpl("second")))), new Ccc(uuid2));
+                .register(
+                        new ComponentKey<>(Ccc.class,
+                                Collections.singleton(
+                                        Qualifier.fromAnnotation(new NamedImpl("first")))),
+                        new Ccc(uuid1))
+                .register(
+                        new ComponentKey<>(Ccc.class,
+                                Collections.singleton(
+                                        Qualifier.fromAnnotation(new NamedImpl("second")))),
+                        new Ccc(uuid2));
         final Ddd component = creator.inject(container, null);
         assertEquals(uuid1, component.ccc1.value);
         assertEquals(uuid2, component.ccc2.value);

@@ -46,7 +46,8 @@ public final class MethodCollector {
         return true;
     }
 
-    private static boolean isOverridden(final Method self, final Method other, final boolean isPackagePrivate) {
+    private static boolean isOverridden(final Method self, final Method other,
+            final boolean isPackagePrivate) {
         if (self.getDeclaringClass() == other.getDeclaringClass()) {
             return false;
         } else if (Modifier.isPrivate(other.getModifiers())) {
@@ -55,7 +56,8 @@ public final class MethodCollector {
             return false;
         } else if (Arrays.equals(self.getParameterTypes(), other.getParameterTypes()) == false) {
             return false;
-        } else if (isPackagePrivate && Objects.equals(self.getDeclaringClass().getPackage(), other.getDeclaringClass().getPackage()) == false) {
+        } else if (isPackagePrivate && Objects.equals(self.getDeclaringClass().getPackage(),
+                other.getDeclaringClass().getPackage()) == false) {
             return false;
         }
         return true;

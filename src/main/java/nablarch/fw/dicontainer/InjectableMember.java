@@ -56,12 +56,14 @@ public interface InjectableMember {
         final Set<InjectableMember> injectableMembers = new LinkedHashSet<>();
         for (final Class<?> clazz : classes) {
             for (final Field field : fields.get(clazz)) {
-                final InjectionComponentResolver resolver = InjectionComponentResolver.fromField(field);
+                final InjectionComponentResolver resolver = InjectionComponentResolver
+                        .fromField(field);
                 final InjectableField injectableField = new InjectableField(field, resolver);
                 injectableMembers.add(injectableField);
             }
             for (final Method method : methods.get(clazz)) {
-                final List<InjectionComponentResolver> resolvers = InjectionComponentResolver.fromMethodParameters(method);
+                final List<InjectionComponentResolver> resolvers = InjectionComponentResolver
+                        .fromMethodParameters(method);
                 final InjectableMethod injectableMethod = new InjectableMethod(method, resolvers);
                 injectableMembers.add(injectableMethod);
             }

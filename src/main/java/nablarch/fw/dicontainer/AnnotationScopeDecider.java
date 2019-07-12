@@ -2,8 +2,10 @@ package nablarch.fw.dicontainer;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Singleton;
 
@@ -11,6 +13,7 @@ public final class AnnotationScopeDecider {
 
     private final Map<Class<?>, Scope> builtinScopes = new HashMap<>();
     private Scope defaultScope;
+    private final PassthroughScope passthroughScope = new PassthroughScope();
 
     public AnnotationScopeDecider() {
         this.defaultScope = new PrototypeScope();
@@ -38,5 +41,29 @@ public final class AnnotationScopeDecider {
 
     public void setDefaultScope(final Scope defaultScope) {
         this.defaultScope = defaultScope;
+    }
+
+    //FIXME
+    void registerScopes(final AnnotationContainerBuilder builder) {
+        for (final Scope scope : builtinScopes.values()) {
+            registerScope(builder, scope);
+        }
+        if (builtinScopes.values().stream().anyMatch(a -> a == defaultScope) == false) {
+            registerScope(builder, defaultScope);
+        }
+    }
+
+    private <T extends Scope> void registerScope(final AnnotationContainerBuilder builder,
+            final T scope) {
+        final Class<T> componentType = (Class<T>) scope.getClass();
+        final ComponentKey<T> key = new ComponentKey<>(componentType, Collections.emptySet());
+        final InjectableMember injectableConstructor = (container, component) -> scope;
+        final Set<InjectableMember> injectableMembers = Collections.emptySet();
+        final Set<ObservesMethod> observesMethods = ObservesMethod.fromAnnotation(componentType);
+        final Set<InitMethod> initMethods = Collections.emptySet();
+        final Set<DestroyMethod> destroyMethods = DestroyMethod.fromAnnotation(componentType);
+        final ComponentDefinition<T> definition = new ComponentDefinition<>(injectableConstructor,
+                injectableMembers, observesMethods, initMethods, destroyMethods, passthroughScope);
+        builder.register(key, definition);
     }
 }

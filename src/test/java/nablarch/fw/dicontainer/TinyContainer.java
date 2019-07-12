@@ -44,6 +44,17 @@ public final class TinyContainer implements Container {
 
     @Override
     public <T> T getComponent(final Class<T> key, final Annotation... qualifiers) {
-        return getComponent(new ComponentKey<>(key, Arrays.stream(qualifiers).map(Qualifier::fromAnnotation).collect(Collectors.toSet())));
+        return getComponent(new ComponentKey<>(key, Arrays.stream(qualifiers)
+                .map(Qualifier::fromAnnotation).collect(Collectors.toSet())));
+    }
+
+    @Override
+    public void fire(final Object event) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void destroy() {
+        throw new UnsupportedOperationException();
     }
 }

@@ -240,6 +240,7 @@ public class ContainerTest {
 
     @Test
     public void injectionOrder() throws Exception {
+
         final Container container = new AnnotationContainerBuilder()
                 .register(Iii2.class)
                 .register(Aaa.class)
@@ -250,6 +251,86 @@ public class ContainerTest {
         assertEquals(2, component.called.size());
         assertEquals("method1", component.called.get(0));
         assertEquals("method2", component.called.get(1));
+    }
+
+    @Test
+    public void observes() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Jjj2.class)
+                .build();
+
+        assertFalse(Jjj2.called);
+
+        container.fire(new Jjj1());
+
+        assertTrue(Jjj2.called);
+    }
+
+    @Test
+    public void destroySingleton() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Kkk1.class)
+                .build();
+
+        container.getComponent(Kkk1.class);
+
+        assertFalse(Kkk1.called);
+
+        container.destroy();
+
+        assertTrue(Kkk1.called);
+    }
+
+    @Test
+    public void destroyPrototype() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Kkk2.class)
+                .build();
+
+        container.getComponent(Kkk2.class);
+
+        assertFalse(Kkk2.called);
+
+        container.destroy();
+
+        assertFalse(Kkk2.called);
+    }
+
+    @Test
+    public void destroySingletonNotGetComponent() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Kkk3.class)
+                .build();
+
+        assertFalse(Kkk3.called);
+
+        container.destroy();
+
+        assertFalse(Kkk3.called);
+    }
+
+    @Test
+    public void initSingleton() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Lll1.class)
+                .build();
+
+        assertFalse(Lll1.called);
+
+        container.getComponent(Lll1.class);
+
+        assertTrue(Lll1.called);
+    }
+
+    @Test
+    public void initPrototype() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Lll2.class)
+                .build();
+
+        final Lll2 component = container.getComponent(Lll2.class);
+
+        assertTrue(component.called);
     }
 
     @Singleton
@@ -464,6 +545,72 @@ public class ContainerTest {
         @Inject
         void method2() {
             called.add("method2");
+        }
+    }
+
+    static class Jjj1 {
+    }
+
+    static class Jjj2 {
+
+        static boolean called;
+
+        @Observes
+        void handle(final Jjj1 event) {
+            called = true;
+        }
+    }
+
+    @Singleton
+    static class Kkk1 {
+
+        static boolean called;
+
+        @Destroy
+        void method() {
+            called = true;
+        }
+    }
+
+    static class Kkk2 {
+
+        static boolean called;
+
+        @Destroy
+        void method() {
+            called = true;
+        }
+    }
+
+    @Singleton
+    static class Kkk3 {
+
+        static boolean called;
+
+        @Destroy
+        void method() {
+            called = true;
+        }
+    }
+
+    @Singleton
+    static class Lll1 {
+
+        static boolean called;
+
+        @Init
+        void method() {
+            called = true;
+        }
+    }
+
+    static class Lll2 {
+
+        boolean called;
+
+        @Init
+        void method() {
+            called = true;
         }
     }
 }

@@ -45,7 +45,8 @@ public class ComponentKeyTest {
     @Test
     public void aliasViaQualifier() throws Exception {
         final Set<AliasKey> aliasKeys = ComponentKey.fromClass(Ccc2.class).aliasKeys();
-        final AliasKey aliasKey = new AliasKey(Ccc1.class, Collections.singleton(NamedImpl.qualifier("foo")));
+        final AliasKey aliasKey = new AliasKey(Ccc1.class,
+                Collections.singleton(NamedImpl.qualifier("foo")));
         final Set<AliasKey> expected = Collections.singleton(aliasKey);
         assertEquals(expected, aliasKeys);
     }

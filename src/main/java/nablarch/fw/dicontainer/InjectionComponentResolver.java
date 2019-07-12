@@ -35,7 +35,8 @@ public final class InjectionComponentResolver {
         final boolean provider = field.getType() == Provider.class;
         Class<?> componentType;
         if (provider) {
-            componentType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+            componentType = (Class<?>) ((ParameterizedType) field.getGenericType())
+                    .getActualTypeArguments()[0];
         } else {
             componentType = field.getType();
         }
@@ -58,19 +59,22 @@ public final class InjectionComponentResolver {
             final boolean provider = method.getParameterTypes()[i] == Provider.class;
             Class<?> componentType;
             if (provider) {
-                componentType = (Class<?>) ((ParameterizedType) method.getGenericParameterTypes()[i]).getActualTypeArguments()[0];
+                componentType = (Class<?>) ((ParameterizedType) method
+                        .getGenericParameterTypes()[i]).getActualTypeArguments()[0];
             } else {
                 componentType = method.getParameterTypes()[i];
             }
 
             final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
-            final InjectionComponentResolver resolver = new InjectionComponentResolver(key, provider);
+            final InjectionComponentResolver resolver = new InjectionComponentResolver(key,
+                    provider);
             resolvers.add(resolver);
         }
         return resolvers;
     }
 
-    public static List<InjectionComponentResolver> fromConstructorParameters(final Constructor<?> constructor) {
+    public static List<InjectionComponentResolver> fromConstructorParameters(
+            final Constructor<?> constructor) {
         final List<InjectionComponentResolver> resolvers = new ArrayList<>();
         for (int i = 0; i < constructor.getParameterCount(); i++) {
             final Set<Qualifier> qualifiers = new LinkedHashSet<>();
@@ -85,13 +89,15 @@ public final class InjectionComponentResolver {
             final boolean provider = constructor.getParameterTypes()[i] == Provider.class;
             Class<?> componentType;
             if (provider) {
-                componentType = (Class<?>) ((ParameterizedType) constructor.getGenericParameterTypes()[i]).getActualTypeArguments()[0];
+                componentType = (Class<?>) ((ParameterizedType) constructor
+                        .getGenericParameterTypes()[i]).getActualTypeArguments()[0];
             } else {
                 componentType = constructor.getParameterTypes()[i];
             }
 
             final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
-            final InjectionComponentResolver resolver = new InjectionComponentResolver(key, provider);
+            final InjectionComponentResolver resolver = new InjectionComponentResolver(key,
+                    provider);
             resolvers.add(resolver);
         }
         return resolvers;

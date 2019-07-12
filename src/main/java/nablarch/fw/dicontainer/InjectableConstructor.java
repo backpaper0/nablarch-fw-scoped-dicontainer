@@ -14,7 +14,8 @@ public final class InjectableConstructor<T> implements InjectableMember {
     private final Constructor<T> constructor;
     private final List<InjectionComponentResolver> resolvers;
 
-    public InjectableConstructor(final Constructor<T> constructor, final List<InjectionComponentResolver> resolvers) {
+    public InjectableConstructor(final Constructor<T> constructor,
+            final List<InjectionComponentResolver> resolvers) {
         this.constructor = Objects.requireNonNull(constructor);
         this.resolvers = Objects.requireNonNull(resolvers);
     }
@@ -34,7 +35,8 @@ public final class InjectableConstructor<T> implements InjectableMember {
             }
             if (constructors.size() == 1) {
                 final Constructor<T> constructor = constructors.get(0);
-                final List<InjectionComponentResolver> resolvers = InjectionComponentResolver.fromConstructorParameters(constructor);
+                final List<InjectionComponentResolver> resolvers = InjectionComponentResolver
+                        .fromConstructorParameters(constructor);
                 return new InjectableConstructor<>(constructor, resolvers);
             }
 
@@ -48,7 +50,8 @@ public final class InjectableConstructor<T> implements InjectableMember {
 
     @Override
     public T inject(final Container container, final Object component) {
-        final Object[] args = resolvers.stream().map(resolver -> resolver.resolve(container)).toArray();
+        final Object[] args = resolvers.stream().map(resolver -> resolver.resolve(container))
+                .toArray();
         try {
             if (constructor.isAccessible() == false) {
                 constructor.setAccessible(true);

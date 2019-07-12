@@ -36,6 +36,18 @@ public final class ComponentKey<T> {
         return new AliasKey(componentType, qualifiers);
     }
 
+    public String getSessionKey() {
+        if (qualifiers.isEmpty() == false) {
+            //TODO error
+            throw new RuntimeException();
+        }
+        return getSessionKeyPrefix() + componentType.getName();
+    }
+
+    public static String getSessionKeyPrefix() {
+        return ComponentKey.class.getName() + "@";
+    }
+
     private void collectAlias(final Set<Class<?>> classes, final Class<?> clazz) {
         if (clazz == null || clazz == Object.class) {
             return;

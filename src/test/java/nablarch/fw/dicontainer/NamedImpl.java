@@ -33,7 +33,7 @@ public class NamedImpl implements Named {
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return (127 * "value".hashCode()) ^ value.hashCode();
     }
 
     @Override

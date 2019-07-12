@@ -14,9 +14,6 @@ public class QualifierTest {
     @Named("spare")
     Object spare;
 
-    @Named
-    Object defaultValue;
-
     @Singleton
     Object notQualifier;
 
@@ -24,24 +21,8 @@ public class QualifierTest {
     public void fromAnnotation() throws Exception {
         final Annotation annotation = getClass().getDeclaredField("spare")
                 .getAnnotation(Named.class);
-        final Qualifier actual = Qualifier.fromAnnotation(annotation);
-        final Qualifier expected = Qualifier.builder()
-                .name(Named.class.getName())
-                .element("value", "spare")
-                .build();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void fromAnnotationDefaultValue() throws Exception {
-        final Annotation annotation = getClass().getDeclaredField("defaultValue")
-                .getAnnotation(Named.class);
-        final Qualifier actual = Qualifier.fromAnnotation(annotation);
-        final Qualifier expected = Qualifier.builder()
-                .name(Named.class.getName())
-                .element("value", "")
-                .build();
-        assertEquals(expected, actual);
+        final Qualifier qualifier = Qualifier.fromAnnotation(annotation);
+        assertNotNull(qualifier);
     }
 
     @Test
@@ -51,7 +32,25 @@ public class QualifierTest {
         try {
             Qualifier.fromAnnotation(annotation);
             fail();
-        } catch (final IllegalArgumentException e) {
+        } catch (final RuntimeException e) {
         }
+    }
+
+    @Test
+    public void equals() throws Exception {
+        final Annotation annotation = getClass().getDeclaredField("spare")
+                .getAnnotation(Named.class);
+        final Qualifier qualifier1 = Qualifier.fromAnnotation(annotation);
+        final Qualifier qualifier2 = Qualifier.fromAnnotation(new NamedImpl("spare"));
+        assertTrue(qualifier1.equals(qualifier2));
+    }
+
+    @Test
+    public void equalsReverse() throws Exception {
+        final Annotation annotation = getClass().getDeclaredField("spare")
+                .getAnnotation(Named.class);
+        final Qualifier qualifier1 = Qualifier.fromAnnotation(annotation);
+        final Qualifier qualifier2 = Qualifier.fromAnnotation(new NamedImpl("spare"));
+        assertTrue(qualifier2.equals(qualifier1));
     }
 }

@@ -6,6 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import nablarch.fw.dicontainer.servlet.SerializedDestroyMethod;
+
 public final class DestroyMethod {
 
     private final Method method;
@@ -39,5 +41,9 @@ public final class DestroyMethod {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException();
         }
+    }
+
+    public SerializedDestroyMethod serialize() {
+        return new SerializedDestroyMethod(method.getDeclaringClass(), method.getName());
     }
 }

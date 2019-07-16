@@ -7,7 +7,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-public class ContainerLifecycleServletListener implements ServletRequestListener, HttpSessionListener {
+public class ContainerLifecycleServletListener
+        implements ServletRequestListener, HttpSessionListener {
 
     @Override
     public void requestInitialized(final ServletRequestEvent sre) {
@@ -17,7 +18,7 @@ public class ContainerLifecycleServletListener implements ServletRequestListener
     @Override
     public void requestDestroyed(final ServletRequestEvent sre) {
         final ServletRequest request = sre.getServletRequest();
-        ServletRequestContext.destroy(request);
+        ServletAPIContext.destroyRequestComponents(request);
     }
 
     @Override
@@ -28,6 +29,6 @@ public class ContainerLifecycleServletListener implements ServletRequestListener
     @Override
     public void sessionDestroyed(final HttpSessionEvent se) {
         final HttpSession session = se.getSession();
-        HttpSessionContext.destroy(session);
+        ServletAPIContext.destroySessionComponents(session);
     }
 }

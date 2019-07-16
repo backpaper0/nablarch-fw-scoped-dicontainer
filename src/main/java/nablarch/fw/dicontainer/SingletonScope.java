@@ -1,7 +1,6 @@
 package nablarch.fw.dicontainer;
 
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -15,10 +14,10 @@ public final class SingletonScope implements Scope {
 
     @Override
     public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
-            final Set<DestroyMethod> destroyMethods) {
+            final DestroyMethod destroyMethod) {
         InstanceHolder instanceHolder = instances.get(key);
         if (instanceHolder == null) {
-            instanceHolder = new InstanceHolder(destroyMethods);
+            instanceHolder = new InstanceHolder(destroyMethod);
             final InstanceHolder previous = instances.putIfAbsent(key, instanceHolder);
             if (previous != null && instanceHolder != previous) {
                 instanceHolder = previous;
@@ -38,19 +37,17 @@ public final class SingletonScope implements Scope {
 
         Object instance;
         final Lock lock = new ReentrantLock();
-        private final Set<DestroyMethod> destroyMethods;
+        private final DestroyMethod destroyMethod;
 
-        InstanceHolder(final Set<DestroyMethod> destroyMethods) {
-            this.destroyMethods = Objects.requireNonNull(destroyMethods);
+        InstanceHolder(final DestroyMethod destroyMethod) {
+            this.destroyMethod = Objects.requireNonNull(destroyMethod);
         }
 
         void destroy() {
             lock.lock();
             try {
                 if (instance != null) {
-                    for (final DestroyMethod destroyMethod : destroyMethods) {
-                        destroyMethod.invoke(instance);
-                    }
+                    destroyMethod.invoke(instance);
                 }
             } finally {
                 lock.unlock();

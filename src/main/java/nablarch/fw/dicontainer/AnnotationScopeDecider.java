@@ -16,7 +16,8 @@ public final class AnnotationScopeDecider {
     private final Scope defaultScope;
     private final PassthroughScope passthroughScope = new PassthroughScope();
 
-    public AnnotationScopeDecider(final Scope defaultScope, final Map<Class<?>, Scope> additionalScopes) {
+    public AnnotationScopeDecider(final Scope defaultScope,
+            final Map<Class<?>, Scope> additionalScopes) {
         this.defaultScope = Objects.requireNonNull(defaultScope);
         this.scopes.putAll(Objects.requireNonNull(additionalScopes));
 
@@ -61,13 +62,14 @@ public final class AnnotationScopeDecider {
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType, Collections.emptySet());
         final InjectableMember injectableConstructor = (container, component) -> scope;
-        final Set<InjectableMember> injectableMembers = Collections.emptySet();
         final Set<ObservesMethod> observesMethods = ObservesMethod.fromAnnotation(componentType);
-        final Set<InitMethod> initMethods = Collections.emptySet();
-        final Set<DestroyMethod> destroyMethods = DestroyMethod.fromAnnotation(componentType);
-        final ComponentDefinition<T> definition = new ComponentDefinition<>(injectableConstructor,
-                injectableMembers, observesMethods, initMethods, destroyMethods, passthroughScope);
-        builder.register(key, definition);
+        final DestroyMethod destroyMethod = DestroyMethod.fromAnnotation(componentType);
+        final ComponentDefinition.Builder<T> definitionBuilder = ComponentDefinition.<T> builder()
+                .injectableConstructor(injectableConstructor)
+                .observesMethods(observesMethods)
+                .destroyMethod(destroyMethod)
+                .scope(passthroughScope);
+        builder.register(key, definitionBuilder);
     }
 
     public static Builder builder() {

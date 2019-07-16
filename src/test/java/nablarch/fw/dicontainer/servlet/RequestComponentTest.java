@@ -2,8 +2,9 @@ package nablarch.fw.dicontainer.servlet;
 
 import static org.junit.Assert.*;
 
-import javax.servlet.ServletRequest;
+import javax.inject.Named;
 import javax.servlet.ServletRequestEvent;
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -12,19 +13,20 @@ import nablarch.fw.dicontainer.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.AnnotationScopeDecider;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.Destroy;
-import nablarch.fw.dicontainer.RequestContextFactory;
+import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.RequestScope;
 import nablarch.fw.dicontainer.RequestScoped;
 
-public class ServletRequestContextFactoryTest {
+public class RequestComponentTest {
 
     private RequestScope requestScope;
     private AnnotationContainerBuilder builder;
+    private ServletAPIContextSupplier supplier;
 
     @Before
     public void setUp() throws Exception {
-        final RequestContextFactory factory = new ServletRequestContextFactory();
-        requestScope = new RequestScope(factory);
+        supplier = new ServletAPIContextSupplier();
+        requestScope = new RequestScope(supplier);
         final AnnotationScopeDecider decider = AnnotationScopeDecider.builder()
                 .addScope(RequestScoped.class, requestScope)
                 .build();
@@ -38,7 +40,7 @@ public class ServletRequestContextFactoryTest {
                 .build();
 
         final Aaa[] components = new Aaa[2];
-        requestScope.runInScope(MockServletRequests.createMock(), () -> {
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
             components[1] = container.getComponent(Aaa.class);
         });
@@ -55,10 +57,10 @@ public class ServletRequestContextFactoryTest {
                 .build();
 
         final Aaa[] components = new Aaa[2];
-        requestScope.runInScope(MockServletRequests.createMock(), () -> {
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
         });
-        requestScope.runInScope(MockServletRequests.createMock(), () -> {
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[1] = container.getComponent(Aaa.class);
         });
 
@@ -75,15 +77,33 @@ public class ServletRequestContextFactoryTest {
 
         assertFalse(Bbb.called);
 
-        final ServletRequest request = MockServletRequests.createMock();
-        requestScope.runInScope(request, () -> {
+        final HttpServletRequest request = MockServletRequests.createMock();
+        supplier.doWithContext(request, () -> {
             container.getComponent(Bbb.class);
         });
 
-        final ServletRequestEvent sre = new ServletRequestEvent(MockServletContexts.createMock(), request);
+        final ServletRequestEvent sre = new ServletRequestEvent(MockServletContexts.createMock(),
+                request);
         new ContainerLifecycleServletListener().requestDestroyed(sre);
 
         assertTrue(Bbb.called);
+    }
+
+    @Test
+    public void getComponentQualifier() throws Exception {
+        final Container container = builder
+                .register(Ccc2.class)
+                .register(Ccc3.class)
+                .build();
+
+        final Ccc1[] components = new Ccc1[2];
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
+            components[0] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
+            components[1] = container.getComponent(Ccc1.class, new NamedImpl("bar"));
+        });
+
+        assertTrue(components[0].getClass() == Ccc2.class);
+        assertTrue(components[1].getClass() == Ccc3.class);
     }
 
     @RequestScoped
@@ -99,5 +119,18 @@ public class ServletRequestContextFactoryTest {
         void method() {
             called = true;
         }
+    }
+
+    static class Ccc1 {
+    }
+
+    @RequestScoped
+    @Named("foo")
+    static class Ccc2 extends Ccc1 {
+    }
+
+    @RequestScoped
+    @Named("bar")
+    static class Ccc3 extends Ccc1 {
     }
 }

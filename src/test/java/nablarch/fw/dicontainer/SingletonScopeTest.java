@@ -2,7 +2,6 @@ package nablarch.fw.dicontainer;
 
 import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
@@ -17,8 +16,8 @@ public class SingletonScopeTest {
     public void getComponent() throws Exception {
         final ComponentKey<Aaa> key = ComponentKey.fromClass(Aaa.class);
         final Provider<Aaa> provider = Aaa::new;
-        final Aaa component1 = scope.getComponent(key, provider, Collections.emptySet());
-        final Aaa component2 = scope.getComponent(key, provider, Collections.emptySet());
+        final Aaa component1 = scope.getComponent(key, provider, DestroyMethod.noop());
+        final Aaa component2 = scope.getComponent(key, provider, DestroyMethod.noop());
         assertTrue(component1 == component2);
     }
 
@@ -28,10 +27,10 @@ public class SingletonScopeTest {
         final Provider<Bbb> provider = Bbb::new;
         final Bbb[] components = new Bbb[2];
         final Thread t1 = new Thread(() -> {
-            components[0] = scope.getComponent(key, provider, Collections.emptySet());
+            components[0] = scope.getComponent(key, provider, DestroyMethod.noop());
         });
         final Thread t2 = new Thread(() -> {
-            components[1] = scope.getComponent(key, provider, Collections.emptySet());
+            components[1] = scope.getComponent(key, provider, DestroyMethod.noop());
         });
         t1.start();
         t2.start();

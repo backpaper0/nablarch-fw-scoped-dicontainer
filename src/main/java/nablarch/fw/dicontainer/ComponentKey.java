@@ -1,12 +1,13 @@
 package nablarch.fw.dicontainer;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class ComponentKey<T> {
+public final class ComponentKey<T> implements Serializable {
 
     private final Class<T> componentType;
     private final Set<Qualifier> qualifiers;
@@ -36,16 +37,8 @@ public final class ComponentKey<T> {
         return new AliasKey(componentType, qualifiers);
     }
 
-    public String getSessionKey() {
-        if (qualifiers.isEmpty() == false) {
-            //TODO error
-            throw new RuntimeException();
-        }
-        return getSessionKeyPrefix() + componentType.getName();
-    }
-
-    public static String getSessionKeyPrefix() {
-        return ComponentKey.class.getName() + "@";
+    public String getFullyQualifiedClassName() {
+        return componentType.getName();
     }
 
     private void collectAlias(final Set<Class<?>> classes, final Class<?> clazz) {

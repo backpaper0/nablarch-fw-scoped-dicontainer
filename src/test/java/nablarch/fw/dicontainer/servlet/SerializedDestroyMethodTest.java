@@ -9,13 +9,16 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 
+import nablarch.fw.dicontainer.servlet.SerializedDestroyMethod.SerializedDestroyMethodImpl;
+
 public class SerializedDestroyMethodTest {
 
     @Test
     public void serialize() throws Exception {
         final Class<?> declaringClass = SerializedDestroyMethodTest.class;
         final String methodName = "serialize";
-        final SerializedDestroyMethod method1 = new SerializedDestroyMethod(declaringClass, methodName);
+        final SerializedDestroyMethod method1 = new SerializedDestroyMethodImpl(declaringClass,
+                methodName);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {

@@ -6,23 +6,37 @@ import java.util.Objects;
 
 import nablarch.fw.dicontainer.DestroyMethod;
 
-public final class SerializedDestroyMethod implements Serializable {
+public interface SerializedDestroyMethod extends Serializable {
 
-    private final Class<?> declaringClass;
-    private final String methodName;
+    DestroyMethod deserialize();
 
-    public SerializedDestroyMethod(final Class<?> declaringClass, final String methodName) {
-        this.declaringClass = Objects.requireNonNull(declaringClass);
-        this.methodName = Objects.requireNonNull(methodName);
+    public static SerializedDestroyMethod noop() {
+        return () -> DestroyMethod.noop();
     }
 
-    public DestroyMethod deserialize() {
-        try {
-            final Method method = declaringClass.getDeclaredMethod(methodName);
-            return new DestroyMethod(method);
-        } catch (final NoSuchMethodException e) {
-            //TODO error
-            throw new RuntimeException(e);
+    public static SerializedDestroyMethod fromMethod(final Method method) {
+        return new SerializedDestroyMethodImpl(method.getDeclaringClass(), method.getName());
+    }
+
+    final class SerializedDestroyMethodImpl implements SerializedDestroyMethod {
+
+        private final Class<?> declaringClass;
+        private final String methodName;
+
+        public SerializedDestroyMethodImpl(final Class<?> declaringClass, final String methodName) {
+            this.declaringClass = Objects.requireNonNull(declaringClass);
+            this.methodName = Objects.requireNonNull(methodName);
+        }
+
+        @Override
+        public DestroyMethod deserialize() {
+            try {
+                final Method method = declaringClass.getDeclaredMethod(methodName);
+                return DestroyMethod.fromMethod(method);
+            } catch (final NoSuchMethodException e) {
+                //TODO error
+                throw new RuntimeException(e);
+            }
         }
     }
 }

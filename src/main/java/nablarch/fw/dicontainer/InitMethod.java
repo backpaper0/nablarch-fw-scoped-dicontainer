@@ -6,15 +6,16 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public final class InitMethod {
+public interface InitMethod {
 
-    private final Method method;
+    void invoke(final Object component);
 
-    public InitMethod(final Method method) {
-        this.method = Objects.requireNonNull(method);
+    static InitMethod noop() {
+        return component -> {
+        };
     }
 
-    public static Set<InitMethod> fromAnnotation(final Class<?> componentType) {
+    static InitMethod fromAnnotation(final Class<?> componentType) {
         final MethodCollector methodCollector = new MethodCollector();
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
@@ -24,20 +25,37 @@ public final class InitMethod {
         final Set<InitMethod> methods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Init.class)) {
-                methods.add(new InitMethod(method));
+                methods.add(new InitMethodImpl(method));
             }
         }
-        return methods;
+        if (methods.size() > 1) {
+            //TODO error
+            throw new RuntimeException();
+        }
+        if (methods.isEmpty()) {
+            return noop();
+        }
+        return methods.iterator().next();
     }
 
-    public void invoke(final Object component) {
-        if (method.isAccessible() == false) {
-            method.setAccessible(true);
+    final class InitMethodImpl implements InitMethod {
+
+        private final Method method;
+
+        public InitMethodImpl(final Method method) {
+            this.method = Objects.requireNonNull(method);
         }
-        try {
-            method.invoke(component);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException();
+
+        @Override
+        public void invoke(final Object component) {
+            if (method.isAccessible() == false) {
+                method.setAccessible(true);
+            }
+            try {
+                method.invoke(component);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException();
+            }
         }
     }
 }

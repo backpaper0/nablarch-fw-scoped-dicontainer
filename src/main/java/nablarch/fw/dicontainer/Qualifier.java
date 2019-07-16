@@ -1,12 +1,20 @@
 package nablarch.fw.dicontainer;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.Objects;
 
-public interface Qualifier {
+public interface Qualifier extends Serializable {
 
-    public static Qualifier fromAnnotation(final Annotation annotation) {
-        if (annotation.annotationType().isAnnotationPresent(javax.inject.Qualifier.class) == false) {
+    @Override
+    int hashCode();
+
+    @Override
+    boolean equals(Object obj);
+
+    static Qualifier fromAnnotation(final Annotation annotation) {
+        if (annotation.annotationType()
+                .isAnnotationPresent(javax.inject.Qualifier.class) == false) {
             //TODO error
             throw new RuntimeException();
         }

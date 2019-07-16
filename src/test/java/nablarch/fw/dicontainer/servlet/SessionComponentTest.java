@@ -2,9 +2,12 @@ package nablarch.fw.dicontainer.servlet;
 
 import static org.junit.Assert.*;
 
+import java.io.Serializable;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
@@ -16,19 +19,20 @@ import nablarch.fw.dicontainer.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.AnnotationScopeDecider;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.Destroy;
-import nablarch.fw.dicontainer.SessionContextFactory;
+import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.SessionScope;
 import nablarch.fw.dicontainer.SessionScoped;
 
-public class HttpSessionContextFactoryTest {
+public class SessionComponentTest {
 
     private SessionScope sessionScope;
     private AnnotationContainerBuilder builder;
+    private ServletAPIContextSupplier supplier;
 
     @Before
     public void setUp() throws Exception {
-        final SessionContextFactory factory = new HttpSessionContextFactory();
-        sessionScope = new SessionScope(factory);
+        supplier = new ServletAPIContextSupplier();
+        sessionScope = new SessionScope(supplier);
         final AnnotationScopeDecider decider = AnnotationScopeDecider.builder()
                 .addScope(SessionScoped.class, sessionScope)
                 .build();
@@ -42,7 +46,7 @@ public class HttpSessionContextFactoryTest {
                 .build();
 
         final Aaa[] components = new Aaa[2];
-        sessionScope.runInScope(MockServletRequests.createMock(), () -> {
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
             components[1] = container.getComponent(Aaa.class);
         });
@@ -61,7 +65,7 @@ public class HttpSessionContextFactoryTest {
         assertFalse(Bbb.called);
 
         final HttpServletRequest request = MockServletRequests.createMock();
-        sessionScope.runInScope(request, () -> {
+        supplier.doWithContext(request, () -> {
             container.getComponent(Bbb.class);
         });
 
@@ -86,7 +90,7 @@ public class HttpSessionContextFactoryTest {
         final Ccc[] components = new Ccc[2];
 
         final Thread t1 = new Thread(() -> {
-            sessionScope.runInScope(request, () -> {
+            supplier.doWithContext(request, () -> {
                 ready.countDown();
                 try {
                     go.await();
@@ -98,7 +102,7 @@ public class HttpSessionContextFactoryTest {
         });
 
         final Thread t2 = new Thread(() -> {
-            sessionScope.runInScope(request, () -> {
+            supplier.doWithContext(request, () -> {
                 ready.countDown();
                 try {
                     go.await();
@@ -121,12 +125,55 @@ public class HttpSessionContextFactoryTest {
         assertTrue(components[0] == components[1]);
     }
 
-    @SessionScoped
-    static class Aaa {
+    @Test
+    public void serialize() throws Exception {
+        final Container container = builder
+                .register(Ddd.class)
+                .build();
+
+        final UUID[] ids = new UUID[2];
+
+        final HttpSession session = MockHttpSessions.createMock();
+        supplier.doWithContext(MockServletRequests.createMock(session), () -> {
+            final Ddd component = container.getComponent(Ddd.class);
+            ids[0] = component.id;
+        });
+
+        final byte[] serialized = MockHttpSessions.serialize(session);
+
+        final HttpSession deserialized = MockHttpSessions.createMock(serialized);
+        supplier.doWithContext(MockServletRequests.createMock(deserialized), () -> {
+            final Ddd component = container.getComponent(Ddd.class);
+            ids[1] = component.id;
+        });
+
+        assertTrue(ids[0].equals(ids[1]));
+        assertTrue(ids[0] != ids[1]);
+    }
+
+    @Test
+    public void getComponentQualifier() throws Exception {
+        final Container container = builder
+                .register(Ccc2.class)
+                .register(Ccc3.class)
+                .build();
+
+        final Ccc1[] components = new Ccc1[2];
+        supplier.doWithContext(MockServletRequests.createMock(), () -> {
+            components[0] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
+            components[1] = container.getComponent(Ccc1.class, new NamedImpl("bar"));
+        });
+
+        assertTrue(components[0].getClass() == Ccc2.class);
+        assertTrue(components[1].getClass() == Ccc3.class);
     }
 
     @SessionScoped
-    static class Bbb {
+    static class Aaa implements Serializable {
+    }
+
+    @SessionScoped
+    static class Bbb implements Serializable {
 
         static boolean called;
 
@@ -137,7 +184,7 @@ public class HttpSessionContextFactoryTest {
     }
 
     @SessionScoped
-    static class Ccc {
+    static class Ccc implements Serializable {
         public Ccc() {
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
@@ -145,5 +192,23 @@ public class HttpSessionContextFactoryTest {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @SessionScoped
+    static class Ddd implements Serializable {
+        UUID id = UUID.randomUUID();
+    }
+
+    static class Ccc1 {
+    }
+
+    @SessionScoped
+    @Named("foo")
+    static class Ccc2 extends Ccc1 {
+    }
+
+    @SessionScoped
+    @Named("bar")
+    static class Ccc3 extends Ccc1 {
     }
 }

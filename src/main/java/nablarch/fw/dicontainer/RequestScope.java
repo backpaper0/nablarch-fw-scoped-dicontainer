@@ -1,37 +1,25 @@
 package nablarch.fw.dicontainer;
 
 import java.util.Objects;
-import java.util.Set;
 
 import javax.inject.Provider;
 
 public final class RequestScope implements Scope {
 
-    private final ThreadLocal<RequestContext> contexts = new ThreadLocal<>();
-    private final RequestContextFactory factory;
+    private final RequestContextSupplier supplier;
 
-    public RequestScope(final RequestContextFactory factory) {
-        this.factory = Objects.requireNonNull(factory);
-    }
-
-    public void runInScope(final Object request, final Runnable r) {
-        final RequestContext context = factory.create(request);
-        contexts.set(context);
-        try {
-            r.run();
-        } finally {
-            contexts.remove();
-        }
+    public RequestScope(final RequestContextSupplier supplier) {
+        this.supplier = Objects.requireNonNull(supplier);
     }
 
     @Override
     public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
-            final Set<DestroyMethod> destroyMethods) {
-        final RequestContext context = contexts.get();
+            final DestroyMethod destroyMethod) {
+        final RequestContext context = supplier.getRequestContext();
         if (context == null) {
             //TODO error
             throw new RuntimeException();
         }
-        return context.get(key, provider, destroyMethods);
+        return context.getRequestComponent(key, provider, destroyMethod);
     }
 }

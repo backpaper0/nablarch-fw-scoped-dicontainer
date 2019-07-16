@@ -22,7 +22,8 @@ public final class MockServletContexts {
         private final Map<String, Object> map = new HashMap<>();
 
         @Override
-        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+        public Object invoke(final Object proxy, final Method method, final Object[] args)
+                throws Throwable {
             throw new UnsupportedOperationException(method.toGenericString());
         }
     }

@@ -11,6 +11,7 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
+import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.ComponentKey.AliasKey;
 
 public class ComponentKeyTest {

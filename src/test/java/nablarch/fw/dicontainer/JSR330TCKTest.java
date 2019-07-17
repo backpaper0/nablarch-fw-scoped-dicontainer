@@ -15,6 +15,7 @@ import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
 
 import junit.framework.Test;
+import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public class JSR330TCKTest {

@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 
 import org.junit.Test;
 
+import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;

@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
+
 public final class DefaultContainer implements Container {
 
     private final ComponentDefinitionRepository definitions;
@@ -24,6 +26,9 @@ public final class DefaultContainer implements Container {
             return definition.getComponent(this, key);
         }
         final ComponentKey<T> alterKey = aliasMapping.find(key.asAliasKey());
+        if (alterKey == null) {
+            throw new ComponentNotFoundException();
+        }
         definition = definitions.find(alterKey);
         return definition.getComponent(this, key);
     }

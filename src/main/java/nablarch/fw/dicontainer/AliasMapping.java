@@ -20,8 +20,7 @@ public final class AliasMapping {
     public <T> ComponentKey<T> find(final ComponentKey.AliasKey aliasKey) {
         final Set<ComponentKey<?>> keys = aliasesMap.get(aliasKey);
         if (keys == null) {
-            //TODO error
-            throw new RuntimeException();
+            return null;
         }
         if (keys.size() > 1) {
             //TODO error

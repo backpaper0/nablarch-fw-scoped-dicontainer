@@ -18,6 +18,12 @@
 	</properties>
 
 	<dependencies>
+        <dependency>
+            <groupId>com.nablarch.framework</groupId>
+            <artifactId>nablarch-fw-web</artifactId>
+            <version>1.5.1</version>
+            <optional>true</optional>
+        </dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>

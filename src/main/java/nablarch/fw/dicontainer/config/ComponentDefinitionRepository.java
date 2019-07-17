@@ -2,21 +2,34 @@ package nablarch.fw.dicontainer.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
 
 public final class ComponentDefinitionRepository {
 
-    private final Map<ComponentKey<?>, ComponentDefinition<?>> definitionsMap = new HashMap<>();
+    private final Map<ComponentId, ComponentDefinition<?>> idToDefinition = new HashMap<>();
+    private final Map<ComponentKey<?>, ComponentId> keyToId = new HashMap<>();
 
     public <T> void register(final ComponentKey<T> key, final ComponentDefinition<T> definition) {
-        definitionsMap.put(key, definition);
+        final ComponentId id = definition.getId();
+        idToDefinition.put(id, definition);
+        keyToId.put(key, id);
+    }
+
+    public <T> ComponentDefinition<T> get(final ComponentId id) {
+        final ComponentDefinition<?> definition = idToDefinition.get(id);
+        if (definition == null) {
+            //TODO error
+            throw new RuntimeException();
+        }
+        return (ComponentDefinition<T>) definition;
     }
 
     public <T> ComponentDefinition<T> find(final ComponentKey<T> key) {
-        final ComponentDefinition<?> definition = definitionsMap.get(key);
+        final ComponentId id = keyToId.get(key);
+        final ComponentDefinition<?> definition = idToDefinition.get(id);
         if (definition == null) {
             return null;
         }
@@ -24,16 +37,13 @@ public final class ComponentDefinitionRepository {
     }
 
     public <T> void fire(final Container container, final Object event) {
-        for (final Entry<ComponentKey<?>, ComponentDefinition<?>> entry : definitionsMap
-                .entrySet()) {
-            final ComponentKey<T> key = (ComponentKey<T>) entry.getKey();
-            final ComponentDefinition<T> definition = (ComponentDefinition<T>) entry.getValue();
-            definition.fire(container, key, event);
+        for (final ComponentDefinition<?> definition : idToDefinition.values()) {
+            definition.fire(container, event);
         }
     }
 
     public void validate(final ContainerBuilder<?> containerBuilder) {
-        for (final ComponentDefinition<?> definition : definitionsMap.values()) {
+        for (final ComponentDefinition<?> definition : idToDefinition.values()) {
             definition.validate(containerBuilder);
         }
     }

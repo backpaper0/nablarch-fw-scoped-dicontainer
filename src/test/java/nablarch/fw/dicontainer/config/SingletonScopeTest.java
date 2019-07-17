@@ -8,9 +8,7 @@ import javax.inject.Provider;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.config.DestroyMethod;
-import nablarch.fw.dicontainer.config.SingletonScope;
+import nablarch.fw.dicontainer.ComponentId;
 
 public class SingletonScopeTest {
 
@@ -18,23 +16,23 @@ public class SingletonScopeTest {
 
     @Test
     public void getComponent() throws Exception {
-        final ComponentKey<Aaa> key = ComponentKey.fromClass(Aaa.class);
+        final ComponentId id = ComponentId.generate();
         final Provider<Aaa> provider = Aaa::new;
-        final Aaa component1 = scope.getComponent(key, provider, DestroyMethod.noop());
-        final Aaa component2 = scope.getComponent(key, provider, DestroyMethod.noop());
+        final Aaa component1 = scope.getComponent(id, provider, DestroyMethod.noop());
+        final Aaa component2 = scope.getComponent(id, provider, DestroyMethod.noop());
         assertTrue(component1 == component2);
     }
 
     @Test
     public void getComponentMultiThread() throws Exception {
-        final ComponentKey<Bbb> key = ComponentKey.fromClass(Bbb.class);
+        final ComponentId id = ComponentId.generate();
         final Provider<Bbb> provider = Bbb::new;
         final Bbb[] components = new Bbb[2];
         final Thread t1 = new Thread(() -> {
-            components[0] = scope.getComponent(key, provider, DestroyMethod.noop());
+            components[0] = scope.getComponent(id, provider, DestroyMethod.noop());
         });
         final Thread t2 = new Thread(() -> {
-            components[1] = scope.getComponent(key, provider, DestroyMethod.noop());
+            components[1] = scope.getComponent(id, provider, DestroyMethod.noop());
         });
         t1.start();
         t2.start();

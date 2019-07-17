@@ -24,7 +24,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
 
     public AnnotationContainerBuilder(final AnnotationScopeDecider scopeDecider) {
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
-        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory, scopeDecider);
+        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory,
+                scopeDecider);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {

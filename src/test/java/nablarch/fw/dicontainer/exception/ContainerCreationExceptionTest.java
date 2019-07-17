@@ -182,7 +182,8 @@ public class ContainerCreationExceptionTest {
             builder.build();
             fail();
         } catch (final ContainerCreationException e) {
-            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+            assertContainerException(e, CycleInjectionException.class,
+                    CycleInjectionException.class);
         }
     }
 
@@ -195,7 +196,8 @@ public class ContainerCreationExceptionTest {
             builder.build();
             fail();
         } catch (final ContainerCreationException e) {
-            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+            assertContainerException(e, CycleInjectionException.class,
+                    CycleInjectionException.class);
         }
     }
 
@@ -208,7 +210,8 @@ public class ContainerCreationExceptionTest {
             builder.build();
             fail();
         } catch (final ContainerCreationException e) {
-            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+            assertContainerException(e, CycleInjectionException.class,
+                    CycleInjectionException.class);
         }
     }
 
@@ -255,7 +258,8 @@ public class ContainerCreationExceptionTest {
             builder.build();
             fail();
         } catch (final ContainerCreationException e) {
-            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class, CycleInjectionException.class);
+            assertContainerException(e, CycleInjectionException.class,
+                    CycleInjectionException.class, CycleInjectionException.class);
         }
     }
 

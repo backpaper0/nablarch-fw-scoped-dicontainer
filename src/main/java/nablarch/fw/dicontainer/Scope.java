@@ -6,7 +6,7 @@ import nablarch.fw.dicontainer.config.DestroyMethod;
 
 public interface Scope {
 
-    <T> T getComponent(ComponentKey<T> key, Provider<T> provider, DestroyMethod destroyMethod);
+    <T> T getComponent(ComponentId id, Provider<T> provider, DestroyMethod destroyMethod);
 
     int dimensions();
 }

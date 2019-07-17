@@ -15,6 +15,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.Factory;
@@ -80,9 +81,12 @@ public final class AnnotationMemberFactory {
         return injectableConstructor;
     }
 
-    public InjectableMember createFactoryMethod(final Class<?> componentType, final Method factoryMethod, final ErrorCollector errorCollector) {
-        final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory.fromMethodParameters(factoryMethod);
-        final InjectableMember injectableFactoryMethod = new InjectableFactoryMethod(componentType, factoryMethod, resolvers);
+    public InjectableMember createFactoryMethod(final ComponentId id, final Method factoryMethod,
+            final ErrorCollector errorCollector) {
+        final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory
+                .fromMethodParameters(factoryMethod);
+        final InjectableMember injectableFactoryMethod = new InjectableFactoryMethod(id,
+                factoryMethod, resolvers);
         return injectableFactoryMethod;
     }
 
@@ -227,7 +231,8 @@ public final class AnnotationMemberFactory {
         return methods.iterator().next();
     }
 
-    public DestroyMethod createFactoryDestroyMethod(final Method factoryMethod, final ErrorCollector errorCollector) {
+    public DestroyMethod createFactoryDestroyMethod(final Method factoryMethod,
+            final ErrorCollector errorCollector) {
         final Factory factory = factoryMethod.getAnnotation(Factory.class);
         if (factory.destroy().isEmpty()) {
             return DestroyMethod.noop();
@@ -255,7 +260,8 @@ public final class AnnotationMemberFactory {
         return methods.iterator().next();
     }
 
-    public Set<FactoryMethod> createFactoryMethods(final Class<?> componentType,
+    public Set<FactoryMethod> createFactoryMethods(final ComponentId id,
+            final Class<?> componentType,
             final AnnotationComponentDefinitionFactory componentDefinitionFactory,
             final ErrorCollector errorCollector) {
         final MethodCollector methodCollector = new MethodCollector();
@@ -268,7 +274,8 @@ public final class AnnotationMemberFactory {
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Factory.class)) {
                 final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
-                final ComponentDefinition<?> definition = componentDefinitionFactory.fromMethod(componentType, method, errorCollector);
+                final ComponentDefinition<?> definition = componentDefinitionFactory
+                        .fromMethod(id, method, errorCollector);
                 methods.add(new FactoryMethodImpl(key, definition));
             }
         }

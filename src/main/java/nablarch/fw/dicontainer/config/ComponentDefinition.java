@@ -6,13 +6,14 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentKey;
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.ContainerBuilder.CycleDependencyValidationContext;
 
 public final class ComponentDefinition<T> {
 
+    private final ComponentId id;
     private final InjectableMember injectableConstructor;
     private final Set<InjectableMember> injectableMembers;
     private final Set<ObservesMethod> observesMethods;
@@ -21,13 +22,15 @@ public final class ComponentDefinition<T> {
     private final Set<FactoryMethod> factoryMethods;
     private final Scope scope;
 
-    private ComponentDefinition(final InjectableMember injectableConstructor,
+    private ComponentDefinition(final ComponentId id,
+            final InjectableMember injectableConstructor,
             final Set<InjectableMember> injectableMembers,
             final Set<ObservesMethod> observesMethods,
             final InitMethod initMethod,
             final DestroyMethod destroyMethod,
             final Set<FactoryMethod> factoryMethods,
             final Scope scope) {
+        this.id = Objects.requireNonNull(id);
         this.injectableConstructor = Objects.requireNonNull(injectableConstructor);
         this.injectableMembers = Objects.requireNonNull(injectableMembers);
         this.observesMethods = Objects.requireNonNull(observesMethods);
@@ -35,6 +38,10 @@ public final class ComponentDefinition<T> {
         this.destroyMethod = Objects.requireNonNull(destroyMethod);
         this.factoryMethods = Objects.requireNonNull(factoryMethods);
         this.scope = Objects.requireNonNull(scope);
+    }
+
+    public ComponentId getId() {
+        return id;
     }
 
     public void validate(final ContainerBuilder<?> containerBuilder) {
@@ -61,7 +68,7 @@ public final class ComponentDefinition<T> {
         }
     }
 
-    public T getComponent(final Container container, final ComponentKey<T> key) {
+    public T getComponent(final Container container) {
         final Provider<T> provider = new Provider<T>() {
             @Override
             public T get() {
@@ -73,13 +80,13 @@ public final class ComponentDefinition<T> {
                 return (T) component;
             }
         };
-        return scope.getComponent(key, provider, destroyMethod);
+        return scope.getComponent(id, provider, destroyMethod);
     }
 
-    public void fire(final Container container, final ComponentKey<T> key, final Object event) {
+    public void fire(final Container container, final Object event) {
         for (final ObservesMethod observesMethod : observesMethods) {
             if (observesMethod.isTarget(event)) {
-                final T component = getComponent(container, key);
+                final T component = getComponent(container);
                 observesMethod.invoke(component, event);
             }
         }
@@ -91,6 +98,7 @@ public final class ComponentDefinition<T> {
 
     public static final class Builder<T> {
 
+        private ComponentId id = ComponentId.generate();
         private InjectableMember injectableConstructor;
         private Set<InjectableMember> injectableMembers = Collections.emptySet();
         private Set<ObservesMethod> observesMethods = Collections.emptySet();
@@ -100,6 +108,11 @@ public final class ComponentDefinition<T> {
         private Scope scope;
 
         private Builder() {
+        }
+
+        public Builder<T> id(final ComponentId id) {
+            this.id = id;
+            return this;
         }
 
         public Builder<T> injectableConstructor(
@@ -139,7 +152,7 @@ public final class ComponentDefinition<T> {
         }
 
         public ComponentDefinition<T> build() {
-            return new ComponentDefinition<>(injectableConstructor, injectableMembers,
+            return new ComponentDefinition<>(id, injectableConstructor, injectableMembers,
                     observesMethods, initMethod, destroyMethod, factoryMethods, scope);
         }
     }

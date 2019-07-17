@@ -10,11 +10,11 @@ public interface SerializedDestroyMethod extends Serializable {
 
     DestroyMethod deserialize();
 
-    public static SerializedDestroyMethod noop() {
+    static SerializedDestroyMethod noop() {
         return () -> DestroyMethod.noop();
     }
 
-    public static SerializedDestroyMethod fromMethod(final Method method) {
+    static SerializedDestroyMethod fromMethod(final Method method) {
         return new SerializedDestroyMethodImpl(method.getDeclaringClass(), method.getName());
     }
 

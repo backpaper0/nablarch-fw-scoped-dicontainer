@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
 
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.ComponentDefinition;
 import nablarch.fw.dicontainer.config.ComponentDefinition.Builder;
@@ -19,13 +20,15 @@ public final class AnnotationComponentDefinitionFactory {
     private final AnnotationMemberFactory memberFactory;
     private final AnnotationScopeDecider scopeDecider;
 
-    public AnnotationComponentDefinitionFactory(final AnnotationMemberFactory memberFactory, final AnnotationScopeDecider scopeDecider) {
+    public AnnotationComponentDefinitionFactory(final AnnotationMemberFactory memberFactory,
+            final AnnotationScopeDecider scopeDecider) {
         this.memberFactory = Objects.requireNonNull(memberFactory);
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
     }
 
     public <T> ComponentDefinition<T> fromClass(final Class<T> componentType,
             final ErrorCollector errorCollector) {
+        final ComponentId id = ComponentId.generate();
         final InjectableMember injectableConstructor = memberFactory
                 .createConstructor(componentType, errorCollector);
         final Set<InjectableMember> injectableMembers = memberFactory
@@ -33,11 +36,14 @@ public final class AnnotationComponentDefinitionFactory {
         final Set<ObservesMethod> observesMethods = memberFactory
                 .createObservesMethod(componentType, errorCollector);
         final InitMethod initMethod = memberFactory.createInitMethod(componentType, errorCollector);
-        final DestroyMethod destroyMethod = memberFactory.createDestroyMethod(componentType, errorCollector);
-        final Set<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(componentType, this, errorCollector);
+        final DestroyMethod destroyMethod = memberFactory.createDestroyMethod(componentType,
+                errorCollector);
+        final Set<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(id,
+                componentType, this, errorCollector);
         final Scope scope = scopeDecider.fromClass(componentType);
         final Builder<T> builder = ComponentDefinition.builder();
         return builder
+                .id(id)
                 .injectableConstructor(injectableConstructor)
                 .injectableMembers(injectableMembers)
                 .observesMethods(observesMethods)
@@ -48,9 +54,12 @@ public final class AnnotationComponentDefinitionFactory {
                 .build();
     }
 
-    public ComponentDefinition<?> fromMethod(final Class<?> componentType, final Method method, final ErrorCollector errorCollector) {
-        final InjectableMember injectableConstructor = memberFactory.createFactoryMethod(componentType, method, errorCollector);
-        final DestroyMethod destroyMethod = memberFactory.createFactoryDestroyMethod(method, errorCollector);
+    public ComponentDefinition<?> fromMethod(final ComponentId id, final Method method,
+            final ErrorCollector errorCollector) {
+        final InjectableMember injectableConstructor = memberFactory.createFactoryMethod(id, method,
+                errorCollector);
+        final DestroyMethod destroyMethod = memberFactory.createFactoryDestroyMethod(method,
+                errorCollector);
         final Scope scope = scopeDecider.fromMethod(method);
         return ComponentDefinition.builder()
                 .injectableConstructor(injectableConstructor)

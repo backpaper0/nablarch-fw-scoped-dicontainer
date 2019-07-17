@@ -13,7 +13,8 @@ public interface FactoryMethod {
         private final ComponentKey<?> key;
         private final ComponentDefinition<?> definition;
 
-        public FactoryMethodImpl(final ComponentKey<?> key, final ComponentDefinition<?> definition) {
+        public FactoryMethodImpl(final ComponentKey<?> key,
+                final ComponentDefinition<?> definition) {
             this.key = Objects.requireNonNull(key);
             this.definition = Objects.requireNonNull(definition);
         }

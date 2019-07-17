@@ -23,7 +23,8 @@ public class AnnotationAutoContainerFactoryTest {
         final Iterable<TraversalMark> traversalMarks = Collections.singleton(new TraversalMark() {
             @Override
             public Set<String> includes() {
-                return Collections.singleton("^nablarch\\.fw\\.dicontainer\\.annotation\\.auto\\.demo\\..*$$");
+                return Collections.singleton(
+                        "^nablarch\\.fw\\.dicontainer\\.annotation\\.auto\\.demo\\..*$$");
             }
         });
         final Container container = factory.create(traversalMarks);

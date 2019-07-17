@@ -33,6 +33,11 @@ public final class TinyContainer implements Container {
     }
 
     @Override
+    public <T> T getComponent(final ComponentId id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public <T> T getComponent(final ComponentKey<T> key) {
         return (T) components.get(key);
     }

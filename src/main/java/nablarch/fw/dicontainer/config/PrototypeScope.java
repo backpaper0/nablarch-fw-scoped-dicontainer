@@ -2,13 +2,13 @@ package nablarch.fw.dicontainer.config;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentKey;
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Scope;
 
 public final class PrototypeScope implements Scope {
 
     @Override
-    public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
+    public <T> T getComponent(final ComponentId id, final Provider<T> provider,
             final DestroyMethod destroyMethod) {
         return provider.get();
     }

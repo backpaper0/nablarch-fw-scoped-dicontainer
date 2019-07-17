@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentKey;
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.DestroyMethod;
 
@@ -17,14 +17,14 @@ public final class SessionScope implements Scope {
     }
 
     @Override
-    public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
+    public <T> T getComponent(final ComponentId id, final Provider<T> provider,
             final DestroyMethod destroyMethod) {
         final SessionContext context = supplier.getSessionContext();
         if (context == null) {
             //TODO error
             throw new RuntimeException();
         }
-        return context.getSessionComponent(key, provider, destroyMethod);
+        return context.getSessionComponent(id, provider, destroyMethod);
     }
 
     @Override

@@ -34,8 +34,10 @@ public final class InjectionComponentResolver {
         return container.getComponent(key);
     }
 
-    public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
-        final Set<ComponentDefinition<?>> definitions = containerBuilder.findComponentDefinitions(key);
+    public void validate(final ContainerBuilder<?> containerBuilder,
+            final ComponentDefinition<?> self) {
+        final Set<ComponentDefinition<?>> definitions = containerBuilder
+                .findComponentDefinitions(key);
         if (definitions.isEmpty()) {
             containerBuilder.addError(new InjectionComponentNotFoundException());
         } else if (definitions.size() > 1) {

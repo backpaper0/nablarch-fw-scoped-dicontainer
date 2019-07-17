@@ -36,11 +36,14 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
             return Collections.singleton(definition);
         }
         final Set<ComponentKey<?>> alterKeys = aliasesMap.find(key.asAliasKey());
-        return alterKeys.stream().map(definitions::find).filter(Objects::nonNull).collect(Collectors.toSet());
+        return alterKeys.stream().map(definitions::find).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
-    public void validateCycleDependency(final ComponentKey<?> key, final ComponentDefinition<?> target) {
-        final CycleDependencyValidationContext context = CycleDependencyValidationContext.newContext(this, target);
+    public void validateCycleDependency(final ComponentKey<?> key,
+            final ComponentDefinition<?> target) {
+        final CycleDependencyValidationContext context = CycleDependencyValidationContext
+                .newContext(this, target);
         context.validateCycleDependency(key);
     }
 
@@ -64,19 +67,23 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         private final ComponentDefinition<?> target;
         private final List<ComponentDefinition<?>> dependencies;
 
-        public CycleDependencyValidationContext(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> target,
+        public CycleDependencyValidationContext(final ContainerBuilder<?> containerBuilder,
+                final ComponentDefinition<?> target,
                 final List<ComponentDefinition<?>> dependencies) {
             this.containerBuilder = Objects.requireNonNull(containerBuilder);
             this.target = Objects.requireNonNull(target);
             this.dependencies = Objects.requireNonNull(dependencies);
         }
 
-        static CycleDependencyValidationContext newContext(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> target) {
-            return new CycleDependencyValidationContext(containerBuilder, target, new ArrayList<>());
+        static CycleDependencyValidationContext newContext(
+                final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> target) {
+            return new CycleDependencyValidationContext(containerBuilder, target,
+                    new ArrayList<>());
         }
 
         public CycleDependencyValidationContext createSubContext() {
-            return new CycleDependencyValidationContext(containerBuilder, target, new ArrayList<>(dependencies));
+            return new CycleDependencyValidationContext(containerBuilder, target,
+                    new ArrayList<>(dependencies));
         }
 
         public void validateCycleDependency(final ComponentKey<?> key) {

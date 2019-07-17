@@ -19,7 +19,8 @@ public interface InjectableMember {
             }
 
             @Override
-            public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+            public void validate(final ContainerBuilder<?> containerBuilder,
+                    final ComponentDefinition<?> self) {
             }
 
             @Override
@@ -36,7 +37,8 @@ public interface InjectableMember {
             }
 
             @Override
-            public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+            public void validate(final ContainerBuilder<?> containerBuilder,
+                    final ComponentDefinition<?> self) {
             }
 
             @Override

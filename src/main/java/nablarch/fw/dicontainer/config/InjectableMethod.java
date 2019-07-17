@@ -33,7 +33,8 @@ public final class InjectableMethod implements InjectableMember {
     }
 
     @Override
-    public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+    public void validate(final ContainerBuilder<?> containerBuilder,
+            final ComponentDefinition<?> self) {
         for (final InjectionComponentResolver resolver : resolvers) {
             resolver.validate(containerBuilder, self);
         }

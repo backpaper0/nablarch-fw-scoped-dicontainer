@@ -31,7 +31,8 @@ public final class InjectableField implements InjectableMember {
     }
 
     @Override
-    public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+    public void validate(final ContainerBuilder<?> containerBuilder,
+            final ComponentDefinition<?> self) {
         resolver.validate(containerBuilder, self);
     }
 

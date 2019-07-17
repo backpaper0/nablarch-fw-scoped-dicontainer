@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentKey;
+import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.DestroyMethod;
 
@@ -17,14 +17,14 @@ public final class RequestScope implements Scope {
     }
 
     @Override
-    public <T> T getComponent(final ComponentKey<T> key, final Provider<T> provider,
+    public <T> T getComponent(final ComponentId id, final Provider<T> provider,
             final DestroyMethod destroyMethod) {
         final RequestContext context = supplier.getRequestContext();
         if (context == null) {
             //TODO error
             throw new RuntimeException();
         }
-        return context.getRequestComponent(key, provider, destroyMethod);
+        return context.getRequestComponent(id, provider, destroyMethod);
     }
 
     @Override

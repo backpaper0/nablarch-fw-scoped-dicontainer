@@ -22,4 +22,9 @@ public final class RequestScope implements Scope {
         }
         return context.getRequestComponent(key, provider, destroyMethod);
     }
+
+    @Override
+    public int dimensions() {
+        return 100;
+    }
 }

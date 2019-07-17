@@ -9,4 +9,9 @@ public final class PassthroughScope implements Scope {
             final DestroyMethod destroyMethod) {
         return provider.get();
     }
+
+    @Override
+    public int dimensions() {
+        return Integer.MAX_VALUE;
+    }
 }

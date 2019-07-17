@@ -33,6 +33,11 @@ public final class SingletonScope implements Scope {
         }
     }
 
+    @Override
+    public int dimensions() {
+        return Integer.MAX_VALUE;
+    }
+
     private static class InstanceHolder {
 
         Object instance;

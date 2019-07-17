@@ -3,6 +3,8 @@ package nablarch.fw.dicontainer;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.ContainerBuilder.CycleDependencyValidationContext;
+
 public final class InjectableField implements InjectableMember {
 
     private final Field field;
@@ -25,5 +27,15 @@ public final class InjectableField implements InjectableMember {
             throw new RuntimeException(e);
         }
         return null;
+    }
+
+    @Override
+    public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+        resolver.validate(containerBuilder, self);
+    }
+
+    @Override
+    public void validateCycleDependency(final CycleDependencyValidationContext context) {
+        resolver.validateCycleDependency(context);
     }
 }

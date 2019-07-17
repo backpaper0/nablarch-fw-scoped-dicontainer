@@ -9,4 +9,9 @@ public final class PrototypeScope implements Scope {
             final DestroyMethod destroyMethod) {
         return provider.get();
     }
+
+    @Override
+    public int dimensions() {
+        return Integer.MIN_VALUE;
+    }
 }

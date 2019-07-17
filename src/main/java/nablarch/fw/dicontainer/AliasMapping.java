@@ -1,5 +1,6 @@
 package nablarch.fw.dicontainer;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -17,16 +18,11 @@ public final class AliasMapping {
         keys.add(key);
     }
 
-    public <T> ComponentKey<T> find(final ComponentKey.AliasKey aliasKey) {
+    public Set<ComponentKey<?>> find(final ComponentKey.AliasKey aliasKey) {
         final Set<ComponentKey<?>> keys = aliasesMap.get(aliasKey);
         if (keys == null) {
-            return null;
+            return Collections.emptySet();
         }
-        if (keys.size() > 1) {
-            //TODO error
-            throw new RuntimeException();
-        }
-        final ComponentKey<T> key = (ComponentKey<T>) keys.iterator().next();
-        return key;
+        return keys;
     }
 }

@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.ContainerBuilder.CycleDependencyValidationContext;
+
 public final class InjectableMethod implements InjectableMember {
 
     private final Method method;
@@ -26,6 +28,20 @@ public final class InjectableMethod implements InjectableMember {
             return method.invoke(component, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void validate(final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> self) {
+        for (final InjectionComponentResolver resolver : resolvers) {
+            resolver.validate(containerBuilder, self);
+        }
+    }
+
+    @Override
+    public void validateCycleDependency(final CycleDependencyValidationContext context) {
+        for (final InjectionComponentResolver resolver : resolvers) {
+            resolver.validateCycleDependency(context);
         }
     }
 }

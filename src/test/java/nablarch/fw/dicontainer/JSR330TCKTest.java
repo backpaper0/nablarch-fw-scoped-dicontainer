@@ -15,6 +15,7 @@ import org.atinject.tck.auto.accessories.Cupholder;
 import org.atinject.tck.auto.accessories.SpareTire;
 
 import junit.framework.Test;
+import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public class JSR330TCKTest {
 
@@ -25,6 +26,7 @@ public class JSR330TCKTest {
 
     public static Test suite() throws Exception {
         final Container container = new AnnotationContainerBuilder()
+                .ignoreError(StaticInjectionException.class)
                 //org.atinject.tck.auto.Car is implemented by Convertible.
                 .register(Convertible.class)
                 //@Drivers Seat is implemented by DriversSeat.

@@ -3,6 +3,7 @@ package nablarch.fw.dicontainer;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,6 +12,18 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.junit.Test;
+
+import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
+import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
+import nablarch.fw.dicontainer.exception.ContainerCreationException;
+import nablarch.fw.dicontainer.exception.ContainerException;
+import nablarch.fw.dicontainer.exception.CycleInjectionException;
+import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
+import nablarch.fw.dicontainer.exception.InjectableConstructorNotFoundException;
+import nablarch.fw.dicontainer.exception.InjectionComponentDuplicatedException;
+import nablarch.fw.dicontainer.exception.InjectionComponentNotFoundException;
+import nablarch.fw.dicontainer.exception.InvalidInjectionScopeException;
+import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public class ContainerTest {
 
@@ -333,6 +346,327 @@ public class ContainerTest {
         assertTrue(component.called);
     }
 
+    @Test
+    public void componentNotFound() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .build();
+
+        try {
+            container.getComponent(Aaa.class);
+            fail();
+        } catch (final ComponentNotFoundException e) {
+        }
+    }
+
+    @Test
+    public void fieldInjectionComponentNotFound() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ddd1.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentNotFoundException.class);
+        }
+    }
+
+    @Test
+    public void methodInjectionComponentNotFound() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ddd2.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentNotFoundException.class);
+        }
+    }
+
+    @Test
+    public void constructorInjectionComponentNotFound() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ddd3.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentNotFoundException.class);
+        }
+    }
+
+    @Test
+    public void injectableConstructorNotFound() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Mmm1.class)
+                .register(Aaa.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectableConstructorNotFoundException.class);
+        }
+    }
+
+    @Test
+    public void injectableConstructorDuplicatedException() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Mmm2.class)
+                .register(Aaa.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectableConstructorDuplicatedException.class);
+        }
+    }
+
+    @Test
+    public void fieldStaticInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Nnn1.class)
+                .register(Aaa.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, StaticInjectionException.class);
+        }
+    }
+
+    @Test
+    public void methodStaticInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Nnn2.class)
+                .register(Aaa.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, StaticInjectionException.class);
+        }
+    }
+
+    @Test
+    public void fieldInvalidInjectionScope() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo2.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidInjectionScopeException.class);
+        }
+    }
+
+    @Test
+    public void methodInvalidInjectionScope() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo3.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidInjectionScopeException.class);
+        }
+    }
+
+    @Test
+    public void constructorInvalidInjectionScope() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo4.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidInjectionScopeException.class);
+        }
+    }
+
+    @Test
+    public void fieldValidInjectionScopeViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo5.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ooo5.class));
+    }
+
+    @Test
+    public void methodValidInjectionScopeViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo6.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ooo6.class));
+    }
+
+    @Test
+    public void constructorValidInjectionScopeViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ooo1.class)
+                .register(Ooo7.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ooo7.class));
+    }
+
+    @Test
+    public void fieldCycleInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ppp1.class)
+                .register(Ppp2.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+        }
+    }
+
+    @Test
+    public void methodCycleInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ppp3.class)
+                .register(Ppp4.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+        }
+    }
+
+    @Test
+    public void constructorCycleInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ppp5.class)
+                .register(Ppp6.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class);
+        }
+    }
+
+    @Test
+    public void fieldCycleInjectionViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ppp7.class)
+                .register(Ppp8.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ppp7.class));
+        assertNotNull(container.getComponent(Ppp8.class));
+    }
+
+    @Test
+    public void methodCycleInjectionViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ppp9.class)
+                .register(Ppp10.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ppp9.class));
+        assertNotNull(container.getComponent(Ppp10.class));
+    }
+
+    @Test
+    public void constructorCycleInjectionViaProvider() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Ppp11.class)
+                .register(Ppp12.class)
+                .build();
+
+        assertNotNull(container.getComponent(Ppp11.class));
+        assertNotNull(container.getComponent(Ppp12.class));
+    }
+
+    @Test
+    public void manyCycleInjection() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Ppp13.class)
+                .register(Ppp14.class)
+                .register(Ppp15.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, CycleInjectionException.class, CycleInjectionException.class, CycleInjectionException.class);
+        }
+    }
+
+    @Test
+    public void fieldInjectionComponentDuplicated() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Qqq2.class)
+                .register(Qqq3.class)
+                .register(Qqq4.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentDuplicatedException.class);
+        }
+    }
+
+    @Test
+    public void methodInjectionComponentDuplicated() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Qqq2.class)
+                .register(Qqq3.class)
+                .register(Qqq5.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentDuplicatedException.class);
+        }
+    }
+
+    @Test
+    public void constructorInjectionComponentDuplicated() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Qqq2.class)
+                .register(Qqq3.class)
+                .register(Qqq6.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InjectionComponentDuplicatedException.class);
+        }
+    }
+
+    @Test
+    public void componentDuplicated() throws Exception {
+        final Container container = new AnnotationContainerBuilder()
+                .register(Qqq2.class)
+                .register(Qqq3.class)
+                .build();
+        try {
+            container.getComponent(Qqq1.class);
+            fail();
+        } catch (final ComponentDuplicatedException e) {
+        }
+    }
+
+    @SafeVarargs
+    private static void assertContainerException(final ContainerCreationException e,
+            final Class<? extends ContainerException>... expecteds) {
+        final Iterator<ContainerException> it = e.getExceptions().iterator();
+        for (final Class<? extends ContainerException> expected : expecteds) {
+            assertTrue(it.hasNext());
+            assertEquals(expected, it.next().getClass());
+        }
+        assertFalse(it.hasNext());
+    }
+
     @Singleton
     static class Aaa {
     }
@@ -352,10 +686,12 @@ public class ContainerTest {
     interface Ccc1 {
     }
 
+    @Singleton
     @Named("foo")
     static class Ccc2 implements Ccc1 {
     }
 
+    @Singleton
     @Named("bar")
     static class Ccc3 implements Ccc1 {
     }
@@ -611,6 +947,185 @@ public class ContainerTest {
         @Init
         void method() {
             called = true;
+        }
+    }
+
+    static class Mmm1 {
+        Mmm1(final Object obj) {
+        }
+    }
+
+    static class Mmm2 {
+        @Inject
+        Mmm2(final Aaa arg1) {
+        }
+
+        @Inject
+        Mmm2(final Aaa arg1, final Aaa arg2) {
+        }
+    }
+
+    static class Nnn1 {
+        @Inject
+        static Aaa field;
+    }
+
+    static class Nnn2 {
+        @Inject
+        static void method(final Aaa aaa) {
+        }
+    }
+
+    @Prototype
+    static class Ooo1 {
+    }
+
+    @Singleton
+    static class Ooo2 {
+        @Inject
+        Ooo1 field;
+    }
+
+    @Singleton
+    static class Ooo3 {
+        @Inject
+        void method(final Ooo1 arg) {
+        }
+    }
+
+    @Singleton
+    static class Ooo4 {
+        @Inject
+        Ooo4(final Ooo1 arg) {
+        }
+    }
+
+    @Singleton
+    static class Ooo5 {
+        @Inject
+        Provider<Ooo1> field;
+    }
+
+    @Singleton
+    static class Ooo6 {
+        @Inject
+        void method(final Provider<Ooo1> arg) {
+        }
+    }
+
+    @Singleton
+    static class Ooo7 {
+        @Inject
+        Ooo7(final Provider<Ooo1> arg) {
+        }
+    }
+
+    static class Ppp1 {
+        @Inject
+        Ppp2 field;
+    }
+
+    static class Ppp2 {
+        @Inject
+        Ppp1 field;
+    }
+
+    static class Ppp3 {
+        @Inject
+        void method(final Ppp4 arg) {
+        }
+    }
+
+    static class Ppp4 {
+        @Inject
+        void method(final Ppp3 arg) {
+        }
+    }
+
+    static class Ppp5 {
+        @Inject
+        Ppp5(final Ppp6 arg) {
+        }
+    }
+
+    static class Ppp6 {
+        @Inject
+        Ppp6(final Ppp5 arg) {
+        }
+    }
+
+    static class Ppp7 {
+        @Inject
+        Provider<Ppp8> field;
+    }
+
+    static class Ppp8 {
+        @Inject
+        Provider<Ppp7> field;
+    }
+
+    static class Ppp9 {
+        @Inject
+        void method(final Provider<Ppp10> arg) {
+        }
+    }
+
+    static class Ppp10 {
+        @Inject
+        void method(final Provider<Ppp9> arg) {
+        }
+    }
+
+    static class Ppp11 {
+        @Inject
+        Ppp11(final Provider<Ppp12> arg) {
+        }
+    }
+
+    static class Ppp12 {
+        @Inject
+        Ppp12(final Provider<Ppp11> arg) {
+        }
+    }
+
+    static class Ppp13 {
+        @Inject
+        Ppp14 field;
+    }
+
+    static class Ppp14 {
+        @Inject
+        Ppp15 field;
+    }
+
+    static class Ppp15 {
+        @Inject
+        Ppp13 field;
+    }
+
+    static class Qqq1 {
+    }
+
+    static class Qqq2 extends Qqq1 {
+    }
+
+    static class Qqq3 extends Qqq2 {
+    }
+
+    static class Qqq4 {
+        @Inject
+        Qqq1 field;
+    }
+
+    static class Qqq5 {
+        @Inject
+        void method(final Qqq1 arg) {
+        }
+    }
+
+    static class Qqq6 {
+        @Inject
+        Qqq6(final Qqq1 arg) {
         }
     }
 }

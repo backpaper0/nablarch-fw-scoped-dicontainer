@@ -12,25 +12,27 @@ import org.junit.Test;
 
 public class InjectableConstructorTest {
 
+    private final AnnotationMemberFactory factory = new AnnotationMemberFactory();
+
     @Test
     public void fromClass() throws Exception {
-        final InjectableConstructor<Aaa> creator = InjectableConstructor.fromAnnotation(Aaa.class);
+        final InjectableMember creator = factory.createConstructor(Aaa.class, new ErrorCollector());
         final Container container = new TinyContainer();
-        final Aaa component = creator.inject(container, null);
+        final Aaa component = (Aaa) creator.inject(container, null);
         assertTrue(component.called);
     }
 
     @Test
     public void fromClassWithInjection() throws Exception {
-        final InjectableConstructor<Bbb> creator = InjectableConstructor.fromAnnotation(Bbb.class);
+        final InjectableMember creator = factory.createConstructor(Bbb.class, new ErrorCollector());
         final Container container = new TinyContainer(Aaa.class);
-        final Bbb component = creator.inject(container, null);
+        final Bbb component = (Bbb) creator.inject(container, null);
         assertTrue(component.called);
     }
 
     @Test
     public void fromClassWithQualifierParameter() throws Exception {
-        final InjectableConstructor<Ddd> creator = InjectableConstructor.fromAnnotation(Ddd.class);
+        final InjectableMember creator = factory.createConstructor(Ddd.class, new ErrorCollector());
         final UUID uuid1 = UUID.randomUUID();
         final UUID uuid2 = UUID.randomUUID();
         final Container container = new TinyContainer()
@@ -44,7 +46,7 @@ public class InjectableConstructorTest {
                                 Collections.singleton(
                                         Qualifier.fromAnnotation(new NamedImpl("second")))),
                         new Ccc(uuid2));
-        final Ddd component = creator.inject(container, null);
+        final Ddd component = (Ddd) creator.inject(container, null);
         assertEquals(uuid1, component.ccc1.value);
         assertEquals(uuid2, component.ccc2.value);
     }

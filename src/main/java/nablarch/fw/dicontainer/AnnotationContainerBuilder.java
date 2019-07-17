@@ -5,12 +5,12 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class AnnotationContainerBuilder {
+public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {
 
-    private final ComponentDefinitionRepository.Builder definitionsBuilder = ComponentDefinitionRepository
-            .builder();
-    private final AliasMapping aliasesMap = new AliasMapping();
     private final AnnotationScopeDecider decider;
+    //FIXME
+    final AnnotationMemberFactory memberFactory = new AnnotationMemberFactory();
+    private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
 
     public AnnotationContainerBuilder() {
         this(new AnnotationScopeDecider());
@@ -18,13 +18,14 @@ public final class AnnotationContainerBuilder {
 
     public AnnotationContainerBuilder(final AnnotationScopeDecider decider) {
         this.decider = Objects.requireNonNull(decider);
+        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
         final ComponentKey<T> key = ComponentKey.fromClass(componentType);
         final Scope scope = decider.decide(componentType);
-        final ComponentDefinition.Builder<T> definition = ComponentDefinition
-                .builderFromAnnotation(componentType).scope(scope);
+        final ComponentDefinition<T> definition = componentDefinitionFactory
+                .builder(componentType, errorCollector).scope(scope).build();
         return register(key, definition);
     }
 
@@ -34,21 +35,14 @@ public final class AnnotationContainerBuilder {
                 Arrays.stream(qualifiers).map(Qualifier::fromAnnotation)
                         .collect(Collectors.toSet()));
         final Scope scope = decider.decide(componentType);
-        final ComponentDefinition.Builder<T> definition = ComponentDefinition
-                .builderFromAnnotation(componentType).scope(scope);
+        final ComponentDefinition<T> definition = componentDefinitionFactory
+                .builder(componentType, errorCollector).scope(scope).build();
         return register(key, definition);
     }
 
-    public <T> AnnotationContainerBuilder register(final ComponentKey<T> key,
-            final ComponentDefinition.Builder<T> definition) {
-        key.aliasKeys().forEach(aliasKey -> aliasesMap.register(aliasKey, key));
-        definitionsBuilder.register(key, definition);
-        return this;
-    }
-
+    @Override
     public Container build() {
         decider.registerScopes(this);
-        final ComponentDefinitionRepository definitions = definitionsBuilder.build();
-        return new DefaultContainer(definitions, aliasesMap);
+        return super.build();
     }
 }

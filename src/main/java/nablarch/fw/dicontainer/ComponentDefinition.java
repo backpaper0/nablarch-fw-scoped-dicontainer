@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
+import nablarch.fw.dicontainer.ContainerBuilder.CycleDependencyValidationContext;
+
 public final class ComponentDefinition<T> {
 
     private final InjectableMember injectableConstructor;
@@ -15,7 +17,7 @@ public final class ComponentDefinition<T> {
     private final DestroyMethod destroyMethod;
     private final Scope scope;
 
-    public ComponentDefinition(final InjectableMember injectableConstructor,
+    private ComponentDefinition(final InjectableMember injectableConstructor,
             final Set<InjectableMember> injectableMembers,
             final Set<ObservesMethod> observesMethods,
             final InitMethod initMethod,
@@ -29,22 +31,22 @@ public final class ComponentDefinition<T> {
         this.scope = Objects.requireNonNull(scope);
     }
 
-    public static <T> Builder<T> builderFromAnnotation(final Class<T> componentType) {
-        final InjectableConstructor<T> injectableConstructor = InjectableConstructor
-                .fromAnnotation(componentType);
-        final Set<InjectableMember> injectableMembers = InjectableMember
-                .fromAnnotation(componentType);
-        final Set<ObservesMethod> observesMethods = ObservesMethod
-                .fromAnnotation(componentType);
-        final InitMethod initMethod = InitMethod.fromAnnotation(componentType);
-        final DestroyMethod destroyMethod = DestroyMethod.fromAnnotation(componentType);
-        final Builder<T> builder = builder();
-        return builder
-                .injectableConstructor(injectableConstructor)
-                .injectableMembers(injectableMembers)
-                .observesMethods(observesMethods)
-                .initMethod(initMethod)
-                .destroyMethod(destroyMethod);
+    public void validate(final ContainerBuilder<?> containerBuilder) {
+        injectableConstructor.validate(containerBuilder, this);
+        for (final InjectableMember injectableMember : injectableMembers) {
+            injectableMember.validate(containerBuilder, this);
+        }
+    }
+
+    public boolean isNarrowScope(final ComponentDefinition<?> injected) {
+        return scope.dimensions() <= injected.scope.dimensions();
+    }
+
+    public void validateCycleDependency(final CycleDependencyValidationContext context) {
+        injectableConstructor.validateCycleDependency(context.createSubContext());
+        for (final InjectableMember injectableMember : injectableMembers) {
+            injectableMember.validateCycleDependency(context.createSubContext());
+        }
     }
 
     public T getComponent(final Container container, final ComponentKey<T> key) {
@@ -84,7 +86,11 @@ public final class ComponentDefinition<T> {
         private DestroyMethod destroyMethod = DestroyMethod.noop();
         private Scope scope;
 
-        public Builder<T> injectableConstructor(final InjectableMember injectableConstructor) {
+        private Builder() {
+        }
+
+        public Builder<T> injectableConstructor(
+                final InjectableMember injectableConstructor) {
             this.injectableConstructor = injectableConstructor;
             return this;
         }

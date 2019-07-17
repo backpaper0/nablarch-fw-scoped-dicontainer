@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
 public final class DefaultContainer implements Container {
@@ -25,10 +26,13 @@ public final class DefaultContainer implements Container {
         if (definition != null) {
             return definition.getComponent(this, key);
         }
-        final ComponentKey<T> alterKey = aliasMapping.find(key.asAliasKey());
-        if (alterKey == null) {
-            throw new ComponentNotFoundException();
+        final Set<ComponentKey<?>> alterKeys = aliasMapping.find(key.asAliasKey());
+        if (alterKeys.isEmpty()) {
+            throw new ComponentNotFoundException(key);
+        } else if (alterKeys.size() > 1) {
+            throw new ComponentDuplicatedException();
         }
+        final ComponentKey<T> alterKey = (ComponentKey<T>) alterKeys.iterator().next();
         definition = definitions.find(alterKey);
         return definition.getComponent(this, key);
     }

@@ -22,4 +22,9 @@ public final class SessionScope implements Scope {
         }
         return context.getSessionComponent(key, provider, destroyMethod);
     }
+
+    @Override
+    public int dimensions() {
+        return 200;
+    }
 }

@@ -61,14 +61,19 @@ public final class AnnotationScopeDecider {
             final T scope) {
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType, Collections.emptySet());
-        final InjectableMember injectableConstructor = (container, component) -> scope;
-        final Set<ObservesMethod> observesMethods = ObservesMethod.fromAnnotation(componentType);
-        final DestroyMethod destroyMethod = DestroyMethod.fromAnnotation(componentType);
-        final ComponentDefinition.Builder<T> definitionBuilder = ComponentDefinition.<T> builder()
+        final InjectableMember injectableConstructor = InjectableMember.passthrough(scope);
+        //FIXME 引数errorCollector
+        final Set<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
+                componentType, new ErrorCollector());
+        //FIXME 引数errorCollector
+        final DestroyMethod destroyMethod = builder.memberFactory.createDestroyMethod(componentType,
+                new ErrorCollector());
+        final ComponentDefinition<T> definitionBuilder = ComponentDefinition.<T> builder()
                 .injectableConstructor(injectableConstructor)
                 .observesMethods(observesMethods)
                 .destroyMethod(destroyMethod)
-                .scope(passthroughScope);
+                .scope(passthroughScope)
+                .build();
         builder.register(key, definitionBuilder);
     }
 

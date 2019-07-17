@@ -26,6 +26,7 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
     public <U> T register(final ComponentKey<U> key, final ComponentDefinition<U> definition) {
         key.aliasKeys().forEach(aliasKey -> aliasesMap.register(aliasKey, key));
         definitions.register(key, definition);
+        definition.applyFactories(this);
         return self();
     }
 

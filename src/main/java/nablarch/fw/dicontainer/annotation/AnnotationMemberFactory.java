@@ -15,22 +15,28 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Destroy;
+import nablarch.fw.dicontainer.Factory;
 import nablarch.fw.dicontainer.Init;
 import nablarch.fw.dicontainer.Observes;
+import nablarch.fw.dicontainer.config.ComponentDefinition;
 import nablarch.fw.dicontainer.config.DestroyMethod;
+import nablarch.fw.dicontainer.config.DestroyMethod.DestroyMethodImpl;
 import nablarch.fw.dicontainer.config.ErrorCollector;
+import nablarch.fw.dicontainer.config.FactoryMethod;
+import nablarch.fw.dicontainer.config.FactoryMethod.FactoryMethodImpl;
 import nablarch.fw.dicontainer.config.FieldCollector;
 import nablarch.fw.dicontainer.config.InitMethod;
+import nablarch.fw.dicontainer.config.InitMethod.InitMethodImpl;
 import nablarch.fw.dicontainer.config.InjectableConstructor;
+import nablarch.fw.dicontainer.config.InjectableFactoryMethod;
 import nablarch.fw.dicontainer.config.InjectableField;
 import nablarch.fw.dicontainer.config.InjectableMember;
 import nablarch.fw.dicontainer.config.InjectableMethod;
 import nablarch.fw.dicontainer.config.InjectionComponentResolver;
 import nablarch.fw.dicontainer.config.MethodCollector;
 import nablarch.fw.dicontainer.config.ObservesMethod;
-import nablarch.fw.dicontainer.config.DestroyMethod.DestroyMethodImpl;
-import nablarch.fw.dicontainer.config.InitMethod.InitMethodImpl;
 import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorNotFoundException;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
@@ -72,6 +78,12 @@ public final class AnnotationMemberFactory {
         final InjectableConstructor injectableConstructor = new InjectableConstructor(
                 noArgConstructor, resolvers);
         return injectableConstructor;
+    }
+
+    public InjectableMember createFactoryMethod(final Class<?> componentType, final Method factoryMethod, final ErrorCollector errorCollector) {
+        final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory.fromMethodParameters(factoryMethod);
+        final InjectableMember injectableFactoryMethod = new InjectableFactoryMethod(componentType, factoryMethod, resolvers);
+        return injectableFactoryMethod;
     }
 
     public Set<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
@@ -213,5 +225,54 @@ public final class AnnotationMemberFactory {
             return DestroyMethod.noop();
         }
         return methods.iterator().next();
+    }
+
+    public DestroyMethod createFactoryDestroyMethod(final Method factoryMethod, final ErrorCollector errorCollector) {
+        final Factory factory = factoryMethod.getAnnotation(Factory.class);
+        if (factory.destroy().isEmpty()) {
+            return DestroyMethod.noop();
+        }
+        final Class<?> componentType = factoryMethod.getReturnType();
+        final MethodCollector methodCollector = new MethodCollector();
+        for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (final Method method : clazz.getDeclaredMethods()) {
+                methodCollector.addInstanceMethodIfNotOverridden(method);
+            }
+        }
+        final Set<DestroyMethod> methods = new LinkedHashSet<>();
+        for (final Method method : methodCollector.getMethods()) {
+            if (method.getName().equals(factory.destroy())) {
+                methods.add(new DestroyMethodImpl(method));
+            }
+        }
+        if (methods.size() > 1) {
+            //TODO error
+            throw new RuntimeException();
+        } else if (methods.isEmpty()) {
+            //TODO error
+            throw new RuntimeException();
+        }
+        return methods.iterator().next();
+    }
+
+    public Set<FactoryMethod> createFactoryMethods(final Class<?> componentType,
+            final AnnotationComponentDefinitionFactory componentDefinitionFactory,
+            final ErrorCollector errorCollector) {
+        final MethodCollector methodCollector = new MethodCollector();
+        for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
+            for (final Method method : clazz.getDeclaredMethods()) {
+                methodCollector.addInstanceMethodIfNotOverridden(method);
+            }
+        }
+        final Set<FactoryMethod> methods = new LinkedHashSet<>();
+        for (final Method method : methodCollector.getMethods()) {
+            if (method.isAnnotationPresent(Factory.class)) {
+                final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
+                final ComponentDefinition<?> definition = componentDefinitionFactory.fromMethod(componentType, method, errorCollector);
+                methods.add(new FactoryMethodImpl(key, definition));
+            }
+        }
+
+        return methods;
     }
 }

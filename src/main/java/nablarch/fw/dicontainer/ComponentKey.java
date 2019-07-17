@@ -1,6 +1,7 @@
 package nablarch.fw.dicontainer;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Objects;
@@ -25,6 +26,16 @@ public final class ComponentKey<T> implements Serializable {
                 .collect(Collectors.toSet());
 
         return new ComponentKey<>(componentType, qualifiers);
+    }
+
+    public static ComponentKey<?> fromFactoryMethod(final Method factoryMethod) {
+
+        final Set<Qualifier> qualifiers = Arrays.stream(factoryMethod.getAnnotations())
+                .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Qualifier.class))
+                .map(Qualifier::fromAnnotation)
+                .collect(Collectors.toSet());
+
+        return new ComponentKey<>(factoryMethod.getReturnType(), qualifiers);
     }
 
     public Set<AliasKey> aliasKeys() {

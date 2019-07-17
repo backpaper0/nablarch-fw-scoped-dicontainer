@@ -18,6 +18,7 @@ public final class ComponentDefinition<T> {
     private final Set<ObservesMethod> observesMethods;
     private final InitMethod initMethod;
     private final DestroyMethod destroyMethod;
+    private final Set<FactoryMethod> factoryMethods;
     private final Scope scope;
 
     private ComponentDefinition(final InjectableMember injectableConstructor,
@@ -25,12 +26,14 @@ public final class ComponentDefinition<T> {
             final Set<ObservesMethod> observesMethods,
             final InitMethod initMethod,
             final DestroyMethod destroyMethod,
+            final Set<FactoryMethod> factoryMethods,
             final Scope scope) {
         this.injectableConstructor = Objects.requireNonNull(injectableConstructor);
         this.injectableMembers = Objects.requireNonNull(injectableMembers);
         this.observesMethods = Objects.requireNonNull(observesMethods);
         this.initMethod = Objects.requireNonNull(initMethod);
         this.destroyMethod = Objects.requireNonNull(destroyMethod);
+        this.factoryMethods = Objects.requireNonNull(factoryMethods);
         this.scope = Objects.requireNonNull(scope);
     }
 
@@ -49,6 +52,12 @@ public final class ComponentDefinition<T> {
         injectableConstructor.validateCycleDependency(context.createSubContext());
         for (final InjectableMember injectableMember : injectableMembers) {
             injectableMember.validateCycleDependency(context.createSubContext());
+        }
+    }
+
+    public void applyFactories(final ContainerBuilder<?> containerBuilder) {
+        for (final FactoryMethod factoryMethod : factoryMethods) {
+            factoryMethod.apply(containerBuilder);
         }
     }
 
@@ -87,6 +96,7 @@ public final class ComponentDefinition<T> {
         private Set<ObservesMethod> observesMethods = Collections.emptySet();
         private InitMethod initMethod = InitMethod.noop();
         private DestroyMethod destroyMethod = DestroyMethod.noop();
+        private Set<FactoryMethod> factoryMethods = Collections.emptySet();
         private Scope scope;
 
         private Builder() {
@@ -118,6 +128,11 @@ public final class ComponentDefinition<T> {
             return this;
         }
 
+        public Builder<T> factoryMethods(final Set<FactoryMethod> factoryMethods) {
+            this.factoryMethods = factoryMethods;
+            return this;
+        }
+
         public Builder<T> scope(final Scope scope) {
             this.scope = scope;
             return this;
@@ -125,7 +140,7 @@ public final class ComponentDefinition<T> {
 
         public ComponentDefinition<T> build() {
             return new ComponentDefinition<>(injectableConstructor, injectableMembers,
-                    observesMethods, initMethod, destroyMethod, scope);
+                    observesMethods, initMethod, destroyMethod, factoryMethods, scope);
         }
     }
 }

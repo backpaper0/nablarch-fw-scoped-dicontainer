@@ -8,13 +8,12 @@ import java.util.stream.Collectors;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.Qualifier;
-import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.ComponentDefinition;
 import nablarch.fw.dicontainer.config.ContainerBuilder;
 
 public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {
 
-    private final AnnotationScopeDecider decider;
+    private final AnnotationScopeDecider scopeDecider;
     //FIXME
     final AnnotationMemberFactory memberFactory = new AnnotationMemberFactory();
     private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
@@ -23,16 +22,15 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         this(new AnnotationScopeDecider());
     }
 
-    public AnnotationContainerBuilder(final AnnotationScopeDecider decider) {
-        this.decider = Objects.requireNonNull(decider);
-        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory);
+    public AnnotationContainerBuilder(final AnnotationScopeDecider scopeDecider) {
+        this.scopeDecider = Objects.requireNonNull(scopeDecider);
+        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory, scopeDecider);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
         final ComponentKey<T> key = ComponentKey.fromClass(componentType);
-        final Scope scope = decider.decide(componentType);
         final ComponentDefinition<T> definition = componentDefinitionFactory
-                .builder(componentType, errorCollector).scope(scope).build();
+                .fromClass(componentType, errorCollector);
         return register(key, definition);
     }
 
@@ -41,15 +39,14 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         final ComponentKey<T> key = new ComponentKey<>(componentType,
                 Arrays.stream(qualifiers).map(Qualifier::fromAnnotation)
                         .collect(Collectors.toSet()));
-        final Scope scope = decider.decide(componentType);
         final ComponentDefinition<T> definition = componentDefinitionFactory
-                .builder(componentType, errorCollector).scope(scope).build();
+                .fromClass(componentType, errorCollector);
         return register(key, definition);
     }
 
     @Override
     public Container build() {
-        decider.registerScopes(this);
+        scopeDecider.registerScopes(this);
         return super.build();
     }
 }

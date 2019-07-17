@@ -27,20 +27,38 @@ public class AnnotationScopeDeciderTest {
     }
 
     @Test
-    public void singleton() throws Exception {
-        final Scope scope = decider.decide(Aaa.class);
+    public void singletonFromClass() throws Exception {
+        final Scope scope = decider.fromClass(Aaa.class);
         assertEquals(SingletonScope.class, scope.getClass());
     }
 
     @Test
-    public void prototype() throws Exception {
-        final Scope scope = decider.decide(Bbb.class);
+    public void prototypeFromClass() throws Exception {
+        final Scope scope = decider.fromClass(Bbb.class);
         assertEquals(PrototypeScope.class, scope.getClass());
     }
 
     @Test
-    public void defaultScope() throws Exception {
-        final Scope scope = decider.decide(Ccc.class);
+    public void defaultScopeFromClass() throws Exception {
+        final Scope scope = decider.fromClass(Ccc.class);
+        assertSame(defaultScope, scope);
+    }
+
+    @Test
+    public void singletonFromMethod() throws Exception {
+        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("singleton"));
+        assertEquals(SingletonScope.class, scope.getClass());
+    }
+
+    @Test
+    public void prototypeFromMethod() throws Exception {
+        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("prototype"));
+        assertEquals(PrototypeScope.class, scope.getClass());
+    }
+
+    @Test
+    public void defaultScopeFromMethod() throws Exception {
+        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("defaultScope"));
         assertSame(defaultScope, scope);
     }
 
@@ -53,5 +71,21 @@ public class AnnotationScopeDeciderTest {
     }
 
     static class Ccc {
+    }
+
+    static class Ddd {
+        @Singleton
+        Object singleton() {
+            return null;
+        }
+
+        @Prototype
+        Object prototype() {
+            return null;
+        }
+
+        Object defaultScope() {
+            return null;
+        }
     }
 }

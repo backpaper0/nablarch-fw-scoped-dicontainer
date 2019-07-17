@@ -1,6 +1,7 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,8 +43,25 @@ public final class AnnotationScopeDecider {
         this(new PrototypeScope(), Collections.emptyMap());
     }
 
-    public Scope decide(final Class<?> componentType) {
+    public Scope fromClass(final Class<?> componentType) {
         final Annotation[] annotations = Arrays.stream(componentType.getAnnotations())
+                .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
+                .toArray(Annotation[]::new);
+        if (annotations.length == 0) {
+            return defaultScope;
+        } else if (annotations.length > 1) {
+            //TODO error
+        }
+        final Class<? extends Annotation> annotation = annotations[0].annotationType();
+        final Scope scope = scopes.get(annotation);
+        if (scope == null) {
+            //TODO error
+        }
+        return scope;
+    }
+
+    public Scope fromMethod(final Method method) {
+        final Annotation[] annotations = Arrays.stream(method.getAnnotations())
                 .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
                 .toArray(Annotation[]::new);
         if (annotations.length == 0) {

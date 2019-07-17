@@ -2,10 +2,8 @@ package nablarch.fw.dicontainer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class TinyContainer implements Container {
 
@@ -49,8 +47,7 @@ public final class TinyContainer implements Container {
 
     @Override
     public <T> T getComponent(final Class<T> key, final Annotation... qualifiers) {
-        return getComponent(new ComponentKey<>(key, Arrays.stream(qualifiers)
-                .map(Qualifier::fromAnnotation).collect(Collectors.toSet())));
+        return getComponent(new ComponentKey<>(key, qualifiers));
     }
 
     @Override

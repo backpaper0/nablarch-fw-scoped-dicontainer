@@ -2,7 +2,6 @@ package nablarch.fw.dicontainer.config;
 
 import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -13,11 +12,8 @@ import org.junit.Test;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.NamedImpl;
-import nablarch.fw.dicontainer.Qualifier;
 import nablarch.fw.dicontainer.TinyContainer;
 import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;
-import nablarch.fw.dicontainer.config.ErrorCollector;
-import nablarch.fw.dicontainer.config.InjectableMember;
 
 public class InjectableConstructorTest {
 
@@ -46,14 +42,10 @@ public class InjectableConstructorTest {
         final UUID uuid2 = UUID.randomUUID();
         final Container container = new TinyContainer()
                 .register(
-                        new ComponentKey<>(Ccc.class,
-                                Collections.singleton(
-                                        Qualifier.fromAnnotation(new NamedImpl("first")))),
+                        new ComponentKey<>(Ccc.class, new NamedImpl("first")),
                         new Ccc(uuid1))
                 .register(
-                        new ComponentKey<>(Ccc.class,
-                                Collections.singleton(
-                                        Qualifier.fromAnnotation(new NamedImpl("second")))),
+                        new ComponentKey<>(Ccc.class, new NamedImpl("second")),
                         new Ccc(uuid2));
         final Ddd component = (Ddd) creator.inject(container, null);
         assertEquals(uuid1, component.ccc1.value);

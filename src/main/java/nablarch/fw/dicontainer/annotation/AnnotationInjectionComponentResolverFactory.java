@@ -11,19 +11,18 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Provider;
+import javax.inject.Qualifier;
 
 import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.Qualifier;
 import nablarch.fw.dicontainer.config.InjectionComponentResolver;
 
 public final class AnnotationInjectionComponentResolverFactory {
 
     public InjectionComponentResolver fromField(final Field field) {
-        final Set<Qualifier> qualifiers = new LinkedHashSet<>();
+        final Set<Annotation> qualifiers = new LinkedHashSet<>();
         for (final Annotation annotation : field.getAnnotations()) {
-            if (annotation.annotationType().isAnnotationPresent(javax.inject.Qualifier.class)) {
-                final Qualifier qualifier = Qualifier.fromAnnotation(annotation);
-                qualifiers.add(qualifier);
+            if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                qualifiers.add(annotation);
             }
         }
 
@@ -43,11 +42,10 @@ public final class AnnotationInjectionComponentResolverFactory {
     public List<InjectionComponentResolver> fromMethodParameters(final Method method) {
         final List<InjectionComponentResolver> resolvers = new ArrayList<>();
         for (int i = 0; i < method.getParameterCount(); i++) {
-            final Set<Qualifier> qualifiers = new LinkedHashSet<>();
+            final Set<Annotation> qualifiers = new LinkedHashSet<>();
             for (final Annotation annotation : method.getParameterAnnotations()[i]) {
-                if (annotation.annotationType().isAnnotationPresent(javax.inject.Qualifier.class)) {
-                    final Qualifier qualifier = Qualifier.fromAnnotation(annotation);
-                    qualifiers.add(qualifier);
+                if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                    qualifiers.add(annotation);
                 }
             }
 
@@ -72,12 +70,10 @@ public final class AnnotationInjectionComponentResolverFactory {
             final Constructor<?> constructor) {
         final List<InjectionComponentResolver> resolvers = new ArrayList<>();
         for (int i = 0; i < constructor.getParameterCount(); i++) {
-            final Set<Qualifier> qualifiers = new LinkedHashSet<>();
+            final Set<Annotation> qualifiers = new LinkedHashSet<>();
             for (final Annotation annotation : constructor.getParameterAnnotations()[i]) {
-                if (annotation.annotationType()
-                        .isAnnotationPresent(javax.inject.Qualifier.class)) {
-                    final Qualifier qualifier = Qualifier.fromAnnotation(annotation);
-                    qualifiers.add(qualifier);
+                if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                    qualifiers.add(annotation);
                 }
             }
 

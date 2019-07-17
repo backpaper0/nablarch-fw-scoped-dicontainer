@@ -90,7 +90,7 @@ public final class AnnotationScopeDecider {
     private <T extends Scope> void registerScope(final AnnotationContainerBuilder builder,
             final T scope) {
         final Class<T> componentType = (Class<T>) scope.getClass();
-        final ComponentKey<T> key = new ComponentKey<>(componentType, Collections.emptySet());
+        final ComponentKey<T> key = new ComponentKey<>(componentType);
         final InjectableMember injectableConstructor = InjectableMember.passthrough(scope);
         //FIXME 引数errorCollector
         final Set<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(

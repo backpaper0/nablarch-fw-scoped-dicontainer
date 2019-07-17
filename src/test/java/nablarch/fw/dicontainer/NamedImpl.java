@@ -13,14 +13,6 @@ public class NamedImpl implements Named {
         this.value = Objects.requireNonNull(value);
     }
 
-    public Qualifier asQualifier() {
-        return Qualifier.fromAnnotation(this);
-    }
-
-    public static Qualifier qualifier(final String value) {
-        return new NamedImpl(value).asQualifier();
-    }
-
     @Override
     public Class<? extends Annotation> annotationType() {
         return Named.class;

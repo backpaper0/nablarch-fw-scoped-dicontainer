@@ -11,7 +11,6 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.ComponentKey.AliasKey;
 
 public class ComponentKeyTest {
@@ -28,9 +27,9 @@ public class ComponentKeyTest {
         final ComponentKey<Bbb4> key = ComponentKey.fromClass(Bbb4.class);
         final Set<AliasKey> aliasKeys = key.aliasKeys();
         final Set<AliasKey> expected = Stream.of(
-                new ComponentKey.AliasKey(Bbb1.class, Collections.emptySet()),
-                new ComponentKey.AliasKey(Bbb2.class, Collections.emptySet()),
-                new ComponentKey.AliasKey(Bbb3.class, Collections.emptySet()))
+                new ComponentKey<>(Bbb1.class).asAliasKey(),
+                new ComponentKey<>(Bbb2.class).asAliasKey(),
+                new ComponentKey<>(Bbb3.class).asAliasKey())
                 .collect(Collectors.toSet());
         assertEquals(expected, aliasKeys);
     }
@@ -38,16 +37,14 @@ public class ComponentKeyTest {
     @Test
     public void qualifier() throws Exception {
         final ComponentKey<Ccc2> key = ComponentKey.fromClass(Ccc2.class);
-        final ComponentKey<Ccc2> expected = new ComponentKey<>(Ccc2.class,
-                Collections.singleton(NamedImpl.qualifier("foo")));
+        final ComponentKey<Ccc2> expected = new ComponentKey<>(Ccc2.class, new NamedImpl("foo"));
         assertEquals(expected, key);
     }
 
     @Test
     public void aliasViaQualifier() throws Exception {
         final Set<AliasKey> aliasKeys = ComponentKey.fromClass(Ccc2.class).aliasKeys();
-        final AliasKey aliasKey = new AliasKey(Ccc1.class,
-                Collections.singleton(NamedImpl.qualifier("foo")));
+        final AliasKey aliasKey = new ComponentKey<>(Ccc1.class, new NamedImpl("foo")).asAliasKey();
         final Set<AliasKey> expected = Collections.singleton(aliasKey);
         assertEquals(expected, aliasKeys);
     }

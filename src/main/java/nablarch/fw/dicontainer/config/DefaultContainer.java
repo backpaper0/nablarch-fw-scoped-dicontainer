@@ -1,15 +1,12 @@
 package nablarch.fw.dicontainer.config;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
-import nablarch.fw.dicontainer.Qualifier;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
@@ -54,9 +51,7 @@ public final class DefaultContainer implements Container {
 
     @Override
     public <T> T getComponent(final Class<T> key, final Annotation... qualifiers) {
-        final Set<Qualifier> qs = Arrays.stream(qualifiers).map(Qualifier::fromAnnotation)
-                .collect(Collectors.toSet());
-        return getComponent(new ComponentKey<>(key, qs));
+        return getComponent(new ComponentKey<>(key, qualifiers));
     }
 
     @Override

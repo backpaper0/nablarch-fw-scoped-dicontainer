@@ -10,11 +10,9 @@ import javax.inject.Named;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.TinyContainer;
 import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;
-import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
 
 public class InjectableConstructorTest {
@@ -26,7 +24,7 @@ public class InjectableConstructorTest {
     public void fromClass() throws Exception {
         final InjectableMember creator = factory.createConstructor(Aaa.class, errorCollector)
                 .get();
-        final Container container = new TinyContainer();
+        final TinyContainer container = new TinyContainer();
         final Aaa component = (Aaa) creator.inject(container, null);
         assertTrue(component.called);
     }
@@ -35,7 +33,7 @@ public class InjectableConstructorTest {
     public void fromClassWithInjection() throws Exception {
         final InjectableMember creator = factory.createConstructor(Bbb.class, errorCollector)
                 .get();
-        final Container container = new TinyContainer(Aaa.class);
+        final TinyContainer container = new TinyContainer(Aaa.class);
         final Bbb component = (Bbb) creator.inject(container, null);
         assertTrue(component.called);
     }
@@ -46,7 +44,7 @@ public class InjectableConstructorTest {
                 .get();
         final UUID uuid1 = UUID.randomUUID();
         final UUID uuid2 = UUID.randomUUID();
-        final Container container = new TinyContainer()
+        final TinyContainer container = new TinyContainer()
                 .register(
                         new ComponentKey<>(Ccc.class, new NamedImpl("first")),
                         new Ccc(uuid1))

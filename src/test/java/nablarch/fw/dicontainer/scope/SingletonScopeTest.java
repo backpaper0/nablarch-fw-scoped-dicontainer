@@ -8,7 +8,7 @@ import javax.inject.Provider;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.scope.SingletonScope;
 

@@ -5,7 +5,10 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class TinyContainer implements Container {
+import nablarch.fw.dicontainer.component.ComponentId;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
+
+public final class TinyContainer implements ContainerImplementer {
 
     private final Map<ComponentKey<?>, Object> components = new HashMap<>();
 

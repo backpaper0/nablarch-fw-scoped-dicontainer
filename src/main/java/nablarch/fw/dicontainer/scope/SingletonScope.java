@@ -8,8 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Observes;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 

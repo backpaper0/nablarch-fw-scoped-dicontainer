@@ -9,7 +9,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import nablarch.fw.dicontainer.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.web.context.RequestContext;
 import nablarch.fw.dicontainer.web.context.SessionContext;

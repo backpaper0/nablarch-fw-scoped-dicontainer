@@ -7,10 +7,9 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentId;
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.scope.Scope;
 
 public final class ComponentDefinition<T> {
@@ -70,7 +69,7 @@ public final class ComponentDefinition<T> {
         }
     }
 
-    public T getComponent(final Container container) {
+    public T getComponent(final ContainerImplementer container) {
         final Provider<T> provider = new Provider<T>() {
             @Override
             public T get() {
@@ -85,7 +84,7 @@ public final class ComponentDefinition<T> {
         return scope.getComponent(id, provider, destroyMethod);
     }
 
-    public void fire(final Container container, final Object event) {
+    public void fire(final ContainerImplementer container, final Object event) {
         for (final ObservesMethod observesMethod : observesMethods) {
             if (observesMethod.isTarget(event)) {
                 final T component = getComponent(container);

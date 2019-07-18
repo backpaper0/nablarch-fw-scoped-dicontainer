@@ -4,11 +4,9 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.Container;
-import nablarch.fw.dicontainer.component.ComponentDefinition;
-import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.SingletonScope;
 
@@ -37,7 +35,7 @@ public class ComponentDefinitionTest {
     private static class MockInjectableMember implements InjectableMember {
 
         @Override
-        public Object inject(final Container container, final Object component) {
+        public Object inject(final ContainerImplementer container, final Object component) {
             return null;
         }
 

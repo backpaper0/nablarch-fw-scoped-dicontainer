@@ -16,13 +16,13 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.Factory;
 import nablarch.fw.dicontainer.Init;
 import nablarch.fw.dicontainer.Observes;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.FieldCollector;

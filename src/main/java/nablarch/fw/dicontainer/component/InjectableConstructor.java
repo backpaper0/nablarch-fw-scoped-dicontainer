@@ -5,9 +5,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 
 public final class InjectableConstructor implements InjectableMember {
 
@@ -21,7 +21,7 @@ public final class InjectableConstructor implements InjectableMember {
     }
 
     @Override
-    public Object inject(final Container container, final Object component) {
+    public Object inject(final ContainerImplementer container, final Object component) {
         final Object[] args = resolvers.stream().map(resolver -> resolver.resolve(container))
                 .toArray();
         try {

@@ -1,12 +1,12 @@
 package nablarch.fw.dicontainer.component;
 
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 
 public interface InjectableMember {
 
-    Object inject(Container container, Object component);
+    Object inject(ContainerImplementer container, Object component);
 
     void validate(ContainerBuilder<?> containerBuilder, ComponentDefinition<?> self);
 
@@ -15,7 +15,7 @@ public interface InjectableMember {
     static InjectableMember passthrough(final Object instance) {
         return new InjectableMember() {
             @Override
-            public Object inject(final Container container, final Object component) {
+            public Object inject(final ContainerImplementer container, final Object component) {
                 return instance;
             }
 

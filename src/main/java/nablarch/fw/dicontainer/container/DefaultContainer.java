@@ -4,17 +4,16 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 import java.util.Set;
 
-import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
-public final class DefaultContainer implements Container {
+public final class DefaultContainer implements ContainerImplementer {
 
     private final ComponentDefinitionRepository definitions;
     private final AliasMapping aliasMapping;

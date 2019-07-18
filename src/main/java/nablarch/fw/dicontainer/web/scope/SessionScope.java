@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
 import nablarch.fw.dicontainer.scope.Scope;

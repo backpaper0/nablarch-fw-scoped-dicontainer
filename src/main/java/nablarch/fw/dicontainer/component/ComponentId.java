@@ -1,4 +1,4 @@
-package nablarch.fw.dicontainer;
+package nablarch.fw.dicontainer.component;
 
 import java.io.Serializable;
 import java.util.Objects;

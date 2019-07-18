@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.InitMethod;

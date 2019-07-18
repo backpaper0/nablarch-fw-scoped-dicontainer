@@ -2,7 +2,7 @@ package nablarch.fw.dicontainer.scope;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 
 public interface Scope {

@@ -19,7 +19,6 @@ public class AnnotationAutoContainerFactoryTest {
 
     @Test
     public void create() throws Exception {
-        final AnnotationAutoContainerFactory factory = new AnnotationAutoContainerFactory();
         final Iterable<TraversalMark> traversalMarks = Collections.singleton(new TraversalMark() {
             @Override
             public Set<String> includes() {
@@ -27,7 +26,11 @@ public class AnnotationAutoContainerFactoryTest {
                         "^nablarch\\.fw\\.dicontainer\\.annotation\\.auto\\.demo\\..*$$");
             }
         });
-        final Container container = factory.create(traversalMarks);
+        final AnnotationAutoContainerFactory factory = AnnotationAutoContainerFactory
+                .builder()
+                .traversalMarks(traversalMarks)
+                .build();
+        final Container container = factory.create();
 
         assertNotNull(container.getComponent(Auto1.class));
         assertNotNull(container.getComponent(Auto2.class));

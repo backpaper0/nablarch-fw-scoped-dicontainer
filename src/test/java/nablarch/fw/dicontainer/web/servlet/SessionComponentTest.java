@@ -39,7 +39,7 @@ public class SessionComponentTest {
         final AnnotationScopeDecider decider = AnnotationScopeDecider.builder()
                 .addScope(SessionScoped.class, sessionScope)
                 .build();
-        builder = new AnnotationContainerBuilder(decider);
+        builder = AnnotationContainerBuilder.builder().scopeDecider(decider).build();
     }
 
     @Test

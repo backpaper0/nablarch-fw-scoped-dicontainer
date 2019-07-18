@@ -16,7 +16,7 @@ public class DestroyTest {
 
     @Test
     public void destroySingleton() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .build();
 
@@ -31,7 +31,7 @@ public class DestroyTest {
 
     @Test
     public void destroyPrototype() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Bbb.class)
                 .build();
 
@@ -46,7 +46,7 @@ public class DestroyTest {
 
     @Test
     public void destroySingletonNotGetComponent() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ccc.class)
                 .build();
 
@@ -59,7 +59,7 @@ public class DestroyTest {
 
     @Test
     public void destroyMethodMustBeNoArgs() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ddd.class);
         try {
             builder.build();
@@ -71,7 +71,7 @@ public class DestroyTest {
 
     @Test
     public void destroyMethodMustBeOnePerComponent() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Eee.class);
         try {
             builder.build();
@@ -83,7 +83,7 @@ public class DestroyTest {
 
     @Test
     public void destroyMethodMustBeInstanceMethod() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Fff.class);
         try {
             builder.build();

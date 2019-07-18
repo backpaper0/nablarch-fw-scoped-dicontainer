@@ -11,17 +11,22 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Provider;
-import javax.inject.Qualifier;
 
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 
 public final class AnnotationInjectionComponentResolverFactory {
 
+    private final AnnotationSet qualifierAnnotations;
+
+    public AnnotationInjectionComponentResolverFactory(final AnnotationSet qualifierAnnotations) {
+        this.qualifierAnnotations = qualifierAnnotations;
+    }
+
     public InjectionComponentResolver fromField(final Field field) {
         final Set<Annotation> qualifiers = new LinkedHashSet<>();
         for (final Annotation annotation : field.getAnnotations()) {
-            if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+            if (qualifierAnnotations.isAnnotationPresent(annotation.annotationType())) {
                 qualifiers.add(annotation);
             }
         }
@@ -44,7 +49,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         for (int i = 0; i < method.getParameterCount(); i++) {
             final Set<Annotation> qualifiers = new LinkedHashSet<>();
             for (final Annotation annotation : method.getParameterAnnotations()[i]) {
-                if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                if (qualifierAnnotations.isAnnotationPresent(annotation.annotationType())) {
                     qualifiers.add(annotation);
                 }
             }
@@ -72,7 +77,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         for (int i = 0; i < constructor.getParameterCount(); i++) {
             final Set<Annotation> qualifiers = new LinkedHashSet<>();
             for (final Annotation annotation : constructor.getParameterAnnotations()[i]) {
-                if (annotation.annotationType().isAnnotationPresent(Qualifier.class)) {
+                if (qualifierAnnotations.isAnnotationPresent(annotation.annotationType())) {
                     qualifiers.add(annotation);
                 }
             }

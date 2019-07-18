@@ -21,7 +21,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldInjectionComponentNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ddd1.class);
         try {
             builder.build();
@@ -33,7 +33,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodInjectionComponentNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ddd2.class);
         try {
             builder.build();
@@ -45,7 +45,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorInjectionComponentNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ddd3.class);
         try {
             builder.build();
@@ -57,7 +57,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void injectableConstructorNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Mmm1.class)
                 .register(Aaa.class);
         try {
@@ -70,7 +70,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void injectableConstructorDuplicatedException() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Mmm2.class)
                 .register(Aaa.class);
         try {
@@ -83,7 +83,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldStaticInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Nnn1.class)
                 .register(Aaa.class);
         try {
@@ -96,7 +96,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodStaticInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Nnn2.class)
                 .register(Aaa.class);
         try {
@@ -109,7 +109,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldInvalidInjectionScope() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo2.class);
         try {
@@ -122,7 +122,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodInvalidInjectionScope() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo3.class);
         try {
@@ -135,7 +135,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorInvalidInjectionScope() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo4.class);
         try {
@@ -148,7 +148,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldValidInjectionScopeViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo5.class)
                 .build();
@@ -158,7 +158,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodValidInjectionScopeViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo6.class)
                 .build();
@@ -168,7 +168,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorValidInjectionScopeViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ooo1.class)
                 .register(Ooo7.class)
                 .build();
@@ -178,7 +178,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldCycleInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ppp1.class)
                 .register(Ppp2.class);
         try {
@@ -192,7 +192,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodCycleInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ppp3.class)
                 .register(Ppp4.class);
         try {
@@ -206,7 +206,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorCycleInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ppp5.class)
                 .register(Ppp6.class);
         try {
@@ -220,7 +220,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldCycleInjectionViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ppp7.class)
                 .register(Ppp8.class)
                 .build();
@@ -231,7 +231,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodCycleInjectionViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ppp9.class)
                 .register(Ppp10.class)
                 .build();
@@ -242,7 +242,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorCycleInjectionViaProvider() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ppp11.class)
                 .register(Ppp12.class)
                 .build();
@@ -253,7 +253,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void manyCycleInjection() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ppp13.class)
                 .register(Ppp14.class)
                 .register(Ppp15.class);
@@ -268,7 +268,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void fieldInjectionComponentDuplicated() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Qqq2.class)
                 .register(Qqq3.class)
                 .register(Qqq4.class);
@@ -282,7 +282,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void methodInjectionComponentDuplicated() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Qqq2.class)
                 .register(Qqq3.class)
                 .register(Qqq5.class);
@@ -296,7 +296,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void constructorInjectionComponentDuplicated() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Qqq2.class)
                 .register(Qqq3.class)
                 .register(Qqq6.class);
@@ -310,7 +310,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void componentDuplicated() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Qqq2.class)
                 .register(Qqq3.class)
                 .build();
@@ -323,7 +323,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void scopeDuplicated() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Rrr1.class);
         try {
             builder.build();
@@ -335,7 +335,7 @@ public class ContainerCreationExceptionTest {
 
     @Test
     public void scopeNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Rrr2.class);
         try {
             builder.build();

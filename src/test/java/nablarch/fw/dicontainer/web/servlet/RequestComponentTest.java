@@ -34,7 +34,7 @@ public class RequestComponentTest {
         final AnnotationScopeDecider decider = AnnotationScopeDecider.builder()
                 .addScope(RequestScoped.class, requestScope)
                 .build();
-        builder = new AnnotationContainerBuilder(decider);
+        builder = AnnotationContainerBuilder.builder().scopeDecider(decider).build();
     }
 
     @After

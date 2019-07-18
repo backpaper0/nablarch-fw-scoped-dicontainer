@@ -25,7 +25,7 @@ public class FactoryTest {
     @Test
     public void getComponent() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .build();
 
@@ -37,7 +37,7 @@ public class FactoryTest {
     @Test
     public void qualifier() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ccc.class)
                 .build();
 
@@ -53,7 +53,7 @@ public class FactoryTest {
 
     @Test
     public void factoryMethodMustReturnValue() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Eee.class);
         try {
             builder.build();
@@ -65,7 +65,7 @@ public class FactoryTest {
 
     @Test
     public void factoryMethodMustBeNoArg() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Fff.class);
         try {
             builder.build();
@@ -77,7 +77,7 @@ public class FactoryTest {
 
     @Test
     public void factoryMethodMustBeInstanceMethod() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ggg.class);
         try {
             builder.build();
@@ -89,7 +89,7 @@ public class FactoryTest {
 
     @Test
     public void scopeDuplicated() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Hhh.class);
         try {
             builder.build();
@@ -101,7 +101,7 @@ public class FactoryTest {
 
     @Test
     public void scopeNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Iii.class);
         try {
             builder.build();
@@ -114,7 +114,7 @@ public class FactoryTest {
     @Test
     public void scope() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Jjj1.class)
                 .build();
 
@@ -129,7 +129,7 @@ public class FactoryTest {
 
     @Test
     public void destroyMethodMustBeNoArgs() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Kkk1.class);
         try {
             builder.build();
@@ -141,7 +141,7 @@ public class FactoryTest {
 
     @Test
     public void destroyMethodNotFound() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Kkk3.class);
         try {
             builder.build();
@@ -153,7 +153,7 @@ public class FactoryTest {
 
     @Test
     public void destroyMethodMustBeInstanceMethod() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Kkk5.class);
         try {
             builder.build();

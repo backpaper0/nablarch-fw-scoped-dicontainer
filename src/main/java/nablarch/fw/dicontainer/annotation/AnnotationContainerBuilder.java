@@ -13,17 +13,15 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
 
     private final AnnotationScopeDecider scopeDecider;
     //FIXME
-    final AnnotationMemberFactory memberFactory = new AnnotationMemberFactory();
+    final AnnotationMemberFactory memberFactory;
     private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
 
-    public AnnotationContainerBuilder() {
-        this(new AnnotationScopeDecider());
-    }
-
-    public AnnotationContainerBuilder(final AnnotationScopeDecider scopeDecider) {
+    private AnnotationContainerBuilder(final AnnotationScopeDecider scopeDecider,
+            final AnnotationMemberFactory memberFactory,
+            final AnnotationComponentDefinitionFactory componentDefinitionFactory) {
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
-        this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(memberFactory,
-                scopeDecider);
+        this.memberFactory = Objects.requireNonNull(memberFactory);
+        this.componentDefinitionFactory = Objects.requireNonNull(componentDefinitionFactory);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
@@ -47,5 +45,50 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
     public Container build() {
         scopeDecider.registerScopes(this);
         return super.build();
+    }
+
+    public static AnnotationContainerBuilder createDefault() {
+        return builder().build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private AnnotationScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
+        private AnnotationMemberFactory memberFactory = AnnotationMemberFactory.createDefault();
+        private AnnotationComponentDefinitionFactory componentDefinitionFactory;
+
+        private Builder() {
+            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
+                    memberFactory, scopeDecider);
+        }
+
+        public Builder scopeDecider(final AnnotationScopeDecider scopeDecider) {
+            this.scopeDecider = scopeDecider;
+            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
+                    memberFactory, scopeDecider);
+            return this;
+        }
+
+        public Builder memberFactory(final AnnotationMemberFactory memberFactory) {
+            this.memberFactory = memberFactory;
+            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
+                    memberFactory, scopeDecider);
+            return this;
+        }
+
+        public Builder componentDefinitionFactory(
+                final AnnotationComponentDefinitionFactory componentDefinitionFactory) {
+            this.componentDefinitionFactory = componentDefinitionFactory;
+            return this;
+        }
+
+        public AnnotationContainerBuilder build() {
+            return new AnnotationContainerBuilder(scopeDecider, memberFactory,
+                    componentDefinitionFactory);
+        }
     }
 }

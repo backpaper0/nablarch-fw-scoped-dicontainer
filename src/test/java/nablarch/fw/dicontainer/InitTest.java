@@ -16,7 +16,7 @@ public class InitTest {
 
     @Test
     public void initSingleton() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .build();
 
@@ -29,7 +29,7 @@ public class InitTest {
 
     @Test
     public void initPrototype() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Bbb.class)
                 .build();
 
@@ -40,7 +40,7 @@ public class InitTest {
 
     @Test
     public void initMethodMustBeNoArgs() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ccc.class);
         try {
             builder.build();
@@ -52,7 +52,7 @@ public class InitTest {
 
     @Test
     public void initMethodMustBeOnePerComponent() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Ddd.class);
         try {
             builder.build();
@@ -64,7 +64,7 @@ public class InitTest {
 
     @Test
     public void initMethodMustBeInstanceMethod() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(Eee.class);
         try {
             builder.build();

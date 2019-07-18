@@ -19,7 +19,7 @@ public class ContainerTest {
     @Test
     public void getComponent() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .build();
 
@@ -31,7 +31,7 @@ public class ContainerTest {
     @Test
     public void singleton() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .build();
 
@@ -44,7 +44,7 @@ public class ContainerTest {
     @Test
     public void getComponentByInterface() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Bbb4.class)
                 .build();
 
@@ -56,7 +56,7 @@ public class ContainerTest {
     @Test
     public void fieldInjection() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .register(Ddd1.class)
                 .build();
@@ -72,7 +72,7 @@ public class ContainerTest {
     @Test
     public void methodInjection() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .register(Ddd2.class)
                 .build();
@@ -88,7 +88,7 @@ public class ContainerTest {
     @Test
     public void constructorInjection() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class)
                 .register(Ddd3.class)
                 .build();
@@ -104,7 +104,7 @@ public class ContainerTest {
     @Test
     public void methodInjectionOverride() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Fff2.class)
                 .build();
 
@@ -120,7 +120,7 @@ public class ContainerTest {
     @Test
     public void fieldInjectionExtends() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Ggg2.class)
                 .register(Aaa.class)
                 .build();
@@ -138,7 +138,7 @@ public class ContainerTest {
     @Test
     public void constructorInjectionProvider() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Hhh1.class)
                 .register(Aaa.class)
                 .build();
@@ -153,7 +153,7 @@ public class ContainerTest {
     @Test
     public void fieldInjectionProvider() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Hhh2.class)
                 .register(Aaa.class)
                 .build();
@@ -168,7 +168,7 @@ public class ContainerTest {
     @Test
     public void methodInjectionProvider() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Hhh3.class)
                 .register(Aaa.class)
                 .build();
@@ -183,7 +183,7 @@ public class ContainerTest {
     @Test
     public void injectionOrder() throws Exception {
 
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Iii2.class)
                 .register(Aaa.class)
                 .build();
@@ -197,7 +197,7 @@ public class ContainerTest {
 
     @Test
     public void componentNotFound() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .build();
 
         try {

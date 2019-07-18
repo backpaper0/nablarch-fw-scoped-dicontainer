@@ -17,7 +17,7 @@ import nablarch.fw.dicontainer.exception.ErrorCollector;
 
 public class InjectableConstructorTest {
 
-    private final AnnotationMemberFactory factory = new AnnotationMemberFactory();
+    private final AnnotationMemberFactory factory = AnnotationMemberFactory.createDefault();
     private final ErrorCollector errorCollector = ErrorCollector.newInstance();
 
     @Test

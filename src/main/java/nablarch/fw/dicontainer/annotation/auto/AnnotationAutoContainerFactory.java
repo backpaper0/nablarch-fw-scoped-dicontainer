@@ -1,23 +1,28 @@
 package nablarch.fw.dicontainer.annotation.auto;
 
 import java.lang.annotation.Annotation;
-import java.util.ServiceLoader;
+import java.util.Objects;
 
 import javax.inject.Qualifier;
 import javax.inject.Scope;
 
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
+import nablarch.fw.dicontainer.annotation.AnnotationSet;
 
-public class AnnotationAutoContainerFactory {
+public final class AnnotationAutoContainerFactory {
 
-    public Container create() {
-        final ServiceLoader<TraversalMark> traversalMarks = ServiceLoader.load(TraversalMark.class);
-        return create(traversalMarks);
+    private final AnnotationSet targetAnnotations;
+    private final Iterable<TraversalMark> traversalMarks;
+
+    private AnnotationAutoContainerFactory(final AnnotationSet targetAnnotations,
+            final Iterable<TraversalMark> traversalMarks) {
+        this.targetAnnotations = Objects.requireNonNull(targetAnnotations);
+        this.traversalMarks = Objects.requireNonNull(traversalMarks);
     }
 
-    public Container create(final Iterable<TraversalMark> traversalMarks) {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder();
+    public Container create() {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault();
         for (final TraversalMark traversalMark : traversalMarks) {
             final ClassLoader classLoader = traversalMark.getClass().getClassLoader();
             final Class<?> base = traversalMark.getClass();
@@ -33,14 +38,45 @@ public class AnnotationAutoContainerFactory {
         return builder.build();
     }
 
-    private static boolean isTarget(final Class<?> clazz) {
+    private boolean isTarget(final Class<?> clazz) {
         for (final Annotation annotation : clazz.getAnnotations()) {
             final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType.isAnnotationPresent(Scope.class)
-                    || annotationType.isAnnotationPresent(Qualifier.class)) {
+            if (targetAnnotations.isAnnotationPresent(annotationType)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public static AnnotationAutoContainerFactory createDefault() {
+        return builder().build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+
+        private AnnotationSet targetAnnotations = new AnnotationSet(Scope.class, Qualifier.class);
+        private Iterable<TraversalMark> traversalMarks;
+
+        private Builder() {
+        }
+
+        @SafeVarargs
+        public final Builder targetAnnotations(final Class<? extends Annotation>... annotations) {
+            this.targetAnnotations = new AnnotationSet(annotations);
+            return this;
+        }
+
+        public Builder traversalMarks(final Iterable<TraversalMark> traversalMarks) {
+            this.traversalMarks = traversalMarks;
+            return this;
+        }
+
+        public AnnotationAutoContainerFactory build() {
+            return new AnnotationAutoContainerFactory(targetAnnotations, traversalMarks);
+        }
     }
 }

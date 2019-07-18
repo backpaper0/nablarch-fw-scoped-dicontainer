@@ -12,7 +12,7 @@ import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
 public class ObservesTest {
     @Test
     public void observes() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Observer.class)
                 .build();
 
@@ -25,7 +25,7 @@ public class ObservesTest {
 
     @Test
     public void observesMethodMustNotBeNoArgs() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(InvalidObserver1.class);
         try {
             builder.build();
@@ -37,7 +37,7 @@ public class ObservesTest {
 
     @Test
     public void observesMethodMustNotBeMultiArgs() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(InvalidObserver2.class);
         try {
             builder.build();
@@ -49,7 +49,7 @@ public class ObservesTest {
 
     @Test
     public void observesMethodMustBeInstanceMethod() throws Exception {
-        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
                 .register(InvalidObserver3.class);
         try {
             builder.build();

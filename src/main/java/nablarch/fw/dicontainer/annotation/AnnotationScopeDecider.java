@@ -3,7 +3,6 @@ package nablarch.fw.dicontainer.annotation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -29,28 +28,22 @@ import nablarch.fw.dicontainer.scope.SingletonScope;
 
 public final class AnnotationScopeDecider {
 
-    private final Map<Class<?>, Scope> scopes = new HashMap<>();
+    private final AnnotationSet scopeAnnotations;
     private final Scope defaultScope;
+    private final Map<Class<?>, Scope> scopes;
     private final PassthroughScope passthroughScope = new PassthroughScope();
 
-    public AnnotationScopeDecider(final Scope defaultScope,
-            final Map<Class<?>, Scope> additionalScopes) {
+    private AnnotationScopeDecider(final AnnotationSet scopeAnnotations, final Scope defaultScope,
+            final Map<Class<?>, Scope> scopes) {
+        this.scopeAnnotations = Objects.requireNonNull(scopeAnnotations);
         this.defaultScope = Objects.requireNonNull(defaultScope);
-        this.scopes.putAll(Objects.requireNonNull(additionalScopes));
-
-        //builtin scopes
-        this.scopes.put(Prototype.class, new PrototypeScope());
-        this.scopes.put(Singleton.class, new SingletonScope());
-    }
-
-    public AnnotationScopeDecider() {
-        this(new PrototypeScope(), Collections.emptyMap());
+        this.scopes = Objects.requireNonNull(scopes);
     }
 
     public Optional<Scope> fromClass(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Annotation[] annotations = Arrays.stream(componentType.getAnnotations())
-                .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
+                .filter(a -> scopeAnnotations.isAnnotationPresent(a.annotationType()))
                 .toArray(Annotation[]::new);
         if (annotations.length == 0) {
             return Optional.of(defaultScope);
@@ -69,7 +62,7 @@ public final class AnnotationScopeDecider {
 
     public Optional<Scope> fromMethod(final Method method, final ErrorCollector errorCollector) {
         final Annotation[] annotations = Arrays.stream(method.getAnnotations())
-                .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
+                .filter(a -> scopeAnnotations.isAnnotationPresent(a.annotationType()))
                 .toArray(Annotation[]::new);
         if (annotations.length == 0) {
             return Optional.of(defaultScope);
@@ -118,20 +111,29 @@ public final class AnnotationScopeDecider {
         definition.ifPresent(a -> builder.register(key, a));
     }
 
+    public static AnnotationScopeDecider createDefault() {
+        return builder().build();
+    }
+
     public static Builder builder() {
         return new Builder();
     }
 
     public static final class Builder {
 
-        private final Map<Class<?>, Scope> additionalScopes = new HashMap<>();
-        private Scope defaultScope = new PrototypeScope();
+        private AnnotationSet scopeAnnotations = new AnnotationSet(javax.inject.Scope.class);
+        private Scope defaultScope;
+        private final Map<Class<?>, Scope> scopes = new HashMap<>();
 
         private Builder() {
+            final Scope prototypeScope = new PrototypeScope();
+            this.scopes.put(Prototype.class, prototypeScope);
+            this.scopes.put(Singleton.class, new SingletonScope());
+            this.defaultScope = prototypeScope;
         }
 
-        public Builder addScope(final Class<?> annotationType, final Scope scope) {
-            this.additionalScopes.put(annotationType, scope);
+        public Builder scopeAnnotations(final Class<? extends Annotation> annotations) {
+            this.scopeAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
@@ -140,8 +142,13 @@ public final class AnnotationScopeDecider {
             return this;
         }
 
+        public Builder addScope(final Class<?> annotationType, final Scope scope) {
+            this.scopes.put(annotationType, scope);
+            return this;
+        }
+
         public AnnotationScopeDecider build() {
-            return new AnnotationScopeDecider(defaultScope, additionalScopes);
+            return new AnnotationScopeDecider(scopeAnnotations, defaultScope, scopes);
         }
     }
 }

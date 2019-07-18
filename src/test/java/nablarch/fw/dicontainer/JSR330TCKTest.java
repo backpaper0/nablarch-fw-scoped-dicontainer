@@ -26,7 +26,7 @@ public class JSR330TCKTest {
     Object spare;
 
     public static Test suite() throws Exception {
-        final Container container = new AnnotationContainerBuilder()
+        final Container container = AnnotationContainerBuilder.createDefault()
                 .ignoreError(StaticInjectionException.class)
                 //org.atinject.tck.auto.Car is implemented by Convertible.
                 .register(Convertible.class)

@@ -14,7 +14,7 @@ import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.auto.ClassFilter;
 import nablarch.fw.dicontainer.annotation.auto.ClassTraverser;
-import nablarch.fw.dicontainer.annotation.auto.TraversalMark;
+import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
 
 public class ClassTraverserTest {
 
@@ -28,7 +28,7 @@ public class ClassTraverserTest {
 
         assertTrue(classes.contains(AnnotationContainerBuilder.class));
         assertTrue(classes.contains(ClassTraverser.class));
-        assertTrue(classes.contains(TraversalMark.class));
+        assertTrue(classes.contains(TraversalConfig.class));
         assertTrue(classes.contains(Container.class));
     }
 

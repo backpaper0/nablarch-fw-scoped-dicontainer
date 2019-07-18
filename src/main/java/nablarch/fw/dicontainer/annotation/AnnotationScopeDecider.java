@@ -4,16 +4,16 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Singleton;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Prototype;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
@@ -97,7 +97,7 @@ public final class AnnotationScopeDecider {
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
         final InjectableMember injectableConstructor = new PassthroughInjectableMember(scope);
-        final Set<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
+        final List<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
                 componentType, errorCollector);
         final Optional<DestroyMethod> destroyMethod = builder.memberFactory.createDestroyMethod(
                 componentType, errorCollector);

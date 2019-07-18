@@ -4,11 +4,11 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 import java.util.Set;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
 import nablarch.fw.dicontainer.component.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
@@ -54,7 +54,7 @@ public final class DefaultContainer implements ContainerImplementer {
 
     @Override
     public <T> T getComponent(final Class<T> key) {
-        return getComponent(ComponentKey.fromClass(key));
+        return getComponent(new ComponentKey<>(key));
     }
 
     @Override

@@ -5,10 +5,9 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.InjectionComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectionComponentNotFoundException;
 import nablarch.fw.dicontainer.exception.InvalidInjectionScopeException;
@@ -23,7 +22,7 @@ public final class InjectionComponentResolver {
         this.provider = provider;
     }
 
-    public Object resolve(final Container container) {
+    public Object resolve(final ContainerImplementer container) {
         if (provider) {
             return new Provider<Object>() {
                 @Override

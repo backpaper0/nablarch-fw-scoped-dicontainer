@@ -1,12 +1,10 @@
 package nablarch.fw.dicontainer.component;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
-import nablarch.fw.dicontainer.ComponentKey;
 
 public final class AliasMapping {
 
@@ -14,7 +12,7 @@ public final class AliasMapping {
 
     public <T> void register(final ComponentKey.AliasKey aliasKey, final ComponentKey<T> key) {
         if (aliasesMap.containsKey(aliasKey) == false) {
-            aliasesMap.put(aliasKey, new LinkedHashSet<>());
+            aliasesMap.put(aliasKey, new HashSet<>());
         }
         final Set<ComponentKey<?>> keys = aliasesMap.get(aliasKey);
         keys.add(key);

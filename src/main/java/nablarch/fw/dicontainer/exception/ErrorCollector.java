@@ -22,7 +22,7 @@ public interface ErrorCollector {
     }
 
     static ErrorCollector wrap(final ContainerBuilder<?> containerBuilder) {
-        return null;
+        return new ContainerBuilderWrapper(containerBuilder);
     }
 
     final class ErrorCollectorImpl implements ErrorCollector {

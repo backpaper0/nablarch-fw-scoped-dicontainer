@@ -8,7 +8,7 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 
-public class PassthroughInjectableMember implements InjectableMember {
+public final class PassthroughInjectableMember implements InjectableMember {
 
     private final Object instance;
 

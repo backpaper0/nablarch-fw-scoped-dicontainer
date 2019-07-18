@@ -13,17 +13,17 @@ import nablarch.fw.dicontainer.annotation.AnnotationSet;
 public final class AnnotationAutoContainerFactory {
 
     private final AnnotationSet targetAnnotations;
-    private final Iterable<TraversalMark> traversalMarks;
+    private final Iterable<TraversalConfig> traversalMarks;
 
     private AnnotationAutoContainerFactory(final AnnotationSet targetAnnotations,
-            final Iterable<TraversalMark> traversalMarks) {
+            final Iterable<TraversalConfig> traversalMarks) {
         this.targetAnnotations = Objects.requireNonNull(targetAnnotations);
         this.traversalMarks = Objects.requireNonNull(traversalMarks);
     }
 
     public Container create() {
         final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault();
-        for (final TraversalMark traversalMark : traversalMarks) {
+        for (final TraversalConfig traversalMark : traversalMarks) {
             final ClassLoader classLoader = traversalMark.getClass().getClassLoader();
             final Class<?> base = traversalMark.getClass();
             final ClassFilter classFilter = ClassFilter.valueOf(traversalMark);
@@ -59,7 +59,7 @@ public final class AnnotationAutoContainerFactory {
     public static final class Builder {
 
         private AnnotationSet targetAnnotations = new AnnotationSet(Scope.class, Qualifier.class);
-        private Iterable<TraversalMark> traversalMarks;
+        private Iterable<TraversalConfig> traversalMarks;
 
         private Builder() {
         }
@@ -70,7 +70,7 @@ public final class AnnotationAutoContainerFactory {
             return this;
         }
 
-        public Builder traversalMarks(final Iterable<TraversalMark> traversalMarks) {
+        public Builder traversalMarks(final Iterable<TraversalConfig> traversalMarks) {
             this.traversalMarks = traversalMarks;
             return this;
         }

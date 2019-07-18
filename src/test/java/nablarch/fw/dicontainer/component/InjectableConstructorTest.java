@@ -9,7 +9,6 @@ import javax.inject.Named;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.TinyContainer;
 import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;

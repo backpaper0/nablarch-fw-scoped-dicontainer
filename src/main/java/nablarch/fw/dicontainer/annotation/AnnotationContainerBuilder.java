@@ -4,9 +4,9 @@ import java.lang.annotation.Annotation;
 import java.util.Objects;
 import java.util.Optional;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 
 public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {

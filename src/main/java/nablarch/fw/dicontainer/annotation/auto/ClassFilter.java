@@ -47,7 +47,7 @@ public final class ClassFilter {
         return false;
     }
 
-    public static ClassFilter valueOf(final TraversalMark traversalMark) {
+    public static ClassFilter valueOf(final TraversalConfig traversalMark) {
         final Set<Pattern> includes = traversalMark.includes().stream().map(Pattern::compile)
                 .collect(Collectors.toSet());
         final Set<Pattern> excludes = traversalMark.excludes().stream().map(Pattern::compile)

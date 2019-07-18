@@ -9,23 +9,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Qualifier;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.Factory;
 import nablarch.fw.dicontainer.Init;
 import nablarch.fw.dicontainer.Observes;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.FieldCollector;
@@ -42,6 +42,7 @@ import nablarch.fw.dicontainer.component.impl.InjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.InjectableFactoryMethod;
 import nablarch.fw.dicontainer.component.impl.InjectableField;
 import nablarch.fw.dicontainer.component.impl.InjectableMethod;
+import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
 import nablarch.fw.dicontainer.exception.FactoryMethodSignatureException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
@@ -96,7 +97,7 @@ public final class AnnotationMemberFactory {
             return Optional.empty();
         } else if (constructors.size() == 1) {
             final Constructor<?> constructor = constructors.iterator().next();
-            final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory
+            final InjectionComponentResolvers resolvers = injectionComponentResolverFactory
                     .fromConstructorParameters(constructor);
             final InjectableConstructor injectableConstructor = new InjectableConstructor(
                     constructor, resolvers);
@@ -107,7 +108,7 @@ public final class AnnotationMemberFactory {
             return Optional.empty();
         }
 
-        final List<InjectionComponentResolver> resolvers = Collections.emptyList();
+        final InjectionComponentResolvers resolvers = InjectionComponentResolvers.empty();
         final InjectableConstructor injectableConstructor = new InjectableConstructor(
                 noArgConstructor, resolvers);
         return Optional.of(injectableConstructor);
@@ -115,14 +116,12 @@ public final class AnnotationMemberFactory {
 
     public InjectableMember createFactoryMethod(final ComponentId id, final Method factoryMethod,
             final ErrorCollector errorCollector) {
-        final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory
+        final InjectionComponentResolvers resolvers = injectionComponentResolverFactory
                 .fromMethodParameters(factoryMethod);
-        final InjectableMember injectableFactoryMethod = new InjectableFactoryMethod(id,
-                factoryMethod, resolvers);
-        return injectableFactoryMethod;
+        return new InjectableFactoryMethod(id, factoryMethod, resolvers);
     }
 
-    public Set<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
+    public List<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final FieldCollector fieldCollector = new FieldCollector();
         final MethodCollector methodCollector = new MethodCollector();
@@ -167,7 +166,7 @@ public final class AnnotationMemberFactory {
 
         Collections.reverse(classes);
 
-        final Set<InjectableMember> injectableMembers = new LinkedHashSet<>();
+        final List<InjectableMember> injectableMembers = new ArrayList<>();
         for (final Class<?> clazz : classes) {
             for (final Field field : fields.get(clazz)) {
                 final InjectionComponentResolver resolver = injectionComponentResolverFactory
@@ -176,7 +175,7 @@ public final class AnnotationMemberFactory {
                 injectableMembers.add(injectableField);
             }
             for (final Method method : methods.get(clazz)) {
-                final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory
+                final InjectionComponentResolvers resolvers = injectionComponentResolverFactory
                         .fromMethodParameters(method);
                 final InjectableMethod injectableMethod = new InjectableMethod(method, resolvers);
                 injectableMembers.add(injectableMethod);
@@ -186,7 +185,7 @@ public final class AnnotationMemberFactory {
         return injectableMembers;
     }
 
-    public Set<ObservesMethod> createObservesMethod(final Class<?> componentType,
+    public List<ObservesMethod> createObservesMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
         final MethodCollector methodCollector = new MethodCollector();
@@ -200,7 +199,7 @@ public final class AnnotationMemberFactory {
             }
         }
 
-        final Set<ObservesMethod> observesMethods = new LinkedHashSet<>();
+        final List<ObservesMethod> observesMethods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (observesAnnotations.isAnnotationPresent(method)) {
                 if (method.getParameterCount() == 1) {
@@ -217,37 +216,18 @@ public final class AnnotationMemberFactory {
 
     public Optional<InitMethod> createInitMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
-
-        final MethodCollector methodCollector = new MethodCollector();
-        for (final Class<?> clazz : new ClassInheritances(componentType)) {
-            for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addInstanceMethodIfNotOverridden(method);
-                if (Modifier.isStatic(method.getModifiers())
-                        && initAnnotations.isAnnotationPresent(method)) {
-                    errorCollector.add(new LifeCycleMethodSignatureException());
-                }
-            }
-        }
-        final Set<InitMethod> methods = new LinkedHashSet<>();
-        for (final Method method : methodCollector.getMethods()) {
-            if (initAnnotations.isAnnotationPresent(method)) {
-                if (method.getParameterCount() == 0) {
-                    methods.add(new DefaultInitMethod(method));
-                } else {
-                    errorCollector.add(new LifeCycleMethodSignatureException());
-                }
-            }
-        }
-        if (methods.size() > 1) {
-            errorCollector.add(new LifeCycleMethodDuplicatedException());
-            return Optional.empty();
-        } else if (methods.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(methods.iterator().next());
+        return createLifeCycleMethod(initAnnotations, DefaultInitMethod::new, componentType,
+                errorCollector);
     }
 
     public Optional<DestroyMethod> createDestroyMethod(final Class<?> componentType,
+            final ErrorCollector errorCollector) {
+        return createLifeCycleMethod(destroyAnnotations, DefaultDestroyMethod::new, componentType,
+                errorCollector);
+    }
+
+    private static <T> Optional<T> createLifeCycleMethod(final AnnotationSet annotationSet,
+            final Function<Method, T> factory, final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
         final MethodCollector methodCollector = new MethodCollector();
@@ -255,16 +235,16 @@ public final class AnnotationMemberFactory {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
                 if (Modifier.isStatic(method.getModifiers())
-                        && destroyAnnotations.isAnnotationPresent(method)) {
+                        && annotationSet.isAnnotationPresent(method)) {
                     errorCollector.add(new LifeCycleMethodSignatureException());
                 }
             }
         }
-        final Set<DestroyMethod> methods = new LinkedHashSet<>();
+        final List<T> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
-            if (destroyAnnotations.isAnnotationPresent(method)) {
+            if (annotationSet.isAnnotationPresent(method)) {
                 if (method.getParameterCount() == 0) {
-                    methods.add(new DefaultDestroyMethod(method));
+                    methods.add(factory.apply(method));
                 } else {
                     errorCollector.add(new LifeCycleMethodSignatureException());
                 }
@@ -298,7 +278,7 @@ public final class AnnotationMemberFactory {
                             }
                         }
                     }
-                    final Set<Method> methods = new LinkedHashSet<>();
+                    final List<Method> methods = new ArrayList<>();
                     for (final Method method : methodCollector.getMethods()) {
                         if (method.getName().equals(destroy)) {
                             methods.add(method);
@@ -319,7 +299,7 @@ public final class AnnotationMemberFactory {
                 });
     }
 
-    public Set<FactoryMethod> createFactoryMethods(final ComponentId id,
+    public List<FactoryMethod> createFactoryMethods(final ComponentId id,
             final Class<?> componentType,
             final AnnotationComponentDefinitionFactory componentDefinitionFactory,
             final ErrorCollector errorCollector) {
@@ -333,7 +313,7 @@ public final class AnnotationMemberFactory {
                 }
             }
         }
-        final Set<FactoryMethod> methods = new LinkedHashSet<>();
+        final List<FactoryMethod> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (factoryAnnotations.isAnnotationPresent(method)) {
                 if (method.getReturnType() == Void.TYPE) {

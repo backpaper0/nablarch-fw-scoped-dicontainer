@@ -1,9 +1,9 @@
 package nablarch.fw.dicontainer.component;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Provider;
 
@@ -18,20 +18,20 @@ public final class ComponentDefinition<T> {
 
     private final ComponentId id;
     private final InjectableMember injectableConstructor;
-    private final Set<InjectableMember> injectableMembers;
-    private final Set<ObservesMethod> observesMethods;
+    private final List<InjectableMember> injectableMembers;
+    private final List<ObservesMethod> observesMethods;
     private final InitMethod initMethod;
     private final DestroyMethod destroyMethod;
-    private final Set<FactoryMethod> factoryMethods;
+    private final List<FactoryMethod> factoryMethods;
     private final Scope scope;
 
     private ComponentDefinition(final ComponentId id,
             final InjectableMember injectableConstructor,
-            final Set<InjectableMember> injectableMembers,
-            final Set<ObservesMethod> observesMethods,
+            final List<InjectableMember> injectableMembers,
+            final List<ObservesMethod> observesMethods,
             final InitMethod initMethod,
             final DestroyMethod destroyMethod,
-            final Set<FactoryMethod> factoryMethods,
+            final List<FactoryMethod> factoryMethods,
             final Scope scope) {
         this.id = Objects.requireNonNull(id);
         this.injectableConstructor = Objects.requireNonNull(injectableConstructor);
@@ -109,11 +109,11 @@ public final class ComponentDefinition<T> {
 
         private final ComponentId id = ComponentId.generate();
         private InjectableMember injectableConstructor;
-        private Set<InjectableMember> injectableMembers = Collections.emptySet();
-        private Set<ObservesMethod> observesMethods = Collections.emptySet();
+        private List<InjectableMember> injectableMembers = Collections.emptyList();
+        private List<ObservesMethod> observesMethods = Collections.emptyList();
         private InitMethod initMethod = new NoopInitMethod();
         private DestroyMethod destroyMethod = new NoopDestroyMethod();
-        private Set<FactoryMethod> factoryMethods = Collections.emptySet();
+        private List<FactoryMethod> factoryMethods = Collections.emptyList();
         private Scope scope;
 
         private Builder() {
@@ -129,12 +129,12 @@ public final class ComponentDefinition<T> {
             return this;
         }
 
-        public Builder<T> injectableMembers(final Set<InjectableMember> injectableMembers) {
+        public Builder<T> injectableMembers(final List<InjectableMember> injectableMembers) {
             this.injectableMembers = injectableMembers;
             return this;
         }
 
-        public Builder<T> observesMethods(final Set<ObservesMethod> observesMethods) {
+        public Builder<T> observesMethods(final List<ObservesMethod> observesMethods) {
             this.observesMethods = observesMethods;
             return this;
         }
@@ -149,7 +149,7 @@ public final class ComponentDefinition<T> {
             return this;
         }
 
-        public Builder<T> factoryMethods(final Set<FactoryMethod> factoryMethods) {
+        public Builder<T> factoryMethods(final List<FactoryMethod> factoryMethods) {
             this.factoryMethods = factoryMethods;
             return this;
         }

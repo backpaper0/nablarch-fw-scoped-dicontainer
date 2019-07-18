@@ -2,14 +2,14 @@ package nablarch.fw.dicontainer.component;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 public final class MethodCollector {
 
-    private final Set<Method> methods = new LinkedHashSet<>();
+    private final List<Method> methods = new ArrayList<>();
 
     public void addInstanceMethodIfNotOverridden(final Method method) {
 
@@ -63,7 +63,7 @@ public final class MethodCollector {
         return true;
     }
 
-    public Set<Method> getMethods() {
+    public List<Method> getMethods() {
         return methods;
     }
 }

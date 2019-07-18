@@ -3,7 +3,6 @@ package nablarch.fw.dicontainer.component;
 import java.util.HashMap;
 import java.util.Map;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;

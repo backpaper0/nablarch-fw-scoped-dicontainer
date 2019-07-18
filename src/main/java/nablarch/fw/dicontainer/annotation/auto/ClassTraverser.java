@@ -13,7 +13,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Stream;
 
-public class ClassTraverser {
+public final class ClassTraverser {
 
     private final ClassLoader classLoader;
     private final Class<?> base;

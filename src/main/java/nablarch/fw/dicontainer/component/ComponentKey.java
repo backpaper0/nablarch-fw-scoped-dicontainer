@@ -1,10 +1,10 @@
-package nablarch.fw.dicontainer;
+package nablarch.fw.dicontainer.component;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public final class ComponentKey<T> implements Serializable {
     }
 
     public static <T> ComponentKey<T> fromClass(final Class<T> componentType) {
-
+        //FIXME factoryクラスを作って移動したい
         final Set<Annotation> qualifiers = Arrays.stream(componentType.getAnnotations())
                 .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class))
                 .collect(Collectors.toSet());
@@ -52,7 +52,7 @@ public final class ComponentKey<T> implements Serializable {
     }
 
     public Set<AliasKey> aliasKeys() {
-        final Set<Class<?>> classes = new LinkedHashSet<>();
+        final Set<Class<?>> classes = new HashSet<>();
         collectAlias(classes, componentType);
         return classes.stream().map(a -> new AliasKey(a, qualifiers)).collect(Collectors.toSet());
     }

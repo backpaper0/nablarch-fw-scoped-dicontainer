@@ -2,12 +2,12 @@ package nablarch.fw.dicontainer.component.impl;
 
 import java.util.Objects;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 
-public class DefaultFactoryMethod implements FactoryMethod {
+public final class DefaultFactoryMethod implements FactoryMethod {
 
     private final ComponentKey<?> key;
     private final ComponentDefinition<?> definition;

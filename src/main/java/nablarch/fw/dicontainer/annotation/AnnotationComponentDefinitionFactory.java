@@ -1,18 +1,18 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
-import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
 import nablarch.fw.dicontainer.scope.Scope;
 
@@ -33,15 +33,15 @@ public final class AnnotationComponentDefinitionFactory {
 
         final Optional<InjectableMember> injectableConstructor = memberFactory
                 .createConstructor(componentType, errorCollector);
-        final Set<InjectableMember> injectableMembers = memberFactory
+        final List<InjectableMember> injectableMembers = memberFactory
                 .createFieldsAndMethods(componentType, errorCollector);
-        final Set<ObservesMethod> observesMethods = memberFactory
+        final List<ObservesMethod> observesMethods = memberFactory
                 .createObservesMethod(componentType, errorCollector);
         final Optional<InitMethod> initMethod = memberFactory.createInitMethod(componentType,
                 errorCollector);
         final Optional<DestroyMethod> destroyMethod = memberFactory
                 .createDestroyMethod(componentType, errorCollector);
-        final Set<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(builder.id(),
+        final List<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(builder.id(),
                 componentType, this, errorCollector);
         final Optional<Scope> scope = scopeDecider.fromClass(componentType, errorCollector);
 

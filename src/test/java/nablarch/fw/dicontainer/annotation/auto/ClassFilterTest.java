@@ -10,13 +10,13 @@ import java.util.stream.Stream;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.annotation.auto.ClassFilter;
-import nablarch.fw.dicontainer.annotation.auto.TraversalMark;
+import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
 
 public class ClassFilterTest {
 
     @Test
     public void nothing() throws Exception {
-        final TraversalMark traversalMark = new TraversalMark() {
+        final TraversalConfig traversalMark = new TraversalConfig() {
         };
         final ClassFilter classFilter = ClassFilter.valueOf(traversalMark);
 
@@ -26,7 +26,7 @@ public class ClassFilterTest {
 
     @Test
     public void includes() throws Exception {
-        final TraversalMark traversalMark = new TraversalMark() {
+        final TraversalConfig traversalMark = new TraversalConfig() {
             @Override
             public Set<String> includes() {
                 return Collections.singleton("^.*\\.Ccc$");
@@ -40,7 +40,7 @@ public class ClassFilterTest {
 
     @Test
     public void excludes() throws Exception {
-        final TraversalMark traversalMark = new TraversalMark() {
+        final TraversalConfig traversalMark = new TraversalConfig() {
             @Override
             public Set<String> excludes() {
                 return Collections.singleton("^.*\\.Ccc$");
@@ -54,7 +54,7 @@ public class ClassFilterTest {
 
     @Test
     public void both() throws Exception {
-        final TraversalMark traversalMark = new TraversalMark() {
+        final TraversalConfig traversalMark = new TraversalConfig() {
             @Override
             public Set<String> includes() {
                 return Collections.singleton("^aaa\\.bbb\\..*$");
@@ -75,7 +75,7 @@ public class ClassFilterTest {
 
     @Test
     public void both2() throws Exception {
-        final TraversalMark traversalMark = new TraversalMark() {
+        final TraversalConfig traversalMark = new TraversalConfig() {
             @Override
             public Set<String> includes() {
                 return Stream.of(

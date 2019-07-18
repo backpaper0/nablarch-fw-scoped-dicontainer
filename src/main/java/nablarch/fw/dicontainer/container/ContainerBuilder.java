@@ -7,11 +7,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
+import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.exception.CycleInjectionException;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
@@ -65,7 +65,7 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         return (T) this;
     }
 
-    public static class CycleDependencyValidationContext {
+    public static final class CycleDependencyValidationContext {
 
         private final ContainerBuilder<?> containerBuilder;
         private final ComponentDefinition<?> target;

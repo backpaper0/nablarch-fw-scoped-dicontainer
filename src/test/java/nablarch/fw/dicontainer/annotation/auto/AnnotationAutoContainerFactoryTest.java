@@ -8,6 +8,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.Container;
+import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.auto.demo.Auto1;
 import nablarch.fw.dicontainer.annotation.auto.demo.Auto2;
 import nablarch.fw.dicontainer.annotation.auto.demo.Auto3;
@@ -19,13 +20,14 @@ public class AnnotationAutoContainerFactoryTest {
 
     @Test
     public void create() throws Exception {
-        final Iterable<TraversalMark> traversalMarks = Collections.singleton(new TraversalMark() {
-            @Override
-            public Set<String> includes() {
-                return Collections.singleton(
-                        "^nablarch\\.fw\\.dicontainer\\.annotation\\.auto\\.demo\\..*$$");
-            }
-        });
+        final Iterable<TraversalConfig> traversalMarks = Collections
+                .singleton(new TraversalConfig() {
+                    @Override
+                    public Set<String> includes() {
+                        return Collections.singleton(
+                                "^nablarch\\.fw\\.dicontainer\\.annotation\\.auto\\.demo\\..*$$");
+                    }
+                });
         final AnnotationAutoContainerFactory factory = AnnotationAutoContainerFactory
                 .builder()
                 .traversalMarks(traversalMarks)
@@ -34,7 +36,7 @@ public class AnnotationAutoContainerFactoryTest {
 
         assertNotNull(container.getComponent(Auto1.class));
         assertNotNull(container.getComponent(Auto2.class));
-        assertNotNull(container.getComponent(Auto3.class));
+        assertNotNull(container.getComponent(Auto3.class, new NamedImpl("")));
         assertNotNull(container.getComponent(Auto4.class));
         try {
             assertNotNull(container.getComponent(NotComponent.class));

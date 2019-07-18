@@ -4,14 +4,12 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.component.MethodCollector;
 import nablarch.fw.dicontainer.overridedemo.OverrideDemo1;
 import nablarch.fw.dicontainer.overridedemo.OverrideDemo2;
 import nablarch.fw.dicontainer.overridedemo.subpackage.OverrideDemo3;
@@ -42,14 +40,14 @@ public class MethodCollectorTest {
         collector.addInstanceMethodIfNotOverridden(demo1Method3);
         collector.addInstanceMethodIfNotOverridden(demo1Method4);
 
-        final Set<Method> methods = collector.getMethods();
+        final List<Method> methods = collector.getMethods();
 
-        final Set<Method> expected = Stream.of(
+        final List<Method> expected = Arrays.asList(
                 demo2Method1,
                 demo2Method2,
                 demo2Method3,
                 demo2Method4,
-                demo1Method4).collect(Collectors.toSet());
+                demo1Method4);
 
         assertEquals(expected, methods);
     }
@@ -78,15 +76,15 @@ public class MethodCollectorTest {
         collector.addInstanceMethodIfNotOverridden(demo1Method3);
         collector.addInstanceMethodIfNotOverridden(demo1Method4);
 
-        final Set<Method> methods = collector.getMethods();
+        final List<Method> methods = collector.getMethods();
 
-        final Set<Method> expected = Stream.of(
+        final List<Method> expected = Arrays.asList(
                 demo3Method1,
                 demo3Method2,
                 demo3Method3,
                 demo3Method4,
                 demo1Method3,
-                demo1Method4).collect(Collectors.toSet());
+                demo1Method4);
 
         assertEquals(expected, methods);
     }

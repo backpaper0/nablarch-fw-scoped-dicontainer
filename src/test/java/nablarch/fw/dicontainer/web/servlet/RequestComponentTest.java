@@ -6,6 +6,7 @@ import javax.inject.Named;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +15,9 @@ import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
+import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
 import nablarch.fw.dicontainer.web.RequestScoped;
 import nablarch.fw.dicontainer.web.scope.RequestScope;
 
@@ -32,6 +35,11 @@ public class RequestComponentTest {
                 .addScope(RequestScoped.class, requestScope)
                 .build();
         builder = new AnnotationContainerBuilder(decider);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        ContainerImplementers.clear();
     }
 
     @Test
@@ -75,6 +83,7 @@ public class RequestComponentTest {
         final Container container = builder
                 .register(Bbb.class)
                 .build();
+        ContainerImplementers.set((ContainerImplementer) container);
 
         assertFalse(Bbb.called);
 

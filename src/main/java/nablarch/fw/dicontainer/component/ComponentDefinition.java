@@ -39,6 +39,8 @@ public final class ComponentDefinition<T> {
         this.destroyMethod = Objects.requireNonNull(destroyMethod);
         this.factoryMethods = Objects.requireNonNull(factoryMethods);
         this.scope = Objects.requireNonNull(scope);
+
+        this.scope.register(this);
     }
 
     public ComponentId getId() {
@@ -91,6 +93,10 @@ public final class ComponentDefinition<T> {
                 observesMethod.invoke(component, event);
             }
         }
+    }
+
+    public void destroyComponent(final T component) {
+        destroyMethod.invoke(component);
     }
 
     public static <T> Builder<T> builder() {

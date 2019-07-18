@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
+import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 
@@ -35,6 +36,11 @@ public final class TinyContainer implements ContainerImplementer {
 
     @Override
     public <T> T getComponent(final ComponentId id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> ComponentDefinition<T> getComponentDefinition(final ComponentId id) {
         throw new UnsupportedOperationException();
     }
 

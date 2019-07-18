@@ -5,7 +5,7 @@ import javax.inject.Provider;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 
-public final class PrototypeScope implements Scope {
+public final class PrototypeScope extends AbstractScope {
 
     @Override
     public <T> T getComponent(final ComponentId id, final Provider<T> provider,

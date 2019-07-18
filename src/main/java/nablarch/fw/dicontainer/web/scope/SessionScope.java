@@ -4,14 +4,15 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
+import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
-import nablarch.fw.dicontainer.scope.Scope;
+import nablarch.fw.dicontainer.scope.AbstractScope;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
 
-public final class SessionScope implements Scope {
+public final class SessionScope extends AbstractScope {
 
     private final SessionContextSupplier supplier;
 
@@ -32,5 +33,11 @@ public final class SessionScope implements Scope {
     @Override
     public int dimensions() {
         return 200;
+    }
+
+    public void destroyComponent(final ComponentId id, final Object component) {
+        final ComponentDefinition<Object> definition = (ComponentDefinition<Object>) idToDefinition
+                .get(id);
+        definition.destroyComponent(component);
     }
 }

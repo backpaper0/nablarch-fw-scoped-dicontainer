@@ -1,6 +1,5 @@
 package nablarch.fw.dicontainer.scope;
 
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
@@ -9,11 +8,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.Observes;
+import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 
-public final class SingletonScope implements Scope {
+public final class SingletonScope extends AbstractScope {
 
     private final ConcurrentMap<ComponentId, InstanceHolder> instances = new ConcurrentHashMap<>();
 
@@ -22,7 +22,7 @@ public final class SingletonScope implements Scope {
             final DestroyMethod destroyMethod) {
         InstanceHolder instanceHolder = instances.get(id);
         if (instanceHolder == null) {
-            instanceHolder = new InstanceHolder(destroyMethod);
+            instanceHolder = new InstanceHolder();
             final InstanceHolder previous = instances.putIfAbsent(id, instanceHolder);
             if (previous != null && instanceHolder != previous) {
                 instanceHolder = previous;
@@ -33,9 +33,12 @@ public final class SingletonScope implements Scope {
 
     @Observes
     public void destroy(final ContainerDestroy event) {
-        for (final InstanceHolder instance : instances.values()) {
-            instance.destroy();
-        }
+        idToDefinition.forEach((id, definition) -> {
+            final InstanceHolder holder = instances.get(id);
+            if (holder != null) {
+                holder.destroy((ComponentDefinition<Object>) definition);
+            }
+        });
     }
 
     @Override
@@ -47,17 +50,12 @@ public final class SingletonScope implements Scope {
 
         Object instance;
         final Lock lock = new ReentrantLock();
-        private final DestroyMethod destroyMethod;
 
-        InstanceHolder(final DestroyMethod destroyMethod) {
-            this.destroyMethod = Objects.requireNonNull(destroyMethod);
-        }
-
-        void destroy() {
+        void destroy(final ComponentDefinition<Object> definition) {
             lock.lock();
             try {
                 if (instance != null) {
-                    destroyMethod.invoke(instance);
+                    definition.destroyComponent(instance);
                 }
             } finally {
                 lock.unlock();

@@ -20,7 +20,9 @@ import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
+import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
 import nablarch.fw.dicontainer.web.SessionScoped;
 import nablarch.fw.dicontainer.web.scope.SessionScope;
 
@@ -62,6 +64,7 @@ public class SessionComponentTest {
         final Container container = builder
                 .register(Bbb.class)
                 .build();
+        ContainerImplementers.set((ContainerImplementer) container);
 
         assertFalse(Bbb.called);
 

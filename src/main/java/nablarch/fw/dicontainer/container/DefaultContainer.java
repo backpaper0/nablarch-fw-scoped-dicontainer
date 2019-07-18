@@ -31,6 +31,11 @@ public final class DefaultContainer implements ContainerImplementer {
     }
 
     @Override
+    public <T> ComponentDefinition<T> getComponentDefinition(final ComponentId id) {
+        return definitions.get(id);
+    }
+
+    @Override
     public <T> T getComponent(final ComponentKey<T> key) {
         ComponentDefinition<T> definition = definitions.find(key);
         if (definition != null) {

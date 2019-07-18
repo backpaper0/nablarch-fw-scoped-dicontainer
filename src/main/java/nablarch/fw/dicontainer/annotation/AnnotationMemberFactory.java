@@ -27,17 +27,18 @@ import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.FieldCollector;
 import nablarch.fw.dicontainer.component.InitMethod;
-import nablarch.fw.dicontainer.component.InjectableConstructor;
-import nablarch.fw.dicontainer.component.InjectableFactoryMethod;
-import nablarch.fw.dicontainer.component.InjectableField;
 import nablarch.fw.dicontainer.component.InjectableMember;
-import nablarch.fw.dicontainer.component.InjectableMethod;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.MethodCollector;
 import nablarch.fw.dicontainer.component.ObservesMethod;
-import nablarch.fw.dicontainer.component.DestroyMethod.DestroyMethodImpl;
-import nablarch.fw.dicontainer.component.FactoryMethod.FactoryMethodImpl;
-import nablarch.fw.dicontainer.component.InitMethod.InitMethodImpl;
+import nablarch.fw.dicontainer.component.impl.DefaultDestroyMethod;
+import nablarch.fw.dicontainer.component.impl.DefaultFactoryMethod;
+import nablarch.fw.dicontainer.component.impl.DefaultInitMethod;
+import nablarch.fw.dicontainer.component.impl.InjectableConstructor;
+import nablarch.fw.dicontainer.component.impl.InjectableFactoryMethod;
+import nablarch.fw.dicontainer.component.impl.InjectableField;
+import nablarch.fw.dicontainer.component.impl.InjectableMethod;
+import nablarch.fw.dicontainer.component.impl.DefaultObservesMethod;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
 import nablarch.fw.dicontainer.exception.FactoryMethodSignatureException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
@@ -178,7 +179,7 @@ public final class AnnotationMemberFactory {
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Observes.class)) {
                 if (method.getParameterCount() == 1) {
-                    final ObservesMethod observesMethod = new ObservesMethod(method);
+                    final ObservesMethod observesMethod = new DefaultObservesMethod(method);
                     observesMethods.add(observesMethod);
                 } else {
                     errorCollector.add(new ObserverMethodSignatureException());
@@ -206,7 +207,7 @@ public final class AnnotationMemberFactory {
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Init.class)) {
                 if (method.getParameterCount() == 0) {
-                    methods.add(new InitMethodImpl(method));
+                    methods.add(new DefaultInitMethod(method));
                 } else {
                     errorCollector.add(new LifeCycleMethodSignatureException());
                 }
@@ -238,7 +239,7 @@ public final class AnnotationMemberFactory {
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Destroy.class)) {
                 if (method.getParameterCount() == 0) {
-                    methods.add(new DestroyMethodImpl(method));
+                    methods.add(new DefaultDestroyMethod(method));
                 } else {
                     errorCollector.add(new LifeCycleMethodSignatureException());
                 }
@@ -283,7 +284,7 @@ public final class AnnotationMemberFactory {
         }
         for (final Method method : methods) {
             if (method.getParameterCount() == 0) {
-                final DestroyMethod destroyMethod = new DestroyMethodImpl(method);
+                final DestroyMethod destroyMethod = new DefaultDestroyMethod(method);
                 return Optional.of(destroyMethod);
             }
         }
@@ -316,7 +317,7 @@ public final class AnnotationMemberFactory {
                     final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
                     final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
                             .fromMethod(id, method, errorCollector);
-                    definition.ifPresent(a -> methods.add(new FactoryMethodImpl(key, a)));
+                    definition.ifPresent(a -> methods.add(new DefaultFactoryMethod(key, a)));
                 }
             }
         }

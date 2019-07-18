@@ -9,8 +9,7 @@ import javax.inject.Provider;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.component.ComponentId;
-import nablarch.fw.dicontainer.component.DestroyMethod;
-import nablarch.fw.dicontainer.scope.SingletonScope;
+import nablarch.fw.dicontainer.component.impl.NoopDestroyMethod;
 
 public class SingletonScopeTest {
 
@@ -20,8 +19,8 @@ public class SingletonScopeTest {
     public void getComponent() throws Exception {
         final ComponentId id = ComponentId.generate();
         final Provider<Aaa> provider = Aaa::new;
-        final Aaa component1 = scope.getComponent(id, provider, DestroyMethod.noop());
-        final Aaa component2 = scope.getComponent(id, provider, DestroyMethod.noop());
+        final Aaa component1 = scope.getComponent(id, provider, new NoopDestroyMethod());
+        final Aaa component2 = scope.getComponent(id, provider, new NoopDestroyMethod());
         assertTrue(component1 == component2);
     }
 
@@ -31,10 +30,10 @@ public class SingletonScopeTest {
         final Provider<Bbb> provider = Bbb::new;
         final Bbb[] components = new Bbb[2];
         final Thread t1 = new Thread(() -> {
-            components[0] = scope.getComponent(id, provider, DestroyMethod.noop());
+            components[0] = scope.getComponent(id, provider, new NoopDestroyMethod());
         });
         final Thread t2 = new Thread(() -> {
-            components[1] = scope.getComponent(id, provider, DestroyMethod.noop());
+            components[1] = scope.getComponent(id, provider, new NoopDestroyMethod());
         });
         t1.start();
         t2.start();

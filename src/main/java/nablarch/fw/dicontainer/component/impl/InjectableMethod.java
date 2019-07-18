@@ -1,22 +1,24 @@
-package nablarch.fw.dicontainer.component;
+package nablarch.fw.dicontainer.component.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.InjectableMember;
+import nablarch.fw.dicontainer.component.InjectionComponentResolver;
+import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 
-public final class InjectableConstructor implements InjectableMember {
+public final class InjectableMethod implements InjectableMember {
 
-    private final Constructor<?> constructor;
+    private final MethodWrapper method;
     private final List<InjectionComponentResolver> resolvers;
 
-    public InjectableConstructor(final Constructor<?> constructor,
-            final List<InjectionComponentResolver> resolvers) {
-        this.constructor = Objects.requireNonNull(constructor);
+    public InjectableMethod(final Method method, final List<InjectionComponentResolver> resolvers) {
+        this.method = new MethodWrapper(method);
         this.resolvers = Objects.requireNonNull(resolvers);
     }
 
@@ -24,15 +26,7 @@ public final class InjectableConstructor implements InjectableMember {
     public Object inject(final ContainerImplementer container, final Object component) {
         final Object[] args = resolvers.stream().map(resolver -> resolver.resolve(container))
                 .toArray();
-        try {
-            if (constructor.isAccessible() == false) {
-                constructor.setAccessible(true);
-            }
-            return constructor.newInstance(args);
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return method.invoke(component, args);
     }
 
     @Override
@@ -46,7 +40,7 @@ public final class InjectableConstructor implements InjectableMember {
     @Override
     public void validateCycleDependency(final CycleDependencyValidationContext context) {
         for (final InjectionComponentResolver resolver : resolvers) {
-            resolver.validateCycleDependency(context.createSubContext());
+            resolver.validateCycleDependency(context);
         }
     }
 }

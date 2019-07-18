@@ -1,40 +1,33 @@
-package nablarch.fw.dicontainer.component;
+package nablarch.fw.dicontainer.component.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.InjectableMember;
+import nablarch.fw.dicontainer.component.InjectionComponentResolver;
+import nablarch.fw.dicontainer.component.impl.reflect.ConstructorWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 
-public class InjectableFactoryMethod implements InjectableMember {
+public final class InjectableConstructor implements InjectableMember {
 
-    private final ComponentId componentId;
-    private final Method method;
+    private final ConstructorWrapper constructor;
     private final List<InjectionComponentResolver> resolvers;
 
-    public InjectableFactoryMethod(final ComponentId componentId, final Method method,
+    public InjectableConstructor(final Constructor<?> constructor,
             final List<InjectionComponentResolver> resolvers) {
-        this.componentId = Objects.requireNonNull(componentId);
-        this.method = Objects.requireNonNull(method);
+        this.constructor = new ConstructorWrapper(constructor);
         this.resolvers = Objects.requireNonNull(resolvers);
     }
 
     @Override
     public Object inject(final ContainerImplementer container, final Object component) {
-        final Object factoryComponent = container.getComponent(componentId);
         final Object[] args = resolvers.stream().map(resolver -> resolver.resolve(container))
                 .toArray();
-        if (method.isAccessible() == false) {
-            method.setAccessible(true);
-        }
-        try {
-            return method.invoke(factoryComponent, args);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return constructor.newInstance(args);
     }
 
     @Override
@@ -48,7 +41,7 @@ public class InjectableFactoryMethod implements InjectableMember {
     @Override
     public void validateCycleDependency(final CycleDependencyValidationContext context) {
         for (final InjectionComponentResolver resolver : resolvers) {
-            resolver.validateCycleDependency(context);
+            resolver.validateCycleDependency(context.createSubContext());
         }
     }
 }

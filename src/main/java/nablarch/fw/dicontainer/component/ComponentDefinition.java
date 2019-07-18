@@ -7,6 +7,8 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
+import nablarch.fw.dicontainer.component.impl.NoopDestroyMethod;
+import nablarch.fw.dicontainer.component.impl.NoopInitMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
@@ -109,8 +111,8 @@ public final class ComponentDefinition<T> {
         private InjectableMember injectableConstructor;
         private Set<InjectableMember> injectableMembers = Collections.emptySet();
         private Set<ObservesMethod> observesMethods = Collections.emptySet();
-        private InitMethod initMethod = InitMethod.noop();
-        private DestroyMethod destroyMethod = DestroyMethod.noop();
+        private InitMethod initMethod = new NoopInitMethod();
+        private DestroyMethod destroyMethod = new NoopDestroyMethod();
         private Set<FactoryMethod> factoryMethods = Collections.emptySet();
         private Scope scope;
 

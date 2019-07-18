@@ -6,15 +6,15 @@ import java.util.Optional;
 import java.util.Set;
 
 import nablarch.fw.dicontainer.ComponentId;
-import nablarch.fw.dicontainer.config.ComponentDefinition;
-import nablarch.fw.dicontainer.config.ComponentDefinition.Builder;
-import nablarch.fw.dicontainer.config.DestroyMethod;
-import nablarch.fw.dicontainer.config.ErrorCollector;
-import nablarch.fw.dicontainer.config.FactoryMethod;
-import nablarch.fw.dicontainer.config.InitMethod;
-import nablarch.fw.dicontainer.config.InjectableMember;
-import nablarch.fw.dicontainer.config.ObservesMethod;
-import nablarch.fw.dicontainer.config.Scope;
+import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.DestroyMethod;
+import nablarch.fw.dicontainer.component.FactoryMethod;
+import nablarch.fw.dicontainer.component.InitMethod;
+import nablarch.fw.dicontainer.component.InjectableMember;
+import nablarch.fw.dicontainer.component.ObservesMethod;
+import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
+import nablarch.fw.dicontainer.exception.ErrorCollector;
+import nablarch.fw.dicontainer.scope.Scope;
 
 public final class AnnotationComponentDefinitionFactory {
 

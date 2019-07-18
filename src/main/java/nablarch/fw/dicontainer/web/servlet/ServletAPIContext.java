@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import nablarch.fw.dicontainer.ComponentId;
-import nablarch.fw.dicontainer.config.DestroyMethod;
-import nablarch.fw.dicontainer.web.RequestContext;
-import nablarch.fw.dicontainer.web.SessionContext;
+import nablarch.fw.dicontainer.component.DestroyMethod;
+import nablarch.fw.dicontainer.web.context.RequestContext;
+import nablarch.fw.dicontainer.web.context.SessionContext;
 
 public class ServletAPIContext implements RequestContext, SessionContext {
 

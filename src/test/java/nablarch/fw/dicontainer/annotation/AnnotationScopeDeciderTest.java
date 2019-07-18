@@ -10,10 +10,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.Prototype;
-import nablarch.fw.dicontainer.config.ErrorCollector;
-import nablarch.fw.dicontainer.config.PrototypeScope;
-import nablarch.fw.dicontainer.config.Scope;
-import nablarch.fw.dicontainer.config.SingletonScope;
+import nablarch.fw.dicontainer.exception.ErrorCollector;
+import nablarch.fw.dicontainer.scope.PrototypeScope;
+import nablarch.fw.dicontainer.scope.Scope;
+import nablarch.fw.dicontainer.scope.SingletonScope;
 
 public class AnnotationScopeDeciderTest {
 

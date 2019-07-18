@@ -3,10 +3,10 @@ package nablarch.fw.dicontainer.web.servlet;
 import javax.servlet.http.HttpServletRequest;
 
 import nablarch.fw.dicontainer.exception.web.WebContextException;
-import nablarch.fw.dicontainer.web.RequestContext;
-import nablarch.fw.dicontainer.web.RequestContextSupplier;
-import nablarch.fw.dicontainer.web.SessionContext;
-import nablarch.fw.dicontainer.web.SessionContextSupplier;
+import nablarch.fw.dicontainer.web.context.RequestContext;
+import nablarch.fw.dicontainer.web.context.RequestContextSupplier;
+import nablarch.fw.dicontainer.web.context.SessionContext;
+import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
 
 public final class ServletAPIContextSupplier
         implements RequestContextSupplier, SessionContextSupplier {

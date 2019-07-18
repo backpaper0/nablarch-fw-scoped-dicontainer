@@ -14,7 +14,7 @@ import javax.inject.Provider;
 import javax.inject.Qualifier;
 
 import nablarch.fw.dicontainer.ComponentKey;
-import nablarch.fw.dicontainer.config.InjectionComponentResolver;
+import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 
 public final class AnnotationInjectionComponentResolverFactory {
 

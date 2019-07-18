@@ -15,8 +15,8 @@ import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
-import nablarch.fw.dicontainer.web.RequestScope;
 import nablarch.fw.dicontainer.web.RequestScoped;
+import nablarch.fw.dicontainer.web.scope.RequestScope;
 
 public class RequestComponentTest {
 

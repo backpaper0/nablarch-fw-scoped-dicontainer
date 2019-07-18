@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import nablarch.fw.dicontainer.config.DestroyMethod;
+import nablarch.fw.dicontainer.component.DestroyMethod;
 
 public interface SerializedDestroyMethod extends Serializable {
 

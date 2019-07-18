@@ -6,7 +6,7 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.config.DestroyMethod;
+import nablarch.fw.dicontainer.component.DestroyMethod;
 
 public final class SerializedInstanceHolder implements Serializable {
 

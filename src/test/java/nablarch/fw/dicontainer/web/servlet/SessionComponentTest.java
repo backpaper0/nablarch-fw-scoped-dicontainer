@@ -21,8 +21,8 @@ import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
-import nablarch.fw.dicontainer.web.SessionScope;
 import nablarch.fw.dicontainer.web.SessionScoped;
+import nablarch.fw.dicontainer.web.scope.SessionScope;
 
 public class SessionComponentTest {
 

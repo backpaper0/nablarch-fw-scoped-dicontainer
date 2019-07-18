@@ -14,10 +14,9 @@ import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
+import nablarch.fw.dicontainer.exception.web.WebContextException;
 import nablarch.fw.dicontainer.web.RequestScope;
 import nablarch.fw.dicontainer.web.RequestScoped;
-import nablarch.fw.dicontainer.web.servlet.ContainerLifecycleServletListener;
-import nablarch.fw.dicontainer.web.servlet.ServletAPIContextSupplier;
 
 public class RequestComponentTest {
 
@@ -106,6 +105,17 @@ public class RequestComponentTest {
 
         assertTrue(components[0].getClass() == Ccc2.class);
         assertTrue(components[1].getClass() == Ccc3.class);
+    }
+
+    @Test
+    public void outOfScope() throws Exception {
+        final Container container = builder.register(Aaa.class)
+                .build();
+        try {
+            container.getComponent(Aaa.class);
+            fail();
+        } catch (final WebContextException e) {
+        }
     }
 
     @RequestScoped

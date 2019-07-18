@@ -2,6 +2,7 @@ package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
 import java.util.Objects;
+import java.util.Optional;
 
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
@@ -27,17 +28,19 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
         final ComponentKey<T> key = ComponentKey.fromClass(componentType);
-        final ComponentDefinition<T> definition = componentDefinitionFactory
+        final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
                 .fromClass(componentType, errorCollector);
-        return register(key, definition);
+        definition.ifPresent(a -> register(key, a));
+        return this;
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType,
             final Annotation... qualifiers) {
         final ComponentKey<T> key = new ComponentKey<>(componentType, qualifiers);
-        final ComponentDefinition<T> definition = componentDefinitionFactory
+        final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
                 .fromClass(componentType, errorCollector);
-        return register(key, definition);
+        definition.ifPresent(a -> register(key, a));
+        return this;
     }
 
     @Override

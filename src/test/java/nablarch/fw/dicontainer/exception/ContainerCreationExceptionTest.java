@@ -1,11 +1,14 @@
 package nablarch.fw.dicontainer.exception;
 
+import static nablarch.fw.dicontainer.ContainerAsserts.*;
 import static org.junit.Assert.*;
 
-import java.util.Iterator;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Scope;
 import javax.inject.Singleton;
 
 import org.junit.Test;
@@ -318,15 +321,28 @@ public class ContainerCreationExceptionTest {
         }
     }
 
-    @SafeVarargs
-    private static void assertContainerException(final ContainerCreationException e,
-            final Class<? extends ContainerException>... expecteds) {
-        final Iterator<ContainerException> it = e.getExceptions().iterator();
-        for (final Class<? extends ContainerException> expected : expecteds) {
-            assertTrue(it.hasNext());
-            assertEquals(expected, it.next().getClass());
+    @Test
+    public void scopeDuplicated() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Rrr1.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, ScopeDuplicatedException.class);
         }
-        assertFalse(it.hasNext());
+    }
+
+    @Test
+    public void scopeNotFound() throws Exception {
+        final AnnotationContainerBuilder builder = new AnnotationContainerBuilder()
+                .register(Rrr2.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, ScopeNotFoundException.class);
+        }
     }
 
     @Singleton
@@ -545,5 +561,19 @@ public class ContainerCreationExceptionTest {
         @Inject
         Qqq6(final Qqq1 arg) {
         }
+    }
+
+    @Singleton
+    @Prototype
+    private static class Rrr1 {
+    }
+
+    @UnknownScoped
+    private static class Rrr2 {
+    }
+
+    @Scope
+    @Retention(RetentionPolicy.RUNTIME)
+    private @interface UnknownScoped {
     }
 }

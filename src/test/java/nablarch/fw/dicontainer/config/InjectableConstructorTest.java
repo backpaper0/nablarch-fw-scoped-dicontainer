@@ -18,10 +18,12 @@ import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;
 public class InjectableConstructorTest {
 
     private final AnnotationMemberFactory factory = new AnnotationMemberFactory();
+    private final ErrorCollector errorCollector = ErrorCollector.newInstance();
 
     @Test
     public void fromClass() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Aaa.class, new ErrorCollector());
+        final InjectableMember creator = factory.createConstructor(Aaa.class, errorCollector)
+                .get();
         final Container container = new TinyContainer();
         final Aaa component = (Aaa) creator.inject(container, null);
         assertTrue(component.called);
@@ -29,7 +31,8 @@ public class InjectableConstructorTest {
 
     @Test
     public void fromClassWithInjection() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Bbb.class, new ErrorCollector());
+        final InjectableMember creator = factory.createConstructor(Bbb.class, errorCollector)
+                .get();
         final Container container = new TinyContainer(Aaa.class);
         final Bbb component = (Bbb) creator.inject(container, null);
         assertTrue(component.called);
@@ -37,7 +40,8 @@ public class InjectableConstructorTest {
 
     @Test
     public void fromClassWithQualifierParameter() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Ddd.class, new ErrorCollector());
+        final InjectableMember creator = factory.createConstructor(Ddd.class, errorCollector)
+                .get();
         final UUID uuid1 = UUID.randomUUID();
         final UUID uuid2 = UUID.randomUUID();
         final Container container = new TinyContainer()

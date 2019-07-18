@@ -11,6 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -38,15 +39,20 @@ import nablarch.fw.dicontainer.config.InjectableMethod;
 import nablarch.fw.dicontainer.config.InjectionComponentResolver;
 import nablarch.fw.dicontainer.config.MethodCollector;
 import nablarch.fw.dicontainer.config.ObservesMethod;
+import nablarch.fw.dicontainer.exception.FactoryMethodSignatureException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorNotFoundException;
+import nablarch.fw.dicontainer.exception.LifeCycleMethodDuplicatedException;
+import nablarch.fw.dicontainer.exception.LifeCycleMethodNotFoundException;
+import nablarch.fw.dicontainer.exception.LifeCycleMethodSignatureException;
+import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public final class AnnotationMemberFactory {
 
     private final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory = new AnnotationInjectionComponentResolverFactory();
 
-    public InjectableMember createConstructor(final Class<?> componentType,
+    public Optional<InjectableMember> createConstructor(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Set<Constructor<?>> constructors = new HashSet<>();
         Constructor<?> noArgConstructor = null;
@@ -61,24 +67,24 @@ public final class AnnotationMemberFactory {
         if (constructors.size() > 1) {
             errorCollector.add(
                     new InjectableConstructorDuplicatedException(componentType, constructors));
-            return InjectableMember.errorMock();
+            return Optional.empty();
         } else if (constructors.size() == 1) {
             final Constructor<?> constructor = constructors.iterator().next();
             final List<InjectionComponentResolver> resolvers = injectionComponentResolverFactory
                     .fromConstructorParameters(constructor);
             final InjectableConstructor injectableConstructor = new InjectableConstructor(
                     constructor, resolvers);
-            return injectableConstructor;
+            return Optional.of(injectableConstructor);
         } else if (noArgConstructor == null) {
             errorCollector.add(
                     new InjectableConstructorNotFoundException(componentType));
-            return InjectableMember.errorMock();
+            return Optional.empty();
         }
 
         final List<InjectionComponentResolver> resolvers = Collections.emptyList();
         final InjectableConstructor injectableConstructor = new InjectableConstructor(
                 noArgConstructor, resolvers);
-        return injectableConstructor;
+        return Optional.of(injectableConstructor);
     }
 
     public InjectableMember createFactoryMethod(final ComponentId id, final Method factoryMethod,
@@ -157,107 +163,132 @@ public final class AnnotationMemberFactory {
     public Set<ObservesMethod> createObservesMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
-        //TODO errorCollector
-
         final MethodCollector methodCollector = new MethodCollector();
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
+                if (Modifier.isStatic(method.getModifiers())
+                        && method.isAnnotationPresent(Observes.class)) {
+                    errorCollector.add(new ObserverMethodSignatureException());
+                }
             }
         }
 
         final Set<ObservesMethod> observesMethods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Observes.class)) {
-                if (method.getParameterCount() != 1) {
-                    //TODO error
+                if (method.getParameterCount() == 1) {
+                    final ObservesMethod observesMethod = new ObservesMethod(method);
+                    observesMethods.add(observesMethod);
+                } else {
+                    errorCollector.add(new ObserverMethodSignatureException());
                 }
-                final ObservesMethod observesMethod = new ObservesMethod(method);
-                observesMethods.add(observesMethod);
             }
         }
 
         return observesMethods;
     }
 
-    public InitMethod createInitMethod(final Class<?> componentType,
+    public Optional<InitMethod> createInitMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
-        //TODO errorCollector
 
         final MethodCollector methodCollector = new MethodCollector();
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
+                if (Modifier.isStatic(method.getModifiers())
+                        && method.isAnnotationPresent(Init.class)) {
+                    errorCollector.add(new LifeCycleMethodSignatureException());
+                }
             }
         }
         final Set<InitMethod> methods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Init.class)) {
-                methods.add(new InitMethodImpl(method));
+                if (method.getParameterCount() == 0) {
+                    methods.add(new InitMethodImpl(method));
+                } else {
+                    errorCollector.add(new LifeCycleMethodSignatureException());
+                }
             }
         }
         if (methods.size() > 1) {
-            //TODO error
-            throw new RuntimeException();
+            errorCollector.add(new LifeCycleMethodDuplicatedException());
+            return Optional.empty();
         } else if (methods.isEmpty()) {
-            return InitMethod.noop();
+            return Optional.empty();
         }
-        return methods.iterator().next();
+        return Optional.of(methods.iterator().next());
     }
 
-    public DestroyMethod createDestroyMethod(final Class<?> componentType,
+    public Optional<DestroyMethod> createDestroyMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
-
-        //TODO errorCollector
 
         final MethodCollector methodCollector = new MethodCollector();
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
+                if (Modifier.isStatic(method.getModifiers())
+                        && method.isAnnotationPresent(Destroy.class)) {
+                    errorCollector.add(new LifeCycleMethodSignatureException());
+                }
             }
         }
         final Set<DestroyMethod> methods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Destroy.class)) {
-                methods.add(new DestroyMethodImpl(method));
+                if (method.getParameterCount() == 0) {
+                    methods.add(new DestroyMethodImpl(method));
+                } else {
+                    errorCollector.add(new LifeCycleMethodSignatureException());
+                }
             }
         }
         if (methods.size() > 1) {
-            //TODO error
-            throw new RuntimeException();
+            errorCollector.add(new LifeCycleMethodDuplicatedException());
+            return Optional.empty();
         } else if (methods.isEmpty()) {
-            return DestroyMethod.noop();
+            return Optional.empty();
         }
-        return methods.iterator().next();
+        return Optional.of(methods.iterator().next());
     }
 
-    public DestroyMethod createFactoryDestroyMethod(final Method factoryMethod,
+    public Optional<DestroyMethod> createFactoryDestroyMethod(final Method factoryMethod,
             final ErrorCollector errorCollector) {
         final Factory factory = factoryMethod.getAnnotation(Factory.class);
         if (factory.destroy().isEmpty()) {
-            return DestroyMethod.noop();
+            return Optional.empty();
         }
         final Class<?> componentType = factoryMethod.getReturnType();
         final MethodCollector methodCollector = new MethodCollector();
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
+                if (Modifier.isStatic(method.getModifiers())
+                        && method.getName().equals(factory.destroy())) {
+                    errorCollector.add(new LifeCycleMethodSignatureException());
+                    return Optional.empty();
+                }
             }
         }
-        final Set<DestroyMethod> methods = new LinkedHashSet<>();
+        final Set<Method> methods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.getName().equals(factory.destroy())) {
-                methods.add(new DestroyMethodImpl(method));
+                methods.add(method);
             }
         }
-        if (methods.size() > 1) {
-            //TODO error
-            throw new RuntimeException();
-        } else if (methods.isEmpty()) {
-            //TODO error
-            throw new RuntimeException();
+        if (methods.isEmpty()) {
+            errorCollector.add(new LifeCycleMethodNotFoundException());
+            return Optional.empty();
         }
-        return methods.iterator().next();
+        for (final Method method : methods) {
+            if (method.getParameterCount() == 0) {
+                final DestroyMethod destroyMethod = new DestroyMethodImpl(method);
+                return Optional.of(destroyMethod);
+            }
+        }
+        errorCollector.add(new LifeCycleMethodSignatureException());
+        return Optional.empty();
     }
 
     public Set<FactoryMethod> createFactoryMethods(final ComponentId id,
@@ -268,15 +299,25 @@ public final class AnnotationMemberFactory {
         for (Class<?> clazz = componentType; clazz != Object.class; clazz = clazz.getSuperclass()) {
             for (final Method method : clazz.getDeclaredMethods()) {
                 methodCollector.addInstanceMethodIfNotOverridden(method);
+                if (Modifier.isStatic(method.getModifiers())
+                        && method.isAnnotationPresent(Factory.class)) {
+                    errorCollector.add(new FactoryMethodSignatureException());
+                }
             }
         }
         final Set<FactoryMethod> methods = new LinkedHashSet<>();
         for (final Method method : methodCollector.getMethods()) {
             if (method.isAnnotationPresent(Factory.class)) {
-                final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
-                final ComponentDefinition<?> definition = componentDefinitionFactory
-                        .fromMethod(id, method, errorCollector);
-                methods.add(new FactoryMethodImpl(key, definition));
+                if (method.getReturnType() == Void.TYPE) {
+                    errorCollector.add(new FactoryMethodSignatureException());
+                } else if (method.getParameterCount() != 0) {
+                    errorCollector.add(new FactoryMethodSignatureException());
+                } else {
+                    final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
+                    final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
+                            .fromMethod(id, method, errorCollector);
+                    definition.ifPresent(a -> methods.add(new FactoryMethodImpl(key, a)));
+                }
             }
         }
 

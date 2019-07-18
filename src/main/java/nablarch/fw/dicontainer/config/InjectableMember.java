@@ -11,24 +11,6 @@ public interface InjectableMember {
 
     void validateCycleDependency(CycleDependencyValidationContext context);
 
-    static InjectableMember errorMock() {
-        return new InjectableMember() {
-            @Override
-            public Object inject(final Container container, final Object component) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void validate(final ContainerBuilder<?> containerBuilder,
-                    final ComponentDefinition<?> self) {
-            }
-
-            @Override
-            public void validateCycleDependency(final CycleDependencyValidationContext context) {
-            }
-        };
-    }
-
     static InjectableMember passthrough(final Object instance) {
         return new InjectableMember() {
             @Override

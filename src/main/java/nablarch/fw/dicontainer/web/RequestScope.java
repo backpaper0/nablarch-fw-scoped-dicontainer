@@ -5,8 +5,9 @@ import java.util.Objects;
 import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.ComponentId;
-import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.DestroyMethod;
+import nablarch.fw.dicontainer.config.Scope;
+import nablarch.fw.dicontainer.exception.web.WebContextException;
 
 public final class RequestScope implements Scope {
 
@@ -21,8 +22,7 @@ public final class RequestScope implements Scope {
             final DestroyMethod destroyMethod) {
         final RequestContext context = supplier.getRequestContext();
         if (context == null) {
-            //TODO error
-            throw new RuntimeException();
+            throw new WebContextException();
         }
         return context.getRequestComponent(id, provider, destroyMethod);
     }

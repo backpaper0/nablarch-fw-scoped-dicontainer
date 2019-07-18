@@ -35,7 +35,7 @@ public final class DefaultContainer implements Container {
         }
         final Set<ComponentKey<?>> alterKeys = aliasMapping.find(key.asAliasKey());
         if (alterKeys.isEmpty()) {
-            throw new ComponentNotFoundException(key);
+            throw new ComponentNotFoundException();
         } else if (alterKeys.size() > 1) {
             throw new ComponentDuplicatedException();
         }

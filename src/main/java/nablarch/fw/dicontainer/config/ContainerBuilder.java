@@ -16,7 +16,7 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
 
     private final ComponentDefinitionRepository definitions = new ComponentDefinitionRepository();
     private final AliasMapping aliasesMap = new AliasMapping();
-    protected final ErrorCollector errorCollector = new ErrorCollector();
+    protected final ErrorCollector errorCollector = ErrorCollector.newInstance();
 
     public T ignoreError(final Class<? extends ContainerException> ignoreMe) {
         errorCollector.ignore(ignoreMe);

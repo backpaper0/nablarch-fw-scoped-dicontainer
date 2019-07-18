@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Singleton;
 
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Prototype;
-import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.ComponentDefinition;
 import nablarch.fw.dicontainer.config.DestroyMethod;
 import nablarch.fw.dicontainer.config.ErrorCollector;
@@ -21,7 +21,10 @@ import nablarch.fw.dicontainer.config.InjectableMember;
 import nablarch.fw.dicontainer.config.ObservesMethod;
 import nablarch.fw.dicontainer.config.PassthroughScope;
 import nablarch.fw.dicontainer.config.PrototypeScope;
+import nablarch.fw.dicontainer.config.Scope;
 import nablarch.fw.dicontainer.config.SingletonScope;
+import nablarch.fw.dicontainer.exception.ScopeDuplicatedException;
+import nablarch.fw.dicontainer.exception.ScopeNotFoundException;
 
 public final class AnnotationScopeDecider {
 
@@ -43,38 +46,43 @@ public final class AnnotationScopeDecider {
         this(new PrototypeScope(), Collections.emptyMap());
     }
 
-    public Scope fromClass(final Class<?> componentType) {
+    public Optional<Scope> fromClass(final Class<?> componentType,
+            final ErrorCollector errorCollector) {
         final Annotation[] annotations = Arrays.stream(componentType.getAnnotations())
                 .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
                 .toArray(Annotation[]::new);
         if (annotations.length == 0) {
-            return defaultScope;
+            return Optional.of(defaultScope);
         } else if (annotations.length > 1) {
-            //TODO error
+            errorCollector.add(new ScopeDuplicatedException());
+            return Optional.empty();
         }
         final Class<? extends Annotation> annotation = annotations[0].annotationType();
         final Scope scope = scopes.get(annotation);
         if (scope == null) {
-            //TODO error
+            errorCollector.add(new ScopeNotFoundException());
+            return Optional.empty();
         }
-        return scope;
+        return Optional.of(scope);
     }
 
-    public Scope fromMethod(final Method method) {
+    public Optional<Scope> fromMethod(final Method method, final ErrorCollector errorCollector) {
         final Annotation[] annotations = Arrays.stream(method.getAnnotations())
                 .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
                 .toArray(Annotation[]::new);
         if (annotations.length == 0) {
-            return defaultScope;
+            return Optional.of(defaultScope);
         } else if (annotations.length > 1) {
-            //TODO error
+            errorCollector.add(new ScopeDuplicatedException());
+            return Optional.empty();
         }
         final Class<? extends Annotation> annotation = annotations[0].annotationType();
         final Scope scope = scopes.get(annotation);
         if (scope == null) {
-            //TODO error
+            errorCollector.add(new ScopeNotFoundException());
+            return Optional.empty();
         }
-        return scope;
+        return Optional.of(scope);
     }
 
     //FIXME
@@ -89,22 +97,24 @@ public final class AnnotationScopeDecider {
 
     private <T extends Scope> void registerScope(final AnnotationContainerBuilder builder,
             final T scope) {
+
+        final ErrorCollector errorCollector = ErrorCollector.wrap(builder);
+
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
         final InjectableMember injectableConstructor = InjectableMember.passthrough(scope);
-        //FIXME 引数errorCollector
         final Set<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
-                componentType, new ErrorCollector());
-        //FIXME 引数errorCollector
-        final DestroyMethod destroyMethod = builder.memberFactory.createDestroyMethod(componentType,
-                new ErrorCollector());
-        final ComponentDefinition<T> definitionBuilder = ComponentDefinition.<T> builder()
+                componentType, errorCollector);
+        final Optional<DestroyMethod> destroyMethod = builder.memberFactory.createDestroyMethod(
+                componentType, errorCollector);
+        final ComponentDefinition.Builder<T> cdBuilder = ComponentDefinition.builder();
+        destroyMethod.ifPresent(cdBuilder::destroyMethod);
+        final Optional<ComponentDefinition<T>> definition = cdBuilder
                 .injectableConstructor(injectableConstructor)
                 .observesMethods(observesMethods)
-                .destroyMethod(destroyMethod)
                 .scope(passthroughScope)
                 .build();
-        builder.register(key, definitionBuilder);
+        definition.ifPresent(a -> builder.register(key, a));
     }
 
     public static Builder builder() {

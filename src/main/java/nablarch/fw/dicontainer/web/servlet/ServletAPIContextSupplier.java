@@ -2,6 +2,7 @@ package nablarch.fw.dicontainer.web.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import nablarch.fw.dicontainer.exception.web.WebContextException;
 import nablarch.fw.dicontainer.web.RequestContext;
 import nablarch.fw.dicontainer.web.RequestContextSupplier;
 import nablarch.fw.dicontainer.web.SessionContext;
@@ -13,6 +14,9 @@ public final class ServletAPIContextSupplier
     private final ThreadLocal<ServletAPIContext> contexts = new ThreadLocal<>();
 
     public void doWithContext(final HttpServletRequest request, final Runnable action) {
+        if (contexts.get() != null) {
+            throw new WebContextException();
+        }
         contexts.set(new ServletAPIContext(request));
         try {
             action.run();

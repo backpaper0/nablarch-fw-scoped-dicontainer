@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Qualifier;
 
+import nablarch.fw.dicontainer.exception.QualifierAnnotationException;
+
 public final class ComponentKey<T> implements Serializable {
 
     private final Class<T> componentType;
@@ -26,8 +28,7 @@ public final class ComponentKey<T> implements Serializable {
 
         this.qualifiers.forEach(a -> {
             if (a.annotationType().isAnnotationPresent(Qualifier.class) == false) {
-                //TODO error
-                throw new RuntimeException();
+                throw new QualifierAnnotationException();
             }
         });
     }

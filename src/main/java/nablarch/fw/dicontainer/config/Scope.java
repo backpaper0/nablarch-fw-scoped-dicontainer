@@ -1,8 +1,8 @@
-package nablarch.fw.dicontainer;
+package nablarch.fw.dicontainer.config;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.config.DestroyMethod;
+import nablarch.fw.dicontainer.ComponentId;
 
 public interface Scope {
 

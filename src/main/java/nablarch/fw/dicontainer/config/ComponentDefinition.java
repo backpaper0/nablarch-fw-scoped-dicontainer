@@ -2,13 +2,13 @@ package nablarch.fw.dicontainer.config;
 
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Container;
-import nablarch.fw.dicontainer.Scope;
 import nablarch.fw.dicontainer.config.ContainerBuilder.CycleDependencyValidationContext;
 
 public final class ComponentDefinition<T> {
@@ -98,7 +98,7 @@ public final class ComponentDefinition<T> {
 
     public static final class Builder<T> {
 
-        private ComponentId id = ComponentId.generate();
+        private final ComponentId id = ComponentId.generate();
         private InjectableMember injectableConstructor;
         private Set<InjectableMember> injectableMembers = Collections.emptySet();
         private Set<ObservesMethod> observesMethods = Collections.emptySet();
@@ -110,9 +110,8 @@ public final class ComponentDefinition<T> {
         private Builder() {
         }
 
-        public Builder<T> id(final ComponentId id) {
-            this.id = id;
-            return this;
+        public ComponentId id() {
+            return id;
         }
 
         public Builder<T> injectableConstructor(
@@ -151,9 +150,17 @@ public final class ComponentDefinition<T> {
             return this;
         }
 
-        public ComponentDefinition<T> build() {
-            return new ComponentDefinition<>(id, injectableConstructor, injectableMembers,
-                    observesMethods, initMethod, destroyMethod, factoryMethods, scope);
+        public Optional<ComponentDefinition<T>> build() {
+            if (injectableConstructor == null) {
+                return Optional.empty();
+            }
+            if (scope == null) {
+                return Optional.empty();
+            }
+            final ComponentDefinition<T> cd = new ComponentDefinition<>(id, injectableConstructor,
+                    injectableMembers, observesMethods, initMethod, destroyMethod, factoryMethods,
+                    scope);
+            return Optional.of(cd);
         }
     }
 }

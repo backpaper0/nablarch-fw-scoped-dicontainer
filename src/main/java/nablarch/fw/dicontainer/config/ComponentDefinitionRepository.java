@@ -6,6 +6,7 @@ import java.util.Map;
 import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.ComponentKey;
 import nablarch.fw.dicontainer.Container;
+import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
 public final class ComponentDefinitionRepository {
 
@@ -21,8 +22,7 @@ public final class ComponentDefinitionRepository {
     public <T> ComponentDefinition<T> get(final ComponentId id) {
         final ComponentDefinition<?> definition = idToDefinition.get(id);
         if (definition == null) {
-            //TODO error
-            throw new RuntimeException();
+            throw new ComponentNotFoundException();
         }
         return (ComponentDefinition<T>) definition;
     }

@@ -10,7 +10,6 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.ComponentId;
 import nablarch.fw.dicontainer.Observes;
-import nablarch.fw.dicontainer.Scope;
 
 public final class SingletonScope implements Scope {
 

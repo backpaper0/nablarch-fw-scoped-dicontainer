@@ -10,14 +10,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.Prototype;
-import nablarch.fw.dicontainer.Scope;
+import nablarch.fw.dicontainer.config.ErrorCollector;
 import nablarch.fw.dicontainer.config.PrototypeScope;
+import nablarch.fw.dicontainer.config.Scope;
 import nablarch.fw.dicontainer.config.SingletonScope;
 
 public class AnnotationScopeDeciderTest {
 
     private AnnotationScopeDecider decider;
     private Scope defaultScope;
+    private ErrorCollector errorCollector;
 
     @Before
     public void setUp() throws Exception {
@@ -28,37 +30,40 @@ public class AnnotationScopeDeciderTest {
 
     @Test
     public void singletonFromClass() throws Exception {
-        final Scope scope = decider.fromClass(Aaa.class);
+        final Scope scope = decider.fromClass(Aaa.class, errorCollector).get();
         assertEquals(SingletonScope.class, scope.getClass());
     }
 
     @Test
     public void prototypeFromClass() throws Exception {
-        final Scope scope = decider.fromClass(Bbb.class);
+        final Scope scope = decider.fromClass(Bbb.class, errorCollector).get();
         assertEquals(PrototypeScope.class, scope.getClass());
     }
 
     @Test
     public void defaultScopeFromClass() throws Exception {
-        final Scope scope = decider.fromClass(Ccc.class);
+        final Scope scope = decider.fromClass(Ccc.class, errorCollector).get();
         assertSame(defaultScope, scope);
     }
 
     @Test
     public void singletonFromMethod() throws Exception {
-        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("singleton"));
+        final Scope scope = decider
+                .fromMethod(Ddd.class.getDeclaredMethod("singleton"), errorCollector).get();
         assertEquals(SingletonScope.class, scope.getClass());
     }
 
     @Test
     public void prototypeFromMethod() throws Exception {
-        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("prototype"));
+        final Scope scope = decider
+                .fromMethod(Ddd.class.getDeclaredMethod("prototype"), errorCollector).get();
         assertEquals(PrototypeScope.class, scope.getClass());
     }
 
     @Test
     public void defaultScopeFromMethod() throws Exception {
-        final Scope scope = decider.fromMethod(Ddd.class.getDeclaredMethod("defaultScope"));
+        final Scope scope = decider
+                .fromMethod(Ddd.class.getDeclaredMethod("defaultScope"), errorCollector).get();
         assertSame(defaultScope, scope);
     }
 

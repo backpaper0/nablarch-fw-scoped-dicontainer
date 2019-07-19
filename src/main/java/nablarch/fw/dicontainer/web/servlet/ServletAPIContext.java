@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
-import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
 import nablarch.fw.dicontainer.web.context.RequestContext;
@@ -26,8 +25,7 @@ public class ServletAPIContext implements RequestContext, SessionContext {
     }
 
     @Override
-    public <T> T getRequestComponent(final ComponentId id, final Provider<T> provider,
-            final DestroyMethod destroyMethod) {
+    public <T> T getRequestComponent(final ComponentId id, final Provider<T> provider) {
         final String name = getKeyPrefix() + id;
         ComponentHolder holder = (ComponentHolder) request.getAttribute(name);
         if (holder == null) {
@@ -54,8 +52,7 @@ public class ServletAPIContext implements RequestContext, SessionContext {
     }
 
     @Override
-    public <T> T getSessionComponent(final ComponentId id, final Provider<T> provider,
-            final DestroyMethod destroyMethod) {
+    public <T> T getSessionComponent(final ComponentId id, final Provider<T> provider) {
         final HttpSession session = request.getSession();
         synchronized (session.getId().intern()) {
             final String name = getKeyPrefix() + id;

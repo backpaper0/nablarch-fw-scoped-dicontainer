@@ -11,7 +11,6 @@ import javax.inject.Provider;
 import nablarch.fw.dicontainer.Observes;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
-import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
@@ -33,8 +32,7 @@ public final class SingletonScope extends AbstractScope {
     }
 
     @Override
-    public <T> T getComponent(final ComponentId id, final Provider<T> provider,
-            final DestroyMethod destroyMethod) {
+    public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
         InstanceHolder instanceHolder = instances.get(id);
         if (instanceHolder == null) {
             instanceHolder = new InstanceHolder();

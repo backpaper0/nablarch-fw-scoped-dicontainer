@@ -86,7 +86,7 @@ public final class ComponentDefinition<T> {
                 return (T) component;
             }
         };
-        return scope.getComponent(id, provider, destroyMethod);
+        return scope.getComponent(id, provider);
     }
 
     public void fire(final ContainerImplementer container, final Object event) {

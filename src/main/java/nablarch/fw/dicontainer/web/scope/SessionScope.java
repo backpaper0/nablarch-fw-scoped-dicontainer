@@ -6,7 +6,6 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
-import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.exception.web.WebContextException;
 import nablarch.fw.dicontainer.scope.AbstractScope;
 import nablarch.fw.dicontainer.web.context.SessionContext;
@@ -21,13 +20,12 @@ public final class SessionScope extends AbstractScope {
     }
 
     @Override
-    public <T> T getComponent(final ComponentId id, final Provider<T> provider,
-            final DestroyMethod destroyMethod) {
+    public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
         final SessionContext context = supplier.getSessionContext();
         if (context == null) {
             throw new WebContextException();
         }
-        return context.getSessionComponent(id, provider, destroyMethod);
+        return context.getSessionComponent(id, provider);
     }
 
     @Override

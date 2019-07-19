@@ -18,7 +18,7 @@ public final class ComponentId implements Serializable {
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return Objects.hash(value);
     }
 
     @Override

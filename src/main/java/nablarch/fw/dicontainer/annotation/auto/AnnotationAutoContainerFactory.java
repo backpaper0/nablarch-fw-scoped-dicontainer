@@ -14,15 +14,18 @@ public final class AnnotationAutoContainerFactory {
 
     private final AnnotationSet targetAnnotations;
     private final Iterable<TraversalConfig> traversalMarks;
+    private final boolean eagerLoad;
 
     private AnnotationAutoContainerFactory(final AnnotationSet targetAnnotations,
-            final Iterable<TraversalConfig> traversalMarks) {
+            final Iterable<TraversalConfig> traversalMarks, final boolean eagerLoad) {
         this.targetAnnotations = Objects.requireNonNull(targetAnnotations);
         this.traversalMarks = Objects.requireNonNull(traversalMarks);
+        this.eagerLoad = eagerLoad;
     }
 
     public Container create() {
-        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault();
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.builder()
+                .eagerLoad(eagerLoad).build();
         for (final TraversalConfig traversalMark : traversalMarks) {
             final ClassLoader classLoader = traversalMark.getClass().getClassLoader();
             final Class<?> base = traversalMark.getClass();
@@ -60,6 +63,7 @@ public final class AnnotationAutoContainerFactory {
 
         private AnnotationSet targetAnnotations = new AnnotationSet(Scope.class, Qualifier.class);
         private Iterable<TraversalConfig> traversalMarks;
+        private boolean eagerLoad;
 
         private Builder() {
         }
@@ -75,8 +79,13 @@ public final class AnnotationAutoContainerFactory {
             return this;
         }
 
+        public Builder eagerLoad(final boolean eagerLoad) {
+            this.eagerLoad = eagerLoad;
+            return this;
+        }
+
         public AnnotationAutoContainerFactory build() {
-            return new AnnotationAutoContainerFactory(targetAnnotations, traversalMarks);
+            return new AnnotationAutoContainerFactory(targetAnnotations, traversalMarks, eagerLoad);
         }
     }
 }

@@ -2,12 +2,13 @@ package nablarch.fw.dicontainer.component;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Qualifier;
 
@@ -33,28 +34,21 @@ public final class ComponentKey<T> implements Serializable {
         });
     }
 
-    public static <T> ComponentKey<T> fromClass(final Class<T> componentType) {
-        //FIXME factoryクラスを作って移動したい
-        final Set<Annotation> qualifiers = Arrays.stream(componentType.getAnnotations())
-                .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class))
-                .collect(Collectors.toSet());
-
-        return new ComponentKey<>(componentType, qualifiers);
-    }
-
-    public static ComponentKey<?> fromFactoryMethod(final Method factoryMethod) {
-
-        final Set<Annotation> qualifiers = Arrays.stream(factoryMethod.getAnnotations())
-                .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class))
-                .collect(Collectors.toSet());
-
-        return new ComponentKey<>(factoryMethod.getReturnType(), qualifiers);
-    }
-
     public Set<AliasKey> aliasKeys() {
         final Set<Class<?>> classes = new HashSet<>();
         collectAlias(classes, componentType);
-        return classes.stream().map(a -> new AliasKey(a, qualifiers)).collect(Collectors.toSet());
+        final Stream<AliasKey> withQualifier = classes.stream()
+                .map(a -> new AliasKey(a, qualifiers));
+        final Stream<AliasKey> classOnly = classes.stream()
+                .map(a -> new AliasKey(a, Collections.emptySet()));
+        final Stream<AliasKey> selfClassOnly;
+        if (qualifiers.isEmpty()) {
+            selfClassOnly = Stream.empty();
+        } else {
+            selfClassOnly = Stream.of(new AliasKey(componentType, Collections.emptySet()));
+        }
+        return Stream.concat(withQualifier, Stream.concat(classOnly, selfClassOnly))
+                .collect(Collectors.toSet());
     }
 
     public AliasKey asAliasKey() {

@@ -74,6 +74,7 @@ public final class ComponentDefinition<T> {
     }
 
     public T getComponent(final ContainerImplementer container) {
+        Objects.requireNonNull(container);
         final Provider<T> provider = new Provider<T>() {
             @Override
             public T get() {

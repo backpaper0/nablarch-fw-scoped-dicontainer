@@ -97,6 +97,8 @@ public final class AnnotationScopeDecider {
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
         final InjectableMember injectableConstructor = new PassthroughInjectableMember(scope);
+        final List<InjectableMember> injectableMembers = builder.memberFactory
+                .createFieldsAndMethods(componentType, errorCollector);
         final List<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
                 componentType, errorCollector);
         final Optional<DestroyMethod> destroyMethod = builder.memberFactory.createDestroyMethod(
@@ -105,6 +107,7 @@ public final class AnnotationScopeDecider {
         destroyMethod.ifPresent(cdBuilder::destroyMethod);
         final Optional<ComponentDefinition<T>> definition = cdBuilder
                 .injectableConstructor(injectableConstructor)
+                .injectableMembers(injectableMembers)
                 .observesMethods(observesMethods)
                 .scope(passthroughScope)
                 .build();
@@ -144,6 +147,11 @@ public final class AnnotationScopeDecider {
 
         public Builder addScope(final Class<?> annotationType, final Scope scope) {
             this.scopes.put(annotationType, scope);
+            return this;
+        }
+
+        public Builder eagerLoad(final boolean eagerLoad) {
+            this.scopes.put(Singleton.class, new SingletonScope(eagerLoad));
             return this;
         }
 

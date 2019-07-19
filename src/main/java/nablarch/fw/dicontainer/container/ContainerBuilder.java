@@ -12,9 +12,12 @@ import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
 import nablarch.fw.dicontainer.component.ComponentKey;
+import nablarch.fw.dicontainer.component.impl.ContainerInjectableMember;
+import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.exception.CycleInjectionException;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
+import nablarch.fw.dicontainer.scope.PassthroughScope;
 
 public class ContainerBuilder<T extends ContainerBuilder<T>> {
 
@@ -56,9 +59,24 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
     }
 
     public Container build() {
+        registerContainer();
         definitions.validate(this);
         errorCollector.throwExceptionIfExistsError();
-        return new DefaultContainer(definitions, aliasesMap);
+        final DefaultContainer container = new DefaultContainer(definitions, aliasesMap);
+        container.fire(new ContainerCreated());
+        return container;
+    }
+
+    private void registerContainer() {
+        final ComponentKey<ContainerImplementer> key = new ComponentKey<>(
+                ContainerImplementer.class);
+        final ComponentDefinition<ContainerImplementer> definition = ComponentDefinition
+                .<ContainerImplementer> builder()
+                .injectableConstructor(new ContainerInjectableMember())
+                .scope(new PassthroughScope())
+                .build()
+                .get();
+        register(key, definition);
     }
 
     private T self() {

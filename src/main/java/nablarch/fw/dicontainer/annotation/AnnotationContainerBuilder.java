@@ -11,21 +11,24 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 
 public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {
 
+    private final AnnotationComponentKeyFactory componentKeyFactory;
     private final AnnotationScopeDecider scopeDecider;
     //FIXME
     final AnnotationMemberFactory memberFactory;
     private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
 
-    private AnnotationContainerBuilder(final AnnotationScopeDecider scopeDecider,
+    private AnnotationContainerBuilder(final AnnotationComponentKeyFactory componentKeyFactory,
+            final AnnotationScopeDecider scopeDecider,
             final AnnotationMemberFactory memberFactory,
             final AnnotationComponentDefinitionFactory componentDefinitionFactory) {
+        this.componentKeyFactory = Objects.requireNonNull(componentKeyFactory);
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
         this.memberFactory = Objects.requireNonNull(memberFactory);
         this.componentDefinitionFactory = Objects.requireNonNull(componentDefinitionFactory);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
-        final ComponentKey<T> key = ComponentKey.fromClass(componentType);
+        final ComponentKey<T> key = componentKeyFactory.fromComponentClass(componentType);
         final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
                 .fromClass(componentType, errorCollector);
         definition.ifPresent(a -> register(key, a));
@@ -57,6 +60,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
 
     public static final class Builder {
 
+        private AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
+                .createDefault();
         private AnnotationScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
         private AnnotationMemberFactory memberFactory = AnnotationMemberFactory.createDefault();
         private AnnotationComponentDefinitionFactory componentDefinitionFactory;
@@ -64,6 +69,12 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         private Builder() {
             this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
                     memberFactory, scopeDecider);
+        }
+
+        public Builder componentKeyFactory(
+                final AnnotationComponentKeyFactory componentKeyFactory) {
+            this.componentKeyFactory = componentKeyFactory;
+            return this;
         }
 
         public Builder scopeDecider(final AnnotationScopeDecider scopeDecider) {
@@ -86,8 +97,13 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
             return this;
         }
 
+        public Builder eagerLoad(final boolean eagerLoad) {
+            scopeDecider(AnnotationScopeDecider.builder().eagerLoad(eagerLoad).build());
+            return this;
+        }
+
         public AnnotationContainerBuilder build() {
-            return new AnnotationContainerBuilder(scopeDecider, memberFactory,
+            return new AnnotationContainerBuilder(componentKeyFactory, scopeDecider, memberFactory,
                     componentDefinitionFactory);
         }
     }

@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
+import nablarch.fw.dicontainer.annotation.AnnotationComponentKeyFactory;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
@@ -13,6 +14,8 @@ import nablarch.fw.dicontainer.container.ContainerImplementer;
 public final class TinyContainer implements ContainerImplementer {
 
     private final Map<ComponentKey<?>, Object> components = new HashMap<>();
+    private final AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
+            .createDefault();
 
     public TinyContainer(final Class<?>... componentTypes) throws Exception {
         for (final Class<?> componentType : componentTypes) {
@@ -21,7 +24,7 @@ public final class TinyContainer implements ContainerImplementer {
     }
 
     public TinyContainer register(final Class<?> componentType) throws Exception {
-        final ComponentKey<?> key = ComponentKey.fromClass(componentType);
+        final ComponentKey<?> key = componentKeyFactory.fromComponentClass(componentType);
         final Constructor<?> constructor = componentType.getDeclaredConstructor();
         if (constructor.isAccessible() == false) {
             constructor.setAccessible(true);
@@ -52,7 +55,7 @@ public final class TinyContainer implements ContainerImplementer {
 
     @Override
     public <T> T getComponent(final Class<T> key) {
-        return getComponent(ComponentKey.fromClass(key));
+        return getComponent(componentKeyFactory.fromComponentClass(key));
     }
 
     @Override

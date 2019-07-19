@@ -62,13 +62,15 @@ public final class AnnotationMemberFactory {
     private final AnnotationSet factoryAnnotations;
     private final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory;
     private final String destroyMethodName;
+    private final AnnotationComponentKeyFactory componentKeyFactory;
 
     private AnnotationMemberFactory(final AnnotationSet injectAnnotations,
             final AnnotationSet initAnnotations,
             final AnnotationSet destroyAnnotations, final AnnotationSet observesAnnotations,
             final AnnotationSet factoryAnnotations,
             final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory,
-            final String destroyMethodName) {
+            final String destroyMethodName,
+            final AnnotationComponentKeyFactory componentKeyFactory) {
         this.injectAnnotations = Objects.requireNonNull(injectAnnotations);
         this.initAnnotations = Objects.requireNonNull(initAnnotations);
         this.destroyAnnotations = Objects.requireNonNull(destroyAnnotations);
@@ -77,6 +79,7 @@ public final class AnnotationMemberFactory {
         this.injectionComponentResolverFactory = Objects
                 .requireNonNull(injectionComponentResolverFactory);
         this.destroyMethodName = Objects.requireNonNull(destroyMethodName);
+        this.componentKeyFactory = Objects.requireNonNull(componentKeyFactory);
     }
 
     public Optional<InjectableMember> createConstructor(final Class<?> componentType,
@@ -321,7 +324,7 @@ public final class AnnotationMemberFactory {
                 } else if (method.getParameterCount() != 0) {
                     errorCollector.add(new FactoryMethodSignatureException());
                 } else {
-                    final ComponentKey<?> key = ComponentKey.fromFactoryMethod(method);
+                    final ComponentKey<?> key = componentKeyFactory.fromFactoryMethod(method);
                     final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
                             .fromMethod(id, method, errorCollector);
                     definition.ifPresent(a -> methods.add(new DefaultFactoryMethod(key, a)));
@@ -343,13 +346,11 @@ public final class AnnotationMemberFactory {
     public static final class Builder {
 
         private AnnotationSet qualifierAnnotations = new AnnotationSet(Qualifier.class);
-
         private AnnotationSet injectAnnotations = new AnnotationSet(Inject.class);
         private AnnotationSet initAnnotations = new AnnotationSet(Init.class);
         private AnnotationSet destroyAnnotations = new AnnotationSet(Destroy.class);
         private AnnotationSet observesAnnotations = new AnnotationSet(Observes.class);
         private AnnotationSet factoryAnnotations = new AnnotationSet(Factory.class);
-
         private String destroyMethodName = "destroy";
 
         private Builder() {
@@ -400,9 +401,11 @@ public final class AnnotationMemberFactory {
         public AnnotationMemberFactory build() {
             final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory = new AnnotationInjectionComponentResolverFactory(
                     qualifierAnnotations);
+            final AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
+                    .builder().qualifierAnnotations(qualifierAnnotations).build();
             return new AnnotationMemberFactory(injectAnnotations, initAnnotations,
                     destroyAnnotations, observesAnnotations, factoryAnnotations,
-                    injectionComponentResolverFactory, destroyMethodName);
+                    injectionComponentResolverFactory, destroyMethodName, componentKeyFactory);
         }
     }
 }

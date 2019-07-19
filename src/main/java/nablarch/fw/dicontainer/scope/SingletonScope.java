@@ -5,17 +5,32 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.Observes;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
+import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 
 public final class SingletonScope extends AbstractScope {
 
     private final ConcurrentMap<ComponentId, InstanceHolder> instances = new ConcurrentHashMap<>();
+    private final boolean eagerLoad;
+
+    @Inject
+    private ContainerImplementer containerImplementer;
+
+    public SingletonScope() {
+        this(false);
+    }
+
+    public SingletonScope(final boolean eagerLoad) {
+        this.eagerLoad = eagerLoad;
+    }
 
     @Override
     public <T> T getComponent(final ComponentId id, final Provider<T> provider,
@@ -29,6 +44,15 @@ public final class SingletonScope extends AbstractScope {
             }
         }
         return instanceHolder.get(provider);
+    }
+
+    @Observes
+    public void init(final ContainerCreated event) {
+        if (eagerLoad) {
+            idToDefinition.forEach((id, definition) -> {
+                definition.getComponent(containerImplementer);
+            });
+        }
     }
 
     @Observes

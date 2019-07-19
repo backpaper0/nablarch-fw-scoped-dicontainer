@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -207,6 +208,71 @@ public class ContainerTest {
         }
     }
 
+    @Test
+    public void eagerLoad() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.builder().eagerLoad(true).build()
+                .register(EagerLoading.class)
+                .build();
+
+        assertTrue(EagerLoading.loaded);
+
+        container.getComponent(EagerLoading.class);
+    }
+
+    @Test
+    public void lazyLoad() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(LazyLoading.class)
+                .build();
+
+        assertFalse(LazyLoading.loaded);
+
+        container.getComponent(LazyLoading.class);
+    }
+
+    @Test
+    public void injectionContainer() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(ContainerInjection.class)
+                .build();
+
+        final ContainerInjection component = container.getComponent(ContainerInjection.class);
+
+        assertNotNull(component.container);
+    }
+
+    @Test
+    public void getComponentWithQualifier() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Qualifier2.class)
+                .register(Qualifier3.class)
+                .build();
+
+        final Qualifier1 component1 = container.getComponent(Qualifier1.class,
+                new NamedImpl("foo"));
+        final Qualifier1 component2 = container.getComponent(Qualifier1.class,
+                new NamedImpl("bar"));
+
+        assertTrue(component1.getClass() == Qualifier2.class);
+        assertTrue(component2.getClass() == Qualifier3.class);
+    }
+
+    @Test
+    public void getComponentWithQualifierViaClassOnly() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Qualifier2.class)
+                .build();
+
+        final Qualifier1 component1 = container.getComponent(Qualifier1.class);
+
+        assertTrue(component1.getClass() == Qualifier2.class);
+    }
+
     @Singleton
     private static class Aaa {
     }
@@ -373,5 +439,41 @@ public class ContainerTest {
         void method2() {
             called.add("method2");
         }
+    }
+
+    @Singleton
+    private static class EagerLoading {
+
+        static boolean loaded;
+
+        public EagerLoading() {
+            loaded = true;
+        }
+    }
+
+    @Singleton
+    private static class LazyLoading {
+
+        static boolean loaded;
+
+        public LazyLoading() {
+            loaded = true;
+        }
+    }
+
+    private static class ContainerInjection {
+        @Inject
+        Container container;
+    }
+
+    private interface Qualifier1 {
+    }
+
+    @Named("foo")
+    private static class Qualifier2 implements Qualifier1 {
+    }
+
+    @Named("bar")
+    private static class Qualifier3 implements Qualifier1 {
     }
 }

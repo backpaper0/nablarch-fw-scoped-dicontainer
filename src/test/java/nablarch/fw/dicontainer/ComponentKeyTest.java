@@ -2,7 +2,6 @@ package nablarch.fw.dicontainer;
 
 import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,14 +17,14 @@ public class ComponentKeyTest {
 
     @Test
     public void aliasKeysEmpty() throws Exception {
-        final ComponentKey<Aaa> key = ComponentKey.fromClass(Aaa.class);
+        final ComponentKey<?> key = new ComponentKey<>(Aaa.class);
         final Set<AliasKey> aliasKeys = key.aliasKeys();
         assertTrue(aliasKeys.isEmpty());
     }
 
     @Test
     public void aliasKeys() throws Exception {
-        final ComponentKey<Bbb4> key = ComponentKey.fromClass(Bbb4.class);
+        final ComponentKey<?> key = new ComponentKey<>(Bbb4.class);
         final Set<AliasKey> aliasKeys = key.aliasKeys();
         final Set<AliasKey> expected = Stream.of(
                 new ComponentKey<>(Bbb1.class).asAliasKey(),
@@ -36,17 +35,14 @@ public class ComponentKeyTest {
     }
 
     @Test
-    public void qualifier() throws Exception {
-        final ComponentKey<Ccc2> key = ComponentKey.fromClass(Ccc2.class);
-        final ComponentKey<Ccc2> expected = new ComponentKey<>(Ccc2.class, new NamedImpl("foo"));
-        assertEquals(expected, key);
-    }
-
-    @Test
-    public void aliasViaQualifier() throws Exception {
-        final Set<AliasKey> aliasKeys = ComponentKey.fromClass(Ccc2.class).aliasKeys();
-        final AliasKey aliasKey = new ComponentKey<>(Ccc1.class, new NamedImpl("foo")).asAliasKey();
-        final Set<AliasKey> expected = Collections.singleton(aliasKey);
+    public void aliasKeysWithQualifier() throws Exception {
+        final ComponentKey<?> key = new ComponentKey<>(Ccc2.class, new NamedImpl("foo"));
+        final Set<AliasKey> aliasKeys = key.aliasKeys();
+        final Set<AliasKey> expected = Stream.of(
+                new ComponentKey<>(Ccc1.class, new NamedImpl("foo")).asAliasKey(),
+                new ComponentKey<>(Ccc1.class).asAliasKey(),
+                new ComponentKey<>(Ccc2.class).asAliasKey())
+                .collect(Collectors.toSet());
         assertEquals(expected, aliasKeys);
     }
 

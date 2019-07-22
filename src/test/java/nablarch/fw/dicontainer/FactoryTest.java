@@ -163,6 +163,20 @@ public class FactoryTest {
         }
     }
 
+    @Test
+    public void overload() throws Exception {
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Kkk7.class)
+                .build();
+        container.getComponent(Kkk8.class);
+
+        assertFalse(Kkk8.called);
+
+        container.destroy();
+
+        assertTrue(Kkk8.called);
+    }
+
     private static class Aaa {
 
         @Factory
@@ -287,6 +301,26 @@ public class FactoryTest {
 
     private static class Kkk6 {
         static void destroy() {
+        }
+    }
+
+    @Singleton
+    private static class Kkk7 {
+        @Factory(destroy = "destroy")
+        @Singleton
+        Kkk8 create() {
+            return new Kkk8();
+        }
+    }
+
+    private static class Kkk8 {
+        static boolean called;
+
+        void destroy() {
+            called = true;
+        }
+
+        void destroy(final Object arg) {
         }
     }
 }

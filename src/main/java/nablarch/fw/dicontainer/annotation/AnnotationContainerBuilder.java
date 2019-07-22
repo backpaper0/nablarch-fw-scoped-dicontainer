@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
@@ -15,8 +16,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
 
     private final AnnotationComponentKeyFactory componentKeyFactory;
     private final AnnotationScopeDecider scopeDecider;
-    //FIXME
-    final AnnotationMemberFactory memberFactory;
+    private final AnnotationMemberFactory memberFactory;
     private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
 
     private AnnotationContainerBuilder(final AnnotationComponentKeyFactory componentKeyFactory,
@@ -29,7 +29,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         this.componentDefinitionFactory = Objects.requireNonNull(componentDefinitionFactory);
     }
 
-    public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
+    private <T> AnnotationContainerBuilder register(final Supplier<ComponentKey<T>> keyFactory,
+            final Class<T> componentType) {
 
         if (componentType.isAnnotation()) {
             errorCollector.add(new InvalidComponentException(
@@ -62,25 +63,29 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
             return this;
         }
 
-        final ComponentKey<T> key = componentKeyFactory.fromComponentClass(componentType);
+        final ComponentKey<T> key = keyFactory.get();
         final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
-                .fromClass(componentType, errorCollector);
+                .fromComponentClass(componentType, errorCollector);
         definition.ifPresent(a -> register(key, a));
         return this;
+    }
+
+    public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
+        final Supplier<ComponentKey<T>> keyFactory = () -> componentKeyFactory
+                .fromComponentClass(componentType);
+        return register(keyFactory, componentType);
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType,
             final Annotation... qualifiers) {
-        final ComponentKey<T> key = new ComponentKey<>(componentType, qualifiers);
-        final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
-                .fromClass(componentType, errorCollector);
-        definition.ifPresent(a -> register(key, a));
-        return this;
+        final Supplier<ComponentKey<T>> keyFactory = () -> new ComponentKey<>(componentType,
+                qualifiers);
+        return register(keyFactory, componentType);
     }
 
     @Override
     public Container build() {
-        scopeDecider.registerScopes(this);
+        scopeDecider.registerScopes(this, memberFactory);
         return super.build();
     }
 

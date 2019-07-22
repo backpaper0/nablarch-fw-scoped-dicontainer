@@ -12,13 +12,13 @@ import nablarch.fw.dicontainer.scope.SingletonScope;
 
 public class ComponentDefinitionTest {
 
-    private final ComponentDefinition<?> cd1 = ComponentDefinition.builder()
+    private final ComponentDefinition<?> cd1 = ComponentDefinition.builder(getClass())
             .injectableConstructor(new MockInjectableMember())
             .scope(new PrototypeScope())
             .build()
             .get();
 
-    private final ComponentDefinition<?> cd2 = ComponentDefinition.builder()
+    private final ComponentDefinition<?> cd2 = ComponentDefinition.builder(getClass())
             .injectableConstructor(new MockInjectableMember())
             .scope(new SingletonScope())
             .build()

@@ -103,7 +103,7 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         final ComponentKey<ContainerImplementer> key = new ComponentKey<>(
                 ContainerImplementer.class);
         final ComponentDefinition<ContainerImplementer> definition = ComponentDefinition
-                .<ContainerImplementer> builder()
+                .builder(ContainerImplementer.class)
                 .injectableConstructor(new ContainerInjectableMember())
                 .scope(new PassthroughScope())
                 .build()

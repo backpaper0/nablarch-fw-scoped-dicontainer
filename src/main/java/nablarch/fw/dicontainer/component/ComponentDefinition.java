@@ -17,6 +17,7 @@ import nablarch.fw.dicontainer.scope.Scope;
 public final class ComponentDefinition<T> {
 
     private final ComponentId id;
+    private final Class<T> componentType;
     private final InjectableMember injectableConstructor;
     private final List<InjectableMember> injectableMembers;
     private final List<ObservesMethod> observesMethods;
@@ -26,6 +27,7 @@ public final class ComponentDefinition<T> {
     private final Scope scope;
 
     private ComponentDefinition(final ComponentId id,
+            final Class<T> componentType,
             final InjectableMember injectableConstructor,
             final List<InjectableMember> injectableMembers,
             final List<ObservesMethod> observesMethods,
@@ -34,6 +36,7 @@ public final class ComponentDefinition<T> {
             final List<FactoryMethod> factoryMethods,
             final Scope scope) {
         this.id = Objects.requireNonNull(id);
+        this.componentType = Objects.requireNonNull(componentType);
         this.injectableConstructor = Objects.requireNonNull(injectableConstructor);
         this.injectableMembers = Objects.requireNonNull(injectableMembers);
         this.observesMethods = Objects.requireNonNull(observesMethods);
@@ -91,7 +94,7 @@ public final class ComponentDefinition<T> {
                     injectableMember.inject(container, component);
                 }
                 initMethod.invoke(component);
-                return (T) component;
+                return componentType.cast(component);
             }
         };
         return scope.getComponent(id, provider);
@@ -112,17 +115,18 @@ public final class ComponentDefinition<T> {
 
     @Override
     public String toString() {
-        return "Component(class=" + /* TODO componentType */ ", scope="
+        return "Component(class=" + componentType.getName() + ", scope="
                 + scope.getClass().getSimpleName() + ")";
     }
 
-    public static <T> Builder<T> builder() {
-        return new Builder<>();
+    public static <T> Builder<T> builder(final Class<T> componentType) {
+        return new Builder<>(componentType);
     }
 
     public static final class Builder<T> {
 
         private final ComponentId id = ComponentId.generate();
+        private final Class<T> componentType;
         private InjectableMember injectableConstructor;
         private List<InjectableMember> injectableMembers = Collections.emptyList();
         private List<ObservesMethod> observesMethods = Collections.emptyList();
@@ -131,7 +135,8 @@ public final class ComponentDefinition<T> {
         private List<FactoryMethod> factoryMethods = Collections.emptyList();
         private Scope scope;
 
-        private Builder() {
+        private Builder(final Class<T> componentType) {
+            this.componentType = Objects.requireNonNull(componentType);
         }
 
         public ComponentId id() {
@@ -181,9 +186,9 @@ public final class ComponentDefinition<T> {
             if (scope == null) {
                 return Optional.empty();
             }
-            final ComponentDefinition<T> cd = new ComponentDefinition<>(id, injectableConstructor,
-                    injectableMembers, observesMethods, initMethod, destroyMethod, factoryMethods,
-                    scope);
+            final ComponentDefinition<T> cd = new ComponentDefinition<>(id, componentType,
+                    injectableConstructor, injectableMembers, observesMethods, initMethod,
+                    destroyMethod, factoryMethods, scope);
             return Optional.of(cd);
         }
     }

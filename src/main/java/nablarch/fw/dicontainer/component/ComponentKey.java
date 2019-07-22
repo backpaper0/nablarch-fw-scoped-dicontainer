@@ -10,10 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Qualifier;
-
-import nablarch.fw.dicontainer.exception.QualifierAnnotationException;
-
 public final class ComponentKey<T> implements Serializable {
 
     private final Class<T> componentType;
@@ -26,13 +22,6 @@ public final class ComponentKey<T> implements Serializable {
     public ComponentKey(final Class<T> componentType, final Set<Annotation> qualifiers) {
         this.componentType = Objects.requireNonNull(componentType);
         this.qualifiers = Objects.requireNonNull(qualifiers);
-
-        //FIXME カスタマイズすればjavax.inject.Qualifier以外も使えるようにしたからこのチェックは無意味かもなぁ
-        this.qualifiers.forEach(a -> {
-            if (a.annotationType().isAnnotationPresent(Qualifier.class) == false) {
-                throw new QualifierAnnotationException("");
-            }
-        });
     }
 
     public Set<AliasKey> aliasKeys() {

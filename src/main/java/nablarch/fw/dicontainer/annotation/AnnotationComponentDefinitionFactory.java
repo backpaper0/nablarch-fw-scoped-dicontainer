@@ -27,9 +27,9 @@ public final class AnnotationComponentDefinitionFactory {
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
     }
 
-    public <T> Optional<ComponentDefinition<T>> fromClass(final Class<T> componentType,
+    public <T> Optional<ComponentDefinition<T>> fromComponentClass(final Class<T> componentType,
             final ErrorCollector errorCollector) {
-        final Builder<T> builder = ComponentDefinition.builder();
+        final Builder<T> builder = ComponentDefinition.builder(componentType);
 
         final Optional<InjectableMember> injectableConstructor = memberFactory
                 .createConstructor(componentType, errorCollector);
@@ -57,10 +57,10 @@ public final class AnnotationComponentDefinitionFactory {
                 .build();
     }
 
-    public <T> Optional<ComponentDefinition<T>> fromMethod(final ComponentId factoryId,
-            final Method method,
-            final ErrorCollector errorCollector) {
-        final Builder<T> builder = ComponentDefinition.builder();
+    public <T> Optional<ComponentDefinition<T>> fromFactoryMethod(final ComponentId factoryId,
+            final Method method, final ErrorCollector errorCollector) {
+        final Class<T> componentType = (Class<T>) method.getReturnType();
+        final Builder<T> builder = ComponentDefinition.builder(componentType);
 
         final InjectableMember injectableConstructor = memberFactory.createFactoryMethod(factoryId,
                 method, errorCollector);

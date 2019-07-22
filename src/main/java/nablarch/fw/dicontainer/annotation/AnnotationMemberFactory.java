@@ -264,12 +264,19 @@ public final class AnnotationMemberFactory {
                                         + componentType.getName() + "]"));
                         return Optional.empty();
                     }
-                    if (methods.size() > 1) {
-                        //FIXME
-                        throw new RuntimeException();
+                    if (methods.size() == 1) {
+                        final DestroyMethod destroyMethod = new DefaultDestroyMethod(
+                                methods.get(0));
+                        return Optional.of(destroyMethod);
                     }
-                    final DestroyMethod destroyMethod = new DefaultDestroyMethod(methods.get(0));
-                    return Optional.of(destroyMethod);
+                    for (final Method method : methods) {
+                        if (method.getReturnType() == Void.TYPE
+                                && method.getParameterCount() == 0) {
+                            final DestroyMethod destroyMethod = new DefaultDestroyMethod(method);
+                            return Optional.of(destroyMethod);
+                        }
+                    }
+                    return Optional.empty();
                 });
     }
 
@@ -288,7 +295,7 @@ public final class AnnotationMemberFactory {
             if (factoryAnnotations.isAnnotationPresent(method)) {
                 final ComponentKey<?> key = componentKeyFactory.fromFactoryMethod(method);
                 final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
-                        .fromMethod(id, method, errorCollector);
+                        .fromFactoryMethod(id, method, errorCollector);
                 definition.ifPresent(a -> methods.add(new DefaultFactoryMethod(key, a)));
             }
         }

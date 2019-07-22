@@ -86,31 +86,31 @@ public final class AnnotationScopeDecider {
         return Optional.of(scope);
     }
 
-    //FIXME
-    void registerScopes(final AnnotationContainerBuilder builder) {
+    public void registerScopes(final AnnotationContainerBuilder builder,
+            final AnnotationMemberFactory memberFactory) {
         for (final Scope scope : scopes.values()) {
-            registerScope(builder, scope);
+            registerScope(builder, memberFactory, scope);
         }
         if (scopes.values().stream().anyMatch(a -> a == defaultScope) == false) {
-            registerScope(builder, defaultScope);
+            registerScope(builder, memberFactory, defaultScope);
         }
     }
 
     private <T extends Scope> void registerScope(final AnnotationContainerBuilder builder,
-            final T scope) {
+            final AnnotationMemberFactory memberFactory, final T scope) {
 
         final ErrorCollector errorCollector = ErrorCollector.wrap(builder);
 
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
         final InjectableMember injectableConstructor = new PassthroughInjectableMember(scope);
-        final List<InjectableMember> injectableMembers = builder.memberFactory
+        final List<InjectableMember> injectableMembers = memberFactory
                 .createFieldsAndMethods(componentType, errorCollector);
-        final List<ObservesMethod> observesMethods = builder.memberFactory.createObservesMethod(
+        final List<ObservesMethod> observesMethods = memberFactory.createObservesMethod(
                 componentType, errorCollector);
-        final Optional<DestroyMethod> destroyMethod = builder.memberFactory.createDestroyMethod(
+        final Optional<DestroyMethod> destroyMethod = memberFactory.createDestroyMethod(
                 componentType, errorCollector);
-        final ComponentDefinition.Builder<T> cdBuilder = ComponentDefinition.builder();
+        final ComponentDefinition.Builder<T> cdBuilder = ComponentDefinition.builder(componentType);
         destroyMethod.ifPresent(cdBuilder::destroyMethod);
         final Optional<ComponentDefinition<T>> definition = cdBuilder
                 .injectableConstructor(injectableConstructor)

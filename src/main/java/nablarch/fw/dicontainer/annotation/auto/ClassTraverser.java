@@ -13,8 +13,13 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Stream;
 
+import nablarch.core.log.Logger;
+import nablarch.core.log.LoggerManager;
+import nablarch.fw.dicontainer.exception.ClassTraversingException;
+
 public final class ClassTraverser {
 
+    private static final Logger logger = LoggerManager.get(ClassTraverser.class);
     private final ClassLoader classLoader;
     private final Class<?> base;
     private final ClassFilter classFilter;
@@ -29,7 +34,9 @@ public final class ClassTraverser {
     public void traverse(final Consumer<Class<?>> consumer) {
         final CodeSource codeSource = base.getProtectionDomain().getCodeSource();
         if (codeSource == null) {
-            //TODO ログ
+            if (logger.isDebugEnabled()) {
+                logger.logDebug("Can not traverse configured by [" + base.getName() + "]");
+            }
             return;
         }
 
@@ -45,8 +52,7 @@ public final class ClassTraverser {
             }
 
         } catch (final URISyntaxException | IOException e) {
-            //TODO error
-            throw new RuntimeException(e);
+            throw new ClassTraversingException(e);
         }
     }
 
@@ -82,8 +88,7 @@ public final class ClassTraverser {
                 consumer.accept(clazz);
             }
         } catch (final ClassNotFoundException e) {
-            //TODO error
-            throw new RuntimeException(e);
+            throw new ClassTraversingException(e);
         }
     }
 }

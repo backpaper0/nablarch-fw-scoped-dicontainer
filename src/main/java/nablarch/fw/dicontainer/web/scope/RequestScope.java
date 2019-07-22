@@ -23,7 +23,7 @@ public final class RequestScope extends AbstractScope {
     public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
         final RequestContext context = supplier.getRequestContext();
         if (context == null) {
-            throw new WebContextException();
+            throw new WebContextException("RequestContext is not found.");
         }
         return context.getRequestComponent(id, provider);
     }

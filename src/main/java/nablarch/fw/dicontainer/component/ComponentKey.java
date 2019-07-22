@@ -27,9 +27,10 @@ public final class ComponentKey<T> implements Serializable {
         this.componentType = Objects.requireNonNull(componentType);
         this.qualifiers = Objects.requireNonNull(qualifiers);
 
+        //FIXME カスタマイズすればjavax.inject.Qualifier以外も使えるようにしたからこのチェックは無意味かもなぁ
         this.qualifiers.forEach(a -> {
             if (a.annotationType().isAnnotationPresent(Qualifier.class) == false) {
-                throw new QualifierAnnotationException();
+                throw new QualifierAnnotationException("");
             }
         });
     }
@@ -91,6 +92,15 @@ public final class ComponentKey<T> implements Serializable {
                 && qualifiers.equals(other.qualifiers);
     }
 
+    @Override
+    public String toString() {
+        if (qualifiers.isEmpty()) {
+            return componentType.getName();
+        }
+        return qualifiers.stream().map(Objects::toString)
+                .collect(Collectors.joining(", ", componentType.getName() + "(", ")"));
+    }
+
     public static final class AliasKey {
 
         private final Class<?> aliasType;
@@ -122,7 +132,11 @@ public final class ComponentKey<T> implements Serializable {
 
         @Override
         public String toString() {
-            return String.format("%s%s", aliasType, qualifiers);
+            if (qualifiers.isEmpty()) {
+                return aliasType.getName();
+            }
+            return qualifiers.stream().map(Objects::toString)
+                    .collect(Collectors.joining(", ", aliasType.getName() + "(", ")"));
         }
     }
 }

@@ -23,7 +23,7 @@ public final class SessionScope extends AbstractScope {
     public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
         final SessionContext context = supplier.getSessionContext();
         if (context == null) {
-            throw new WebContextException();
+            throw new WebContextException("SessionContext is not found.");
         }
         return context.getSessionComponent(id, provider);
     }

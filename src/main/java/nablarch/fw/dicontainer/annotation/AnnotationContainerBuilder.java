@@ -32,23 +32,33 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
 
         if (componentType.isAnnotation()) {
-            errorCollector.add(new InvalidComponentException());
+            errorCollector.add(new InvalidComponentException(
+                    "Annotation [" + componentType.getName()
+                            + "] can not be component. Component must be class (not abstract, not enum) with name."));
             return this;
         }
         if (componentType.isInterface()) {
-            errorCollector.add(new InvalidComponentException());
+            errorCollector.add(new InvalidComponentException(
+                    "Interface [" + componentType.getName()
+                            + "] can not be component. Component must be class (not abstract, not enum) with name."));
             return this;
         }
         if (componentType.isEnum()) {
-            errorCollector.add(new InvalidComponentException());
+            errorCollector.add(new InvalidComponentException(
+                    "Enum [" + componentType.getName()
+                            + "] can not be component. Component must be class (not abstract, not enum) with name."));
             return this;
         }
         if (componentType.isAnonymousClass()) {
-            errorCollector.add(new InvalidComponentException());
+            errorCollector.add(new InvalidComponentException(
+                    "Anonymous Class [" + componentType.getName()
+                            + "] can not be component. Component must be class (not abstract, not enum) with name."));
             return this;
         }
         if (Modifier.isAbstract(componentType.getModifiers())) {
-            errorCollector.add(new InvalidComponentException());
+            errorCollector.add(new InvalidComponentException(
+                    "Abstract Class [" + componentType.getName()
+                            + "] can not be component. Component must be class (not abstract, not enum) with name."));
             return this;
         }
 

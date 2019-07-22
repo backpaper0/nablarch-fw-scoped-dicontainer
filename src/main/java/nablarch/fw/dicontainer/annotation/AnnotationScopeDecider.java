@@ -48,13 +48,15 @@ public final class AnnotationScopeDecider {
         if (annotations.length == 0) {
             return Optional.of(defaultScope);
         } else if (annotations.length > 1) {
-            errorCollector.add(new ScopeDuplicatedException());
+            errorCollector.add(new ScopeDuplicatedException(
+                    "Component [" + componentType.getName() + "] can configured only one scope."));
             return Optional.empty();
         }
         final Class<? extends Annotation> annotation = annotations[0].annotationType();
         final Scope scope = scopes.get(annotation);
         if (scope == null) {
-            errorCollector.add(new ScopeNotFoundException());
+            errorCollector.add(new ScopeNotFoundException("Scope could not be decided from ["
+                    + annotation.getName() + "] annotated to [" + componentType.getName() + "]"));
             return Optional.empty();
         }
         return Optional.of(scope);
@@ -67,13 +69,18 @@ public final class AnnotationScopeDecider {
         if (annotations.length == 0) {
             return Optional.of(defaultScope);
         } else if (annotations.length > 1) {
-            errorCollector.add(new ScopeDuplicatedException());
+            errorCollector.add(new ScopeDuplicatedException(
+                    "Factory method [" + method.getDeclaringClass().getName() + "#"
+                            + method.getName() + "] can configured only one scope."));
             return Optional.empty();
         }
         final Class<? extends Annotation> annotation = annotations[0].annotationType();
         final Scope scope = scopes.get(annotation);
         if (scope == null) {
-            errorCollector.add(new ScopeNotFoundException());
+            errorCollector.add(new ScopeNotFoundException("Scope could not be decided from ["
+                    + annotation.getName() + "] annotated to ["
+                    + method.getDeclaringClass().getName() + "#"
+                    + method.getName() + "]"));
             return Optional.empty();
         }
         return Optional.of(scope);

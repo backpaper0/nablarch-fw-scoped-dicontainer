@@ -39,13 +39,16 @@ public final class InjectionComponentResolver {
         final Set<ComponentDefinition<?>> definitions = containerBuilder
                 .findComponentDefinitions(key);
         if (definitions.isEmpty()) {
-            containerBuilder.addError(new InjectionComponentNotFoundException());
+            containerBuilder.addError(new InjectionComponentNotFoundException("key=" + key));
         } else if (definitions.size() > 1) {
-            containerBuilder.addError(new InjectionComponentDuplicatedException());
+            containerBuilder.addError(new InjectionComponentDuplicatedException(
+                    "key=" + key + ", definitions=" + definitions));
         } else if (provider == false) {
             final ComponentDefinition<?> injected = definitions.iterator().next();
             if (self.isNarrowScope(injected) == false) {
-                containerBuilder.addError(new InvalidInjectionScopeException());
+                containerBuilder.addError(new InvalidInjectionScopeException(
+                        "[" + self + "] must be narrow scope than [" + injected + "] (Or wrap ["
+                                + injected + "] with Provider)."));
             } else {
                 containerBuilder.validateCycleDependency(key, self);
             }

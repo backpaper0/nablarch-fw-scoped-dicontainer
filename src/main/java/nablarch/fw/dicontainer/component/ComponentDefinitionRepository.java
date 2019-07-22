@@ -21,7 +21,7 @@ public final class ComponentDefinitionRepository {
     public <T> ComponentDefinition<T> get(final ComponentId id) {
         final ComponentDefinition<?> definition = idToDefinition.get(id);
         if (definition == null) {
-            throw new ComponentNotFoundException();
+            throw new ComponentNotFoundException("id = " + id);
         }
         return (ComponentDefinition<T>) definition;
     }

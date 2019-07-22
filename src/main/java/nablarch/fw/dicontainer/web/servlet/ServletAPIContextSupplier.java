@@ -15,7 +15,8 @@ public final class ServletAPIContextSupplier
 
     public void doWithContext(final HttpServletRequest request, final Runnable action) {
         if (contexts.get() != null) {
-            throw new WebContextException();
+            throw new WebContextException(
+                    "Method [" + getClass().getName() + "#doWithContext] must not be nested.");
         }
         contexts.set(new ServletAPIContext(request));
         try {

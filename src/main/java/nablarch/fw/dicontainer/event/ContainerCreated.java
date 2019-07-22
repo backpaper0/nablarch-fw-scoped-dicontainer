@@ -1,5 +1,9 @@
 package nablarch.fw.dicontainer.event;
 
-public class ContainerCreated {
+public final class ContainerCreated {
 
+    @Override
+    public String toString() {
+        return getClass().getName();
+    }
 }

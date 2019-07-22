@@ -102,6 +102,12 @@ public final class ComponentDefinition<T> {
         destroyMethod.invoke(component);
     }
 
+    @Override
+    public String toString() {
+        return "Component(class=" + /* TODO componentType */ ", scope="
+                + scope.getClass().getSimpleName() + ")";
+    }
+
     public static <T> Builder<T> builder() {
         return new Builder<>();
     }

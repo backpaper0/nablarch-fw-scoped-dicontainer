@@ -1,6 +1,7 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
+import nablarch.fw.dicontainer.exception.InvalidComponentException;
 
 public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {
 
@@ -28,6 +30,28 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
     }
 
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
+
+        if (componentType.isAnnotation()) {
+            errorCollector.add(new InvalidComponentException());
+            return this;
+        }
+        if (componentType.isInterface()) {
+            errorCollector.add(new InvalidComponentException());
+            return this;
+        }
+        if (componentType.isEnum()) {
+            errorCollector.add(new InvalidComponentException());
+            return this;
+        }
+        if (componentType.isAnonymousClass()) {
+            errorCollector.add(new InvalidComponentException());
+            return this;
+        }
+        if (Modifier.isAbstract(componentType.getModifiers())) {
+            errorCollector.add(new InvalidComponentException());
+            return this;
+        }
+
         final ComponentKey<T> key = componentKeyFactory.fromComponentClass(componentType);
         final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
                 .fromClass(componentType, errorCollector);

@@ -345,6 +345,67 @@ public class ContainerCreationExceptionTest {
         }
     }
 
+    @Test
+    public void interfaceIsNotComponent() throws Exception {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
+                .register(Sss1.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidComponentException.class);
+        }
+    }
+
+    @Test
+    public void abstractClassIsNotComponent() throws Exception {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
+                .register(Sss2.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidComponentException.class);
+        }
+    }
+
+    @Test
+    public void anonymousClassIsNotComponent() throws Exception {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
+                .register(new Sss3() {
+                }.getClass());
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidComponentException.class);
+        }
+    }
+
+    @Test
+    public void enumIsNotComponent() throws Exception {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
+                .register(Sss4.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidComponentException.class);
+        }
+    }
+
+    @Test
+    public void annotationIsNotComponent() throws Exception {
+        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.createDefault()
+                .register(Sss5.class);
+        try {
+            builder.build();
+            fail();
+        } catch (final ContainerCreationException e) {
+            assertContainerException(e, InvalidComponentException.class);
+        }
+    }
+
     @Singleton
     private static class Aaa {
     }
@@ -575,5 +636,20 @@ public class ContainerCreationExceptionTest {
     @Scope
     @Retention(RetentionPolicy.RUNTIME)
     private @interface UnknownScoped {
+    }
+
+    private interface Sss1 {
+    }
+
+    private abstract class Sss2 {
+    }
+
+    private static class Sss3 {
+    }
+
+    private enum Sss4 {
+    }
+
+    private @interface Sss5 {
     }
 }

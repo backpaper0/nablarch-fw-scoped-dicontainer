@@ -5,4 +5,6 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 public interface FactoryMethod {
 
     void apply(ContainerBuilder<?> containerBuilder);
+
+    void validate(ContainerBuilder<?> containerBuilder, ComponentDefinition<?> self);
 }

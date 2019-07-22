@@ -2,26 +2,43 @@ package nablarch.fw.dicontainer.component.impl;
 
 import java.lang.reflect.Method;
 
+import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ObservesMethod;
 import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
+import nablarch.fw.dicontainer.container.ContainerBuilder;
+import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
 
 public final class DefaultObservesMethod implements ObservesMethod {
 
     private final MethodWrapper method;
-    private final Class<?> eventType;
 
     public DefaultObservesMethod(final Method method) {
         this.method = new MethodWrapper(method);
-        this.eventType = method.getParameterTypes()[0];
     }
 
     @Override
     public boolean isTarget(final Object event) {
-        return eventType.isAssignableFrom(event.getClass());
+        return method.getParameterType(0).isAssignableFrom(event.getClass());
     }
 
     @Override
     public void invoke(final Object component, final Object event) {
         method.invoke(component, event);
+    }
+
+    @Override
+    public void validate(final ContainerBuilder<?> containerBuilder,
+            final ComponentDefinition<?> self) {
+        if (method.isStatic()) {
+            containerBuilder.addError(new ObserverMethodSignatureException(
+                    "Observes method [" + method + "] must not be static."));
+            return;
+        }
+
+        if (method.getParameterCount() != 1) {
+            containerBuilder.addError(new ObserverMethodSignatureException(
+                    "Observes method [" + method + "] must have one parameter."));
+            return;
+        }
     }
 }

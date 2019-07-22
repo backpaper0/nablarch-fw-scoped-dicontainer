@@ -11,7 +11,7 @@ public final class MethodCollector {
 
     private final List<Method> methods = new ArrayList<>();
 
-    public void addInstanceMethodIfNotOverridden(final Method method) {
+    public void addMethodIfNotOverridden(final Method method) {
 
         if (isTarget(method) == false) {
             return;
@@ -30,14 +30,19 @@ public final class MethodCollector {
         methods.add(method);
     }
 
+    @Deprecated
+    public void addInstanceMethodIfNotOverridden(final Method method) {
+        if (Modifier.isStatic(method.getModifiers())) {
+            return;
+        }
+        addMethodIfNotOverridden(method);
+    }
+
     private static boolean isTarget(final Method method) {
         if (method.isBridge()) {
             return false;
         }
         if (method.isSynthetic()) {
-            return false;
-        }
-        if (Modifier.isStatic(method.getModifiers())) {
             return false;
         }
         if (Modifier.isAbstract(method.getModifiers())) {

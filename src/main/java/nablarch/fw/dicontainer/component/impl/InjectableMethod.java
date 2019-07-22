@@ -9,6 +9,7 @@ import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public final class InjectableMethod implements InjectableMember {
 
@@ -29,6 +30,11 @@ public final class InjectableMethod implements InjectableMember {
     @Override
     public void validate(final ContainerBuilder<?> containerBuilder,
             final ComponentDefinition<?> self) {
+        if (method.isStatic()) {
+            containerBuilder.addError(new StaticInjectionException(
+                    "Injection method [" + method + "] must not be static."));
+            return;
+        }
         resolvers.validate(containerBuilder, self);
     }
 

@@ -54,6 +54,14 @@ public final class ComponentDefinition<T> {
         for (final InjectableMember injectableMember : injectableMembers) {
             injectableMember.validate(containerBuilder, this);
         }
+        for (final ObservesMethod observesMethod : observesMethods) {
+            observesMethod.validate(containerBuilder, this);
+        }
+        initMethod.validate(containerBuilder, this);
+        destroyMethod.validate(containerBuilder, this);
+        for (final FactoryMethod factoryMethod : factoryMethods) {
+            factoryMethod.validate(containerBuilder, this);
+        }
     }
 
     public boolean isNarrowScope(final ComponentDefinition<?> injected) {

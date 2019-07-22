@@ -22,4 +22,9 @@ public final class DefaultFactoryMethod implements FactoryMethod {
     public void apply(final ContainerBuilder<?> containerBuilder) {
         containerBuilder.register((ComponentKey) key, (ComponentDefinition) definition);
     }
+
+    @Override
+    public void validate(final ContainerBuilder<?> containerBuilder,
+            final ComponentDefinition<?> self) {
+    }
 }

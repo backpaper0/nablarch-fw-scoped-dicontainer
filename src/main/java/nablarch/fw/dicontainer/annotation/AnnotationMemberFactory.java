@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,7 +27,6 @@ import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.FactoryMethod;
-import nablarch.fw.dicontainer.component.FieldCollector;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
@@ -44,14 +42,10 @@ import nablarch.fw.dicontainer.component.impl.InjectableField;
 import nablarch.fw.dicontainer.component.impl.InjectableMethod;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 import nablarch.fw.dicontainer.exception.ErrorCollector;
-import nablarch.fw.dicontainer.exception.FactoryMethodSignatureException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectableConstructorNotFoundException;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodDuplicatedException;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodNotFoundException;
-import nablarch.fw.dicontainer.exception.LifeCycleMethodSignatureException;
-import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
-import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public final class AnnotationMemberFactory {
 
@@ -134,7 +128,6 @@ public final class AnnotationMemberFactory {
 
     public List<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
             final ErrorCollector errorCollector) {
-        final FieldCollector fieldCollector = new FieldCollector();
         final MethodCollector methodCollector = new MethodCollector();
         final Map<Class<?>, List<Field>> fields = new IdentityHashMap<>();
         final Map<Class<?>, List<Method>> methods = new IdentityHashMap<>();
@@ -144,33 +137,14 @@ public final class AnnotationMemberFactory {
             fields.put(clazz, new ArrayList<>());
             methods.put(clazz, new ArrayList<>());
             for (final Field field : clazz.getDeclaredFields()) {
-                fieldCollector.addInstanceField(field);
-                if (Modifier.isStatic(field.getModifiers())
-                        && injectAnnotations.isAnnotationPresent(field)) {
-                    //FIXME InjectableFieldでvalidateしたほうがいい気がする
-                    errorCollector.add(new StaticInjectionException(
-                            "Injection field [" + componentType.getName() + "#" + field.getName()
-                                    + "] must not be static."));
+                if (injectAnnotations.isAnnotationPresent(field)) {
+                    final Class<?> key = field.getDeclaringClass();
+                    final List<Field> list = fields.get(key);
+                    list.add(field);
                 }
             }
             for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addInstanceMethodIfNotOverridden(method);
-                if (Modifier.isStatic(method.getModifiers())
-                        && injectAnnotations.isAnnotationPresent(method)) {
-                    //FIXME InjectableMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new StaticInjectionException(
-                            "Injection method [" + componentType.getName() + "#" + method.getName()
-                                    + "] must not be static."));
-
-                }
-            }
-        }
-
-        for (final Field field : fieldCollector.getFields()) {
-            if (injectAnnotations.isAnnotationPresent(field)) {
-                final Class<?> key = field.getDeclaringClass();
-                final List<Field> list = fields.get(key);
-                list.add(field);
+                methodCollector.addMethodIfNotOverridden(method);
             }
         }
 
@@ -209,29 +183,15 @@ public final class AnnotationMemberFactory {
         final MethodCollector methodCollector = new MethodCollector();
         for (final Class<?> clazz : new ClassInheritances(componentType)) {
             for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addInstanceMethodIfNotOverridden(method);
-                if (Modifier.isStatic(method.getModifiers())
-                        && observesAnnotations.isAnnotationPresent(method)) {
-                    //FIXME ObservesMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new ObserverMethodSignatureException(
-                            "Observes method [" + componentType.getName() + "#" + method.getName()
-                                    + "] must not be static."));
-                }
+                methodCollector.addMethodIfNotOverridden(method);
             }
         }
 
         final List<ObservesMethod> observesMethods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (observesAnnotations.isAnnotationPresent(method)) {
-                if (method.getParameterCount() == 1) {
-                    final ObservesMethod observesMethod = new DefaultObservesMethod(method);
-                    observesMethods.add(observesMethod);
-                } else {
-                    //FIXME ObservesMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new ObserverMethodSignatureException(
-                            "Observes method [" + componentType.getName() + "#" + method.getName()
-                                    + "] must have one parameter."));
-                }
+                final ObservesMethod observesMethod = new DefaultObservesMethod(method);
+                observesMethods.add(observesMethod);
             }
         }
 
@@ -259,27 +219,13 @@ public final class AnnotationMemberFactory {
         final MethodCollector methodCollector = new MethodCollector();
         for (final Class<?> clazz : new ClassInheritances(componentType)) {
             for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addInstanceMethodIfNotOverridden(method);
-                if (Modifier.isStatic(method.getModifiers())
-                        && annotationSet.isAnnotationPresent(method)) {
-                    //FIXME DefaultInitMethod、DefaultDestroyMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new LifeCycleMethodSignatureException(
-                            name + " method [" + componentType.getName() + "#" + method.getName()
-                                    + "] must not be static."));
-                }
+                methodCollector.addMethodIfNotOverridden(method);
             }
         }
         final List<T> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (annotationSet.isAnnotationPresent(method)) {
-                if (method.getParameterCount() == 0) {
-                    methods.add(factory.apply(method));
-                } else {
-                    //FIXME DefaultInitMethod、DefaultDestroyMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new LifeCycleMethodSignatureException(
-                            name + " method [" + componentType.getName() + "#" + method.getName()
-                                    + "] must have one parameter."));
-                }
+                methods.add(factory.apply(method));
             }
         }
         if (methods.size() > 1) {
@@ -303,16 +249,7 @@ public final class AnnotationMemberFactory {
                     final MethodCollector methodCollector = new MethodCollector();
                     for (final Class<?> clazz : new ClassInheritances(componentType)) {
                         for (final Method method : clazz.getDeclaredMethods()) {
-                            methodCollector.addInstanceMethodIfNotOverridden(method);
-                            if (Modifier.isStatic(method.getModifiers())
-                                    && method.getName().equals(destroy)) {
-                                //FIXME DefaultDestroyMethodでvalidateしたほうがいい気がする
-                                errorCollector.add(
-                                        new LifeCycleMethodSignatureException("Destroy method ["
-                                                + componentType.getName() + "#" + method.getName()
-                                                + "] must not be static."));
-                                return Optional.empty();
-                            }
+                            methodCollector.addMethodIfNotOverridden(method);
                         }
                     }
                     final List<Method> methods = new ArrayList<>();
@@ -327,18 +264,12 @@ public final class AnnotationMemberFactory {
                                         + componentType.getName() + "]"));
                         return Optional.empty();
                     }
-                    for (final Method method : methods) {
-                        if (method.getParameterCount() == 0) {
-                            final DestroyMethod destroyMethod = new DefaultDestroyMethod(method);
-                            return Optional.of(destroyMethod);
-                        }
+                    if (methods.size() > 1) {
+                        //FIXME
+                        throw new RuntimeException();
                     }
-                    //FIXME DefaultDestroyMethodでvalidateしたほうがいい気がする
-                    errorCollector.add(new LifeCycleMethodSignatureException(
-                            "Destroy method [" + componentType.getName()
-                                    + "#" /*+ method.getName()*/
-                                    + "] must have one parameter."));
-                    return Optional.empty();
+                    final DestroyMethod destroyMethod = new DefaultDestroyMethod(methods.get(0));
+                    return Optional.of(destroyMethod);
                 });
     }
 
@@ -349,37 +280,16 @@ public final class AnnotationMemberFactory {
         final MethodCollector methodCollector = new MethodCollector();
         for (final Class<?> clazz : new ClassInheritances(componentType)) {
             for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addInstanceMethodIfNotOverridden(method);
-                if (Modifier.isStatic(method.getModifiers())
-                        && factoryAnnotations.isAnnotationPresent(method)) {
-                    //FIXME DefaultFactoryMethodで定義したほうがいい気がする
-                    errorCollector.add(new FactoryMethodSignatureException("Factory method ["
-                            + componentType.getName() + "#" + method.getName()
-                            + "] must not be static."));
-                }
+                methodCollector.addMethodIfNotOverridden(method);
             }
         }
         final List<FactoryMethod> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (factoryAnnotations.isAnnotationPresent(method)) {
-                if (method.getReturnType() == Void.TYPE) {
-                    //FIXME DefaultFactoryMethodで定義したほうがいい気がする
-                    errorCollector.add(new FactoryMethodSignatureException(
-                            "Factory method [" + componentType.getName()
-                                    + "#" + method.getName()
-                                    + "] must be no return."));
-                } else if (method.getParameterCount() != 0) {
-                    //FIXME DefaultFactoryMethodで定義したほうがいい気がする
-                    errorCollector.add(new FactoryMethodSignatureException(
-                            "Factory method [" + componentType.getName()
-                                    + "#" + method.getName()
-                                    + "] must have one parameter."));
-                } else {
-                    final ComponentKey<?> key = componentKeyFactory.fromFactoryMethod(method);
-                    final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
-                            .fromMethod(id, method, errorCollector);
-                    definition.ifPresent(a -> methods.add(new DefaultFactoryMethod(key, a)));
-                }
+                final ComponentKey<?> key = componentKeyFactory.fromFactoryMethod(method);
+                final Optional<ComponentDefinition<Object>> definition = componentDefinitionFactory
+                        .fromMethod(id, method, errorCollector);
+                definition.ifPresent(a -> methods.add(new DefaultFactoryMethod(key, a)));
             }
         }
 

@@ -52,6 +52,7 @@ public class RequestComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
             components[1] = container.getComponent(Aaa.class);
+            return null;
         });
 
         assertNotNull(components[0]);
@@ -68,9 +69,11 @@ public class RequestComponentTest {
         final Aaa[] components = new Aaa[2];
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
+            return null;
         });
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[1] = container.getComponent(Aaa.class);
+            return null;
         });
 
         assertNotNull(components[0]);
@@ -90,6 +93,7 @@ public class RequestComponentTest {
         final HttpServletRequest request = MockServletRequests.createMock();
         supplier.doWithContext(request, () -> {
             container.getComponent(Bbb.class);
+            return null;
         });
 
         final ServletRequestEvent sre = new ServletRequestEvent(MockServletContexts.createMock(),
@@ -110,6 +114,7 @@ public class RequestComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
             components[1] = container.getComponent(Ccc1.class, new NamedImpl("bar"));
+            return null;
         });
 
         assertTrue(components[0].getClass() == Ccc2.class);

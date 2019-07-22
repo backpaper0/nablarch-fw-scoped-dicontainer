@@ -52,6 +52,7 @@ public class SessionComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Aaa.class);
             components[1] = container.getComponent(Aaa.class);
+            return null;
         });
 
         assertNotNull(components[0]);
@@ -71,6 +72,7 @@ public class SessionComponentTest {
         final HttpServletRequest request = MockServletRequests.createMock();
         supplier.doWithContext(request, () -> {
             container.getComponent(Bbb.class);
+            return null;
         });
 
         final HttpSessionEvent se = new HttpSessionEvent(request.getSession());
@@ -102,6 +104,7 @@ public class SessionComponentTest {
                     throw new RuntimeException(e);
                 }
                 components[0] = container.getComponent(Ccc.class);
+                return null;
             });
         });
 
@@ -114,6 +117,7 @@ public class SessionComponentTest {
                     throw new RuntimeException(e);
                 }
                 components[1] = container.getComponent(Ccc.class);
+                return null;
             });
         });
 
@@ -141,6 +145,7 @@ public class SessionComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(session), () -> {
             final Ddd component = container.getComponent(Ddd.class);
             ids[0] = component.id;
+            return null;
         });
 
         final byte[] serialized = MockHttpSessions.serialize(session);
@@ -149,6 +154,7 @@ public class SessionComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(deserialized), () -> {
             final Ddd component = container.getComponent(Ddd.class);
             ids[1] = component.id;
+            return null;
         });
 
         assertTrue(ids[0].equals(ids[1]));
@@ -166,6 +172,7 @@ public class SessionComponentTest {
         supplier.doWithContext(MockServletRequests.createMock(), () -> {
             components[0] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
             components[1] = container.getComponent(Ccc1.class, new NamedImpl("bar"));
+            return null;
         });
 
         assertTrue(components[0].getClass() == Ccc2.class);

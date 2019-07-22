@@ -20,7 +20,7 @@ public class AnnotationAutoContainerFactoryTest {
 
     @Test
     public void create() throws Exception {
-        final Iterable<TraversalConfig> traversalMarks = Collections
+        final Iterable<TraversalConfig> traversalConfigs = Collections
                 .singleton(new TraversalConfig() {
                     @Override
                     public Set<String> includes() {
@@ -30,7 +30,7 @@ public class AnnotationAutoContainerFactoryTest {
                 });
         final AnnotationAutoContainerFactory factory = AnnotationAutoContainerFactory
                 .builder()
-                .traversalMarks(traversalMarks)
+                .traversalConfigs(traversalConfigs)
                 .build();
         final Container container = factory.create();
 

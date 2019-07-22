@@ -17,23 +17,27 @@ public final class TinyContainer implements ContainerImplementer {
     private final AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
             .createDefault();
 
-    public TinyContainer(final Class<?>... componentTypes) throws Exception {
+    public TinyContainer(final Class<?>... componentTypes) {
         for (final Class<?> componentType : componentTypes) {
             register(componentType);
         }
     }
 
-    public TinyContainer register(final Class<?> componentType) throws Exception {
-        final ComponentKey<?> key = componentKeyFactory.fromComponentClass(componentType);
-        final Constructor<?> constructor = componentType.getDeclaredConstructor();
-        if (constructor.isAccessible() == false) {
-            constructor.setAccessible(true);
+    public TinyContainer register(final Class<?> componentType) {
+        try {
+            final ComponentKey<?> key = componentKeyFactory.fromComponentClass(componentType);
+            final Constructor<?> constructor = componentType.getDeclaredConstructor();
+            if (constructor.isAccessible() == false) {
+                constructor.setAccessible(true);
+            }
+            final Object value = constructor.newInstance();
+            return register(key, value);
+        } catch (final ReflectiveOperationException e) {
+            throw new RuntimeException(e);
         }
-        final Object value = constructor.newInstance();
-        return register(key, value);
     }
 
-    public TinyContainer register(final ComponentKey<?> key, final Object value) throws Exception {
+    public TinyContainer register(final ComponentKey<?> key, final Object value) {
         components.put(key, value);
         return this;
     }

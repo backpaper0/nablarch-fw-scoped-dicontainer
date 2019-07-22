@@ -2,6 +2,8 @@ package nablarch.fw.dicontainer.web.servlet;
 
 import java.io.Serializable;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.inject.Provider;
@@ -19,9 +21,15 @@ import nablarch.fw.dicontainer.web.context.SessionContext;
 public class ServletAPIContext implements RequestContext, SessionContext {
 
     private final HttpServletRequest request;
+    private final Map<String, ComponentHolder> gotSessionComponentsPerRequest = new HashMap<>();
 
     public ServletAPIContext(final HttpServletRequest request) {
         this.request = Objects.requireNonNull(request);
+    }
+
+    public void destroy() {
+        final HttpSession session = request.getSession();
+        gotSessionComponentsPerRequest.forEach(session::setAttribute);
     }
 
     @Override
@@ -62,6 +70,7 @@ public class ServletAPIContext implements RequestContext, SessionContext {
                 holder = new ComponentHolder(id, component);
                 session.setAttribute(name, holder);
             }
+            gotSessionComponentsPerRequest.put(name, holder);
             return (T) holder.getComponent();
         }
     }

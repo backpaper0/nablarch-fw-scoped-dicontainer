@@ -137,7 +137,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         }
 
         public Builder eagerLoad(final boolean eagerLoad) {
-            scopeDecider(AnnotationScopeDecider.builder().eagerLoad(eagerLoad).build());
+            scopeDecider(
+                    AnnotationScopeDecider.builderFrom(scopeDecider).eagerLoad(eagerLoad).build());
             return this;
         }
 

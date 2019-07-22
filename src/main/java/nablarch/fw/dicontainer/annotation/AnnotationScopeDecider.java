@@ -129,6 +129,14 @@ public final class AnnotationScopeDecider {
         return new Builder();
     }
 
+    public static Builder builderFrom(final AnnotationScopeDecider source) {
+        final Builder builder = builder();
+        builder.scopeAnnotations = builder.scopeAnnotations;
+        builder.defaultScope = builder.defaultScope;
+        builder.scopes.putAll(source.scopes);
+        return builder;
+    }
+
     public static final class Builder {
 
         private AnnotationSet scopeAnnotations = new AnnotationSet(javax.inject.Scope.class);

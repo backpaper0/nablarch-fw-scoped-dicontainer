@@ -1,5 +1,7 @@
 package nablarch.fw.dicontainer.web.servlet;
 
+import java.util.function.Supplier;
+
 import javax.servlet.http.HttpServletRequest;
 
 import nablarch.fw.dicontainer.exception.web.WebContextException;
@@ -13,15 +15,17 @@ public final class ServletAPIContextSupplier
 
     private final ThreadLocal<ServletAPIContext> contexts = new ThreadLocal<>();
 
-    public void doWithContext(final HttpServletRequest request, final Runnable action) {
+    public <T> T doWithContext(final HttpServletRequest request, final Supplier<T> action) {
         if (contexts.get() != null) {
             throw new WebContextException(
                     "Method [" + getClass().getName() + "#doWithContext] must not be nested.");
         }
-        contexts.set(new ServletAPIContext(request));
+        final ServletAPIContext context = new ServletAPIContext(request);
+        contexts.set(context);
         try {
-            action.run();
+            return action.get();
         } finally {
+            context.destroy();
             contexts.remove();
         }
     }

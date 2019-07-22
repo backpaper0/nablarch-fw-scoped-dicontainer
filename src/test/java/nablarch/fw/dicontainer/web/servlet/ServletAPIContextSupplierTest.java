@@ -18,7 +18,9 @@ public class ServletAPIContextSupplierTest {
         try {
             supplier.doWithContext(request, () -> {
                 supplier.doWithContext(request, () -> {
+                    return null;
                 });
+                return null;
             });
             fail();
         } catch (final WebContextException e) {

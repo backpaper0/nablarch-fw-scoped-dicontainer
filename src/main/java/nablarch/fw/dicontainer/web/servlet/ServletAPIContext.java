@@ -18,7 +18,7 @@ import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
 import nablarch.fw.dicontainer.web.context.RequestContext;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 
-public class ServletAPIContext implements RequestContext, SessionContext {
+public final class ServletAPIContext implements RequestContext, SessionContext {
 
     private final HttpServletRequest request;
     private final Map<String, ComponentHolder> gotSessionComponentsPerRequest = new HashMap<>();

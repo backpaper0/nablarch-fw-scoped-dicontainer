@@ -30,14 +30,6 @@ public final class MethodCollector {
         methods.add(method);
     }
 
-    @Deprecated
-    public void addInstanceMethodIfNotOverridden(final Method method) {
-        if (Modifier.isStatic(method.getModifiers())) {
-            return;
-        }
-        addMethodIfNotOverridden(method);
-    }
-
     private static boolean isTarget(final Method method) {
         if (method.isBridge()) {
             return false;

@@ -9,11 +9,11 @@ import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
+import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
-import nablarch.fw.dicontainer.exception.ErrorCollector;
 import nablarch.fw.dicontainer.scope.Scope;
 
 public final class AnnotationComponentDefinitionFactory {

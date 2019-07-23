@@ -16,6 +16,7 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
+import nablarch.fw.dicontainer.component.impl.DefaultInjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 
 public final class AnnotationInjectionComponentResolverFactory {
@@ -64,7 +65,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         }
 
         final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
-        return new InjectionComponentResolver(key, provider);
+        return new DefaultInjectionComponentResolver(key, provider);
     }
 
     private interface Source {
@@ -76,7 +77,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         ParameterizedType getGenericComponentType();
     }
 
-    private static class FieldSource implements Source {
+    private static final class FieldSource implements Source {
 
         private final Field field;
 
@@ -100,7 +101,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         }
     }
 
-    private static class MethodParameterSource implements Source {
+    private static final class MethodParameterSource implements Source {
 
         private final Method method;
         private final int index;
@@ -126,7 +127,7 @@ public final class AnnotationInjectionComponentResolverFactory {
         }
     }
 
-    private static class ConstructorParameterSource implements Source {
+    private static final class ConstructorParameterSource implements Source {
 
         private final Constructor<?> constructor;
         private final int index;

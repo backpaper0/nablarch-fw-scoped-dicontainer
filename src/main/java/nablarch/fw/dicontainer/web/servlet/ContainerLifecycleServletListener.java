@@ -7,7 +7,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-public class ContainerLifecycleServletListener
+public final class ContainerLifecycleServletListener
         implements ServletRequestListener, HttpSessionListener {
 
     @Override

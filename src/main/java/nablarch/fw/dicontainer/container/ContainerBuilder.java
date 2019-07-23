@@ -1,8 +1,6 @@
 package nablarch.fw.dicontainer.container;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -10,27 +8,52 @@ import java.util.stream.Collectors;
 
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
+import nablarch.core.util.annotation.Published;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.ComponentKey.AliasKey;
+import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.impl.ContainerInjectableMember;
 import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.exception.ContainerException;
-import nablarch.fw.dicontainer.exception.CycleInjectionException;
-import nablarch.fw.dicontainer.exception.ErrorCollector;
 import nablarch.fw.dicontainer.scope.PassthroughScope;
 
-public class ContainerBuilder<T extends ContainerBuilder<T>> {
+/**
+ * DIコンテナのビルダー。
+ *
+ * @param <BUILDER> このビルダーのサブクラス
+ */
+@Published(tag = "architect")
+public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
 
+    /**
+     * ロガー
+     */
     private static final Logger logger = LoggerManager.get(ContainerBuilder.class);
+    /**
+     * コンポーネント定義のリポジトリ
+     */
     private final ComponentDefinitionRepository definitions = new ComponentDefinitionRepository();
+    /**
+     * エイリアスキーと検索キーのマッピング
+     */
     private final AliasMapping aliasesMap = new AliasMapping();
+    /**
+     * バリデーションエラーを収集するクラス
+     */
     protected final ErrorCollector errorCollector = ErrorCollector.newInstance();
+    /**
+     * DIコンテナの構築を開始した時点の{@link System#nanoTime()}値
+     */
     private final long startedAt;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     */
     public ContainerBuilder() {
         this.startedAt = System.nanoTime();
         if (logger.isInfoEnabled()) {
@@ -38,7 +61,13 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         }
     }
 
-    public T ignoreError(final Class<? extends ContainerException> ignoreMe) {
+    /**
+     * {@link ErrorCollector#throwExceptionIfExistsError()}で無視をする例外クラスを設定する。
+     * 
+     * @param ignoreMe 無視される例外クラス
+     * @return このビルダー自身
+     */
+    public BUILDER ignoreError(final Class<? extends ContainerException> ignoreMe) {
         if (logger.isDebugEnabled()) {
             logger.logDebug(
                     "Ignore error during building Container. ignored class=" + ignoreMe.getName());
@@ -47,7 +76,16 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         return self();
     }
 
-    public <U> T register(final ComponentKey<U> key, final ComponentDefinition<U> definition) {
+    /**
+     * コンポーネント定義を登録する。
+     * 
+     * @param <T> コンポーネントの型
+     * @param key 検索キー
+     * @param definition コンポーネント定義
+     * @return このビルダー自身
+     */
+    public <T> BUILDER register(final ComponentKey<T> key,
+            final ComponentDefinition<T> definition) {
         if (logger.isDebugEnabled()) {
             logger.logDebug("Start registering component definition. key=" + key);
         }
@@ -65,6 +103,12 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         return self();
     }
 
+    /**
+     * コンポーネント定義を検索する。
+     * 
+     * @param key 検索キー
+     * @return コンポーネント定義の集合
+     */
     public Set<ComponentDefinition<?>> findComponentDefinitions(final ComponentKey<?> key) {
         final ComponentDefinition<?> definition = definitions.find(key);
         if (definition != null) {
@@ -75,6 +119,12 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * 依存関係の循環を検出するためのバリデーションを行う。
+     * 
+     * @param key 検索キー
+     * @param target 対象となるコンポーネント定義
+     */
     public void validateCycleDependency(final ComponentKey<?> key,
             final ComponentDefinition<?> target) {
         final CycleDependencyValidationContext context = CycleDependencyValidationContext
@@ -82,10 +132,20 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         context.validateCycleDependency(key);
     }
 
+    /**
+     * バリデーションエラーを追加する。
+     * 
+     * @param exception バリデーションエラー
+     */
     public void addError(final ContainerException exception) {
         errorCollector.add(exception);
     }
 
+    /**
+     * DIコンテナを構築する。
+     * 
+     * @return 構築されたDIコンテナ
+     */
     public Container build() {
         registerContainer();
         definitions.validate(this);
@@ -99,6 +159,10 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         return container;
     }
 
+    /**
+     * DIコンテナのコンポーネント定義を登録する。
+     * 
+     */
     private void registerContainer() {
         final ComponentKey<ContainerImplementer> key = new ComponentKey<>(
                 ContainerImplementer.class);
@@ -111,52 +175,12 @@ public class ContainerBuilder<T extends ContainerBuilder<T>> {
         register(key, definition);
     }
 
-    private T self() {
-        return (T) this;
-    }
-
-    public static final class CycleDependencyValidationContext {
-
-        private final ContainerBuilder<?> containerBuilder;
-        private final ComponentDefinition<?> target;
-        private final List<ComponentDefinition<?>> dependencies;
-
-        public CycleDependencyValidationContext(final ContainerBuilder<?> containerBuilder,
-                final ComponentDefinition<?> target,
-                final List<ComponentDefinition<?>> dependencies) {
-            this.containerBuilder = Objects.requireNonNull(containerBuilder);
-            this.target = Objects.requireNonNull(target);
-            this.dependencies = Objects.requireNonNull(dependencies);
-        }
-
-        static CycleDependencyValidationContext newContext(
-                final ContainerBuilder<?> containerBuilder, final ComponentDefinition<?> target) {
-            return new CycleDependencyValidationContext(containerBuilder, target,
-                    new ArrayList<>());
-        }
-
-        public CycleDependencyValidationContext createSubContext() {
-            return new CycleDependencyValidationContext(containerBuilder, target,
-                    new ArrayList<>(dependencies));
-        }
-
-        public void validateCycleDependency(final ComponentKey<?> key) {
-            final Set<ComponentDefinition<?>> cds = containerBuilder.findComponentDefinitions(key);
-            if (cds.size() != 1) {
-                return;
-            }
-            final ComponentDefinition<?> dependency = cds.iterator().next();
-            dependencies.add(dependency);
-            if (dependencies.contains(target)) {
-                final ComponentDefinition<?> cd = dependencies.stream().filter(target::equals)
-                        .findAny()
-                        .get();
-                containerBuilder.addError(
-                        new CycleInjectionException("Dependency between [" + target + "] and ["
-                                + cd + "] is cycled."));
-                return;
-            }
-            dependency.validateCycleDependency(this);
-        }
+    /**
+     * 自分自身を{@code BUILDER}型へキャストする。
+     * 
+     * @return 自分自身
+     */
+    private BUILDER self() {
+        return (BUILDER) this;
     }
 }

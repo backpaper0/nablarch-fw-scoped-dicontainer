@@ -12,7 +12,6 @@ import org.junit.Test;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.TinyContainer;
 import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;
-import nablarch.fw.dicontainer.exception.ErrorCollector;
 
 public class InjectableConstructorTest {
 

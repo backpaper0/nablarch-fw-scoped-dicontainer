@@ -1,63 +1,35 @@
 package nablarch.fw.dicontainer.component;
 
-import java.util.Objects;
-import java.util.Set;
-
-import javax.inject.Provider;
-
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
-import nablarch.fw.dicontainer.exception.InjectionComponentDuplicatedException;
-import nablarch.fw.dicontainer.exception.InjectionComponentNotFoundException;
-import nablarch.fw.dicontainer.exception.InvalidInjectionScopeException;
+import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
-public final class InjectionComponentResolver {
+/**
+ * インジェクションされるコンポーネントを解決するメソッドを表すインターフェース。
+ *
+ */
+public interface InjectionComponentResolver {
 
-    private final ComponentKey<?> key;
-    private final boolean provider;
+    /**
+     * 依存コンポーネントを解決する。
+     * 
+     * @param container DIコンテナ
+     * @return 解決されたコンポーネント
+     */
+    Object resolve(ContainerImplementer container);
 
-    public InjectionComponentResolver(final ComponentKey<?> key, final boolean provider) {
-        this.key = Objects.requireNonNull(key);
-        this.provider = provider;
-    }
+    /**
+     * バリデーションを行う。
+     * 
+     * @param containerBuilder DIコンテナのビルダー
+     * @param self 自身を含んでいるコンポーネント定義
+     */
+    void validate(ContainerBuilder<?> containerBuilder, ComponentDefinition<?> self);
 
-    public Object resolve(final ContainerImplementer container) {
-        if (provider) {
-            return new Provider<Object>() {
-                @Override
-                public Object get() {
-                    return container.getComponent(key);
-                }
-            };
-        }
-        return container.getComponent(key);
-    }
-
-    public void validate(final ContainerBuilder<?> containerBuilder,
-            final ComponentDefinition<?> self) {
-        final Set<ComponentDefinition<?>> definitions = containerBuilder
-                .findComponentDefinitions(key);
-        if (definitions.isEmpty()) {
-            containerBuilder.addError(new InjectionComponentNotFoundException("key=" + key));
-        } else if (definitions.size() > 1) {
-            containerBuilder.addError(new InjectionComponentDuplicatedException(
-                    "key=" + key + ", definitions=" + definitions));
-        } else if (provider == false) {
-            final ComponentDefinition<?> injected = definitions.iterator().next();
-            if (self.isNarrowScope(injected) == false) {
-                containerBuilder.addError(new InvalidInjectionScopeException(
-                        "[" + self + "] must be narrow scope than [" + injected + "] (Or wrap ["
-                                + injected + "] with Provider)."));
-            } else {
-                containerBuilder.validateCycleDependency(key, self);
-            }
-        }
-    }
-
-    public void validateCycleDependency(final CycleDependencyValidationContext context) {
-        if (provider == false) {
-            context.validateCycleDependency(key);
-        }
-    }
+    /**
+     * 依存関係の循環を検出するためのバリデーションを行う。
+     * 
+     * @param context 循環依存バリデーションのコンテキスト
+     */
+    void validateCycleDependency(CycleDependencyValidationContext context);
 }

@@ -5,8 +5,8 @@ import java.util.Objects;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 public final class PassthroughInjectableMember implements InjectableMember {
 

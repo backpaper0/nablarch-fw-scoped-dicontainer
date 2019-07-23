@@ -3,9 +3,11 @@ package nablarch.fw.dicontainer.scope;
 import java.util.HashMap;
 import java.util.Map;
 
+import nablarch.core.util.annotation.Published;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 
+@Published(tag = "architect")
 public abstract class AbstractScope implements Scope {
 
     protected final Map<ComponentId, ComponentDefinition<?>> idToDefinition = new HashMap<>();

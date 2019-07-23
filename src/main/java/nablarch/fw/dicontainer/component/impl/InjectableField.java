@@ -8,8 +8,8 @@ import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.reflect.FieldWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
 public final class InjectableField implements InjectableMember {

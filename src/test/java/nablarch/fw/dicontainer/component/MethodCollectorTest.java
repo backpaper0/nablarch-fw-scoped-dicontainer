@@ -17,7 +17,7 @@ import nablarch.fw.dicontainer.overridedemo.subpackage.OverrideDemo3;
 public class MethodCollectorTest {
 
     @Test
-    public void addInstanceMethodIfNotOverridden() throws Exception {
+    public void addMethodIfNotOverridden() throws Exception {
         final MethodCollector collector = new MethodCollector();
 
         final Method demo1Method1 = OverrideDemo1.class.getDeclaredMethod("method1");
@@ -30,15 +30,15 @@ public class MethodCollectorTest {
         final Method demo2Method3 = OverrideDemo2.class.getDeclaredMethod("method3");
         final Method demo2Method4 = OverrideDemo2.class.getDeclaredMethod("method4");
 
-        collector.addInstanceMethodIfNotOverridden(demo2Method1);
-        collector.addInstanceMethodIfNotOverridden(demo2Method2);
-        collector.addInstanceMethodIfNotOverridden(demo2Method3);
-        collector.addInstanceMethodIfNotOverridden(demo2Method4);
+        collector.addMethodIfNotOverridden(demo2Method1);
+        collector.addMethodIfNotOverridden(demo2Method2);
+        collector.addMethodIfNotOverridden(demo2Method3);
+        collector.addMethodIfNotOverridden(demo2Method4);
 
-        collector.addInstanceMethodIfNotOverridden(demo1Method1);
-        collector.addInstanceMethodIfNotOverridden(demo1Method2);
-        collector.addInstanceMethodIfNotOverridden(demo1Method3);
-        collector.addInstanceMethodIfNotOverridden(demo1Method4);
+        collector.addMethodIfNotOverridden(demo1Method1);
+        collector.addMethodIfNotOverridden(demo1Method2);
+        collector.addMethodIfNotOverridden(demo1Method3);
+        collector.addMethodIfNotOverridden(demo1Method4);
 
         final List<Method> methods = collector.getMethods();
 
@@ -53,7 +53,7 @@ public class MethodCollectorTest {
     }
 
     @Test
-    public void addInstanceMethodIfNotOverriddenAnotherPackage() throws Exception {
+    public void addMethodIfNotOverriddenAnotherPackage() throws Exception {
         final MethodCollector collector = new MethodCollector();
 
         final Method demo1Method1 = OverrideDemo1.class.getDeclaredMethod("method1");
@@ -66,15 +66,15 @@ public class MethodCollectorTest {
         final Method demo3Method3 = OverrideDemo3.class.getDeclaredMethod("method3");
         final Method demo3Method4 = OverrideDemo3.class.getDeclaredMethod("method4");
 
-        collector.addInstanceMethodIfNotOverridden(demo3Method1);
-        collector.addInstanceMethodIfNotOverridden(demo3Method2);
-        collector.addInstanceMethodIfNotOverridden(demo3Method3);
-        collector.addInstanceMethodIfNotOverridden(demo3Method4);
+        collector.addMethodIfNotOverridden(demo3Method1);
+        collector.addMethodIfNotOverridden(demo3Method2);
+        collector.addMethodIfNotOverridden(demo3Method3);
+        collector.addMethodIfNotOverridden(demo3Method4);
 
-        collector.addInstanceMethodIfNotOverridden(demo1Method1);
-        collector.addInstanceMethodIfNotOverridden(demo1Method2);
-        collector.addInstanceMethodIfNotOverridden(demo1Method3);
-        collector.addInstanceMethodIfNotOverridden(demo1Method4);
+        collector.addMethodIfNotOverridden(demo1Method1);
+        collector.addMethodIfNotOverridden(demo1Method2);
+        collector.addMethodIfNotOverridden(demo1Method3);
+        collector.addMethodIfNotOverridden(demo1Method4);
 
         final List<Method> methods = collector.getMethods();
 
@@ -90,18 +90,18 @@ public class MethodCollectorTest {
     }
 
     @Test
-    public void ignoreStaticMethod() throws Exception {
+    public void staticMethod() throws Exception {
         final MethodCollector collector = new MethodCollector();
-        collector.addInstanceMethodIfNotOverridden(Aaa.class.getDeclaredMethod("staticMethod"));
+        collector.addMethodIfNotOverridden(Aaa.class.getDeclaredMethod("staticMethod"));
 
-        assertEquals(0, collector.getMethods().size());
+        assertEquals(1, collector.getMethods().size());
     }
 
     @Test
     public void ignoreBridgeMethod() throws Exception {
         final MethodCollector collector = new MethodCollector();
         for (final Method method : Bbb.class.getDeclaredMethods()) {
-            collector.addInstanceMethodIfNotOverridden(method);
+            collector.addMethodIfNotOverridden(method);
         }
 
         assertEquals(1, collector.getMethods().size());
@@ -116,7 +116,7 @@ public class MethodCollectorTest {
         new Ccc().syntheticMethod();
         final MethodCollector collector = new MethodCollector();
         for (final Method method : Ccc.class.getDeclaredMethods()) {
-            collector.addInstanceMethodIfNotOverridden(method);
+            collector.addMethodIfNotOverridden(method);
         }
 
         assertEquals(1, collector.getMethods().size());
@@ -130,10 +130,10 @@ public class MethodCollectorTest {
     public void ignoreAbstractMethod() throws Exception {
         final MethodCollector collector = new MethodCollector();
         for (final Method method : Ddd.class.getDeclaredMethods()) {
-            collector.addInstanceMethodIfNotOverridden(method);
+            collector.addMethodIfNotOverridden(method);
         }
         for (final Method method : Eee.class.getDeclaredMethods()) {
-            collector.addInstanceMethodIfNotOverridden(method);
+            collector.addMethodIfNotOverridden(method);
         }
 
         assertEquals(0, collector.getMethods().size());

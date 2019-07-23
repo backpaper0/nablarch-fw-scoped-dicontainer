@@ -7,8 +7,8 @@ import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.impl.reflect.ConstructorWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 public final class InjectableConstructor implements InjectableMember {
 

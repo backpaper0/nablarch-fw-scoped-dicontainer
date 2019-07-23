@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.Prototype;
-import nablarch.fw.dicontainer.exception.ErrorCollector;
+import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.Scope;
 import nablarch.fw.dicontainer.scope.SingletonScope;

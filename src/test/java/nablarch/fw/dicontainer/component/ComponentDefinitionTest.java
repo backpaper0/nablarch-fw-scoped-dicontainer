@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerBuilder.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
+import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.SingletonScope;
 

@@ -4,14 +4,31 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * コンポーネント定義に付与されるID。
+ *
+ */
 public final class ComponentId implements Serializable {
 
+    /**
+     * IDの値
+     */
     private final UUID value;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param value IDの値
+     */
     private ComponentId(final UUID value) {
         this.value = Objects.requireNonNull(value);
     }
 
+    /**
+     * IDを生成する。
+     * 
+     * @return 生成されたID
+     */
     public static ComponentId generate() {
         return new ComponentId(UUID.randomUUID());
     }

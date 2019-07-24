@@ -16,17 +16,41 @@ import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
 import nablarch.fw.dicontainer.scope.Scope;
 
+/**
+ * アノテーションをもとにコンポーネント定義を生成するファクトリ。
+ *
+ */
 public final class AnnotationComponentDefinitionFactory {
 
+    /**
+     * コンポーネント定義の構成要素のファクトリ
+     */
     private final AnnotationMemberFactory memberFactory;
+    /**
+     * スコープを決定するクラス
+     */
     private final AnnotationScopeDecider scopeDecider;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param memberFactory コンポーネント定義の構成要素のファクトリ
+     * @param scopeDecider スコープを決定するクラス
+     */
     public AnnotationComponentDefinitionFactory(final AnnotationMemberFactory memberFactory,
             final AnnotationScopeDecider scopeDecider) {
         this.memberFactory = Objects.requireNonNull(memberFactory);
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
     }
 
+    /**
+     * コンポーネントのクラスをもとにコンポーネント定義を生成する。
+     * 
+     * @param <T> コンポーネントの型
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return コンポーネント定義
+     */
     public <T> Optional<ComponentDefinition<T>> fromComponentClass(final Class<T> componentType,
             final ErrorCollector errorCollector) {
         final Builder<T> builder = ComponentDefinition.builder(componentType);
@@ -43,7 +67,8 @@ public final class AnnotationComponentDefinitionFactory {
                 .createDestroyMethod(componentType, errorCollector);
         final List<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(builder.id(),
                 componentType, this, errorCollector);
-        final Optional<Scope> scope = scopeDecider.fromClass(componentType, errorCollector);
+        final Optional<Scope> scope = scopeDecider.fromComponentClass(componentType,
+                errorCollector);
 
         injectableConstructor.ifPresent(builder::injectableConstructor);
         initMethod.ifPresent(builder::initMethod);
@@ -57,17 +82,26 @@ public final class AnnotationComponentDefinitionFactory {
                 .build();
     }
 
+    /**
+     * ファクトリメソッドをもとにコンポーネント定義を生成する。
+     * 
+     * @param <T> コンポーネントの型
+     * @param factoryId ファクトリのID
+     * @param factoryMethod ファクトリメソッド
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return コンポーネント定義
+     */
     public <T> Optional<ComponentDefinition<T>> fromFactoryMethod(final ComponentId factoryId,
-            final Method method, final ErrorCollector errorCollector) {
-        final Class<T> componentType = (Class<T>) method.getReturnType();
+            final Method factoryMethod, final ErrorCollector errorCollector) {
+        final Class<T> componentType = (Class<T>) factoryMethod.getReturnType();
         final Builder<T> builder = ComponentDefinition.builder(componentType);
 
         final InjectableMember injectableConstructor = memberFactory.createFactoryMethod(factoryId,
-                method, errorCollector);
+                factoryMethod, errorCollector);
         final Optional<DestroyMethod> destroyMethod = memberFactory.createFactoryDestroyMethod(
-                method,
+                factoryMethod,
                 errorCollector);
-        final Optional<Scope> scope = scopeDecider.fromMethod(method, errorCollector);
+        final Optional<Scope> scope = scopeDecider.fromFactoryMethod(factoryMethod, errorCollector);
 
         destroyMethod.ifPresent(builder::destroyMethod);
         scope.ifPresent(builder::scope);

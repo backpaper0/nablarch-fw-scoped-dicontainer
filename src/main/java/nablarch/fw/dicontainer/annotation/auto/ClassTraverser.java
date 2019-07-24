@@ -17,25 +17,57 @@ import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.fw.dicontainer.exception.ClassTraversingException;
 
+/**
+ * ディレクトリトラバーサルを行って見つけたクラスに特定の処理を行うクラス。
+ *
+ */
 public final class ClassTraverser {
 
+    /**
+     * クラスファイルの拡張子
+     */
+    private static final String CLASSFILE_SUFFIX = ".class";
+    /**
+     * ロガー
+     */
     private static final Logger logger = LoggerManager.get(ClassTraverser.class);
+    /**
+     * 見つけたクラスをロードするためのクラスローダー
+     */
     private final ClassLoader classLoader;
-    private final Class<?> base;
+    /**
+     * ディレクトリトラバーサルの起点となるクラス
+     */
+    private final Class<?> baseClass;
+    /**
+     * フィルター
+     */
     private final ClassFilter classFilter;
 
-    public ClassTraverser(final ClassLoader classLoader, final Class<?> base,
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param classLoader 見つけたクラスをロードするためのクラスローダー
+     * @param baseClass ディレクトリトラバーサルの起点となるクラス
+     * @param classFilter フィルター
+     */
+    public ClassTraverser(final ClassLoader classLoader, final Class<?> baseClass,
             final ClassFilter classFilter) {
         this.classLoader = Objects.requireNonNull(classLoader);
-        this.base = Objects.requireNonNull(base);
+        this.baseClass = Objects.requireNonNull(baseClass);
         this.classFilter = Objects.requireNonNull(classFilter);
     }
 
+    /**
+     * ディレクトリトラバーサルを行う。
+     * 
+     * @param consumer 見つかったクラスに適用する処理
+     */
     public void traverse(final Consumer<Class<?>> consumer) {
-        final CodeSource codeSource = base.getProtectionDomain().getCodeSource();
+        final CodeSource codeSource = baseClass.getProtectionDomain().getCodeSource();
         if (codeSource == null) {
             if (logger.isDebugEnabled()) {
-                logger.logDebug("Can not traverse configured by [" + base.getName() + "]");
+                logger.logDebug("Can not traverse configured by [" + baseClass.getName() + "]");
             }
             return;
         }
@@ -60,7 +92,7 @@ public final class ClassTraverser {
             throws IOException {
         try (Stream<Path> stream = Files.walk(directory)) {
             stream.filter(Files::isRegularFile)
-                    .filter(file -> file.getFileName().toString().endsWith(".class"))
+                    .filter(file -> file.getFileName().toString().endsWith(CLASSFILE_SUFFIX))
                     .forEach(file -> {
                         loadClass(consumer, directory.relativize(file).toString());
                     });
@@ -72,7 +104,7 @@ public final class ClassTraverser {
         try (JarInputStream in = new JarInputStream(Files.newInputStream(jarFile))) {
             JarEntry entry = null;
             while (null != (entry = in.getNextJarEntry())) {
-                if (entry.isDirectory() == false && entry.getName().endsWith(".class")) {
+                if (entry.isDirectory() == false && entry.getName().endsWith(CLASSFILE_SUFFIX)) {
                     loadClass(consumer, entry.getName());
                 }
             }
@@ -82,7 +114,7 @@ public final class ClassTraverser {
     private void loadClass(final Consumer<Class<?>> consumer, final String classFileName) {
         try {
             final String className = classFileName.replace('/', '.').substring(0,
-                    classFileName.length() - ".class".length());
+                    classFileName.length() - CLASSFILE_SUFFIX.length());
             if (classFilter.select(className)) {
                 final Class<?> clazz = Class.forName(className, false, classLoader);
                 consumer.accept(clazz);

@@ -2,10 +2,10 @@ package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -19,65 +19,92 @@ import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.DefaultInjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 
+/**
+ * 依存コンポーネントのリゾルバを生成するファクトリクラス。
+ *
+ */
 public final class AnnotationInjectionComponentResolverFactory {
 
+    /**
+     * 限定子のアノテーションセット
+     */
     private final AnnotationSet qualifierAnnotations;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param qualifierAnnotations 限定子のアノテーションセット
+     */
     public AnnotationInjectionComponentResolverFactory(final AnnotationSet qualifierAnnotations) {
         this.qualifierAnnotations = Objects.requireNonNull(qualifierAnnotations);
     }
 
+    /**
+     * フィールドをもとに依存コンポーネントのリゾルバを生成する。
+     * 
+     * @param field フィールド
+     * @return 依存コンポーネントのリゾルバ
+     */
     public InjectionComponentResolver fromField(final Field field) {
-        return fromSource(new FieldSource(field));
+        return new FieldSource(field).create();
     }
 
+    /**
+     * メソッドのパラメータをもとに依存コンポーネントのリゾルバを生成する。
+     * 
+     * @param method メソッド
+     * @return 依存コンポーネントのリゾルバ
+     */
     public InjectionComponentResolvers fromMethodParameters(final Method method) {
-        final List<InjectionComponentResolver> resolvers = IntStream
-                .range(0, method.getParameterCount())
-                .mapToObj(i -> new MethodParameterSource(method, i))
-                .map(this::fromSource)
-                .collect(Collectors.toList());
-        return new InjectionComponentResolvers(resolvers);
+        return fromExecutable(method);
     }
 
+    /**
+     * コンストラクタのパラメータをもとに依存コンポーネントのリゾルバを生成する。
+     * 
+     * @param constructor コンストラクタ
+     * @return 依存コンポーネントのリゾルバ
+     */
     public InjectionComponentResolvers fromConstructorParameters(
             final Constructor<?> constructor) {
+        return fromExecutable(constructor);
+    }
+
+    private InjectionComponentResolvers fromExecutable(
+            final Executable executable) {
         final List<InjectionComponentResolver> resolvers = IntStream
-                .range(0, constructor.getParameterCount())
-                .mapToObj(i -> new ConstructorParameterSource(constructor, i))
-                .map(this::fromSource)
+                .range(0, executable.getParameterCount())
+                .mapToObj(i -> new ExecutableSource(executable, i))
+                .map(Source::create)
                 .collect(Collectors.toList());
         return new InjectionComponentResolvers(resolvers);
     }
 
-    private InjectionComponentResolver fromSource(final Source source) {
-        final Set<Annotation> qualifiers = Arrays.stream(source.getAnnotations())
-                .filter(a -> qualifierAnnotations.isAnnotationPresent(a.annotationType()))
-                .collect(Collectors.toSet());
+    private abstract class Source {
 
-        final boolean provider = source.getComponentType().equals(Provider.class);
-        final Class<?> componentType;
-        if (provider) {
-            componentType = (Class<?>) source.getGenericComponentType()
-                    .getActualTypeArguments()[0];
-        } else {
-            componentType = source.getComponentType();
+        protected abstract Annotation[] getAnnotations();
+
+        protected abstract Class<?> getComponentType();
+
+        protected abstract ParameterizedType getGenericComponentType();
+
+        public InjectionComponentResolver create() {
+            final Set<Annotation> qualifiers = qualifierAnnotations.filter(getAnnotations());
+
+            final boolean provider = getComponentType().equals(Provider.class);
+            final Class<?> componentType;
+            if (provider) {
+                componentType = (Class<?>) getGenericComponentType().getActualTypeArguments()[0];
+            } else {
+                componentType = getComponentType();
+            }
+
+            final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
+            return new DefaultInjectionComponentResolver(key, provider);
         }
-
-        final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
-        return new DefaultInjectionComponentResolver(key, provider);
     }
 
-    private interface Source {
-
-        Annotation[] getAnnotations();
-
-        Class<?> getComponentType();
-
-        ParameterizedType getGenericComponentType();
-    }
-
-    private static final class FieldSource implements Source {
+    private final class FieldSource extends Source {
 
         private final Field field;
 
@@ -86,70 +113,44 @@ public final class AnnotationInjectionComponentResolverFactory {
         }
 
         @Override
-        public Annotation[] getAnnotations() {
+        protected Annotation[] getAnnotations() {
             return field.getAnnotations();
         }
 
         @Override
-        public Class<?> getComponentType() {
+        protected Class<?> getComponentType() {
             return field.getType();
         }
 
         @Override
-        public ParameterizedType getGenericComponentType() {
+        protected ParameterizedType getGenericComponentType() {
             return (ParameterizedType) field.getGenericType();
         }
     }
 
-    private static final class MethodParameterSource implements Source {
+    private final class ExecutableSource extends Source {
 
-        private final Method method;
+        private final Executable executable;
         private final int index;
 
-        public MethodParameterSource(final Method method, final int index) {
-            this.method = Objects.requireNonNull(method);
+        public ExecutableSource(final Executable executable, final int index) {
+            this.executable = Objects.requireNonNull(executable);
             this.index = index;
         }
 
         @Override
-        public Annotation[] getAnnotations() {
-            return method.getParameterAnnotations()[index];
+        protected Annotation[] getAnnotations() {
+            return executable.getParameterAnnotations()[index];
         }
 
         @Override
-        public Class<?> getComponentType() {
-            return method.getParameterTypes()[index];
+        protected Class<?> getComponentType() {
+            return executable.getParameterTypes()[index];
         }
 
         @Override
-        public ParameterizedType getGenericComponentType() {
-            return (ParameterizedType) method.getGenericParameterTypes()[index];
-        }
-    }
-
-    private static final class ConstructorParameterSource implements Source {
-
-        private final Constructor<?> constructor;
-        private final int index;
-
-        public ConstructorParameterSource(final Constructor<?> constructor, final int index) {
-            this.constructor = Objects.requireNonNull(constructor);
-            this.index = index;
-        }
-
-        @Override
-        public Annotation[] getAnnotations() {
-            return constructor.getParameterAnnotations()[index];
-        }
-
-        @Override
-        public Class<?> getComponentType() {
-            return constructor.getParameterTypes()[index];
-        }
-
-        @Override
-        public ParameterizedType getGenericComponentType() {
-            return (ParameterizedType) constructor.getGenericParameterTypes()[index];
+        protected ParameterizedType getGenericComponentType() {
+            return (ParameterizedType) executable.getGenericParameterTypes()[index];
         }
     }
 }

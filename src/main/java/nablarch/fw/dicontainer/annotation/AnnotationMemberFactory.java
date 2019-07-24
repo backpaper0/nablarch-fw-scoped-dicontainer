@@ -5,8 +5,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Qualifier;
@@ -47,23 +48,63 @@ import nablarch.fw.dicontainer.exception.InjectableConstructorNotFoundException;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodDuplicatedException;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodNotFoundException;
 
+/**
+ * アノテーションをもとにコンポーネント定義の構成要素を生成するファクトリクラス。
+ *
+ */
 public final class AnnotationMemberFactory {
 
+    /**
+     * インジェクションのアノテーションセット
+     */
     private final AnnotationSet injectAnnotations;
+    /**
+     * 初期化のアノテーションセット
+     */
     private final AnnotationSet initAnnotations;
+    /**
+     * 破棄のアノテーションセット
+     */
     private final AnnotationSet destroyAnnotations;
+    /**
+     * イベントハンドリングのアノテーションセット
+     */
     private final AnnotationSet observesAnnotations;
+    /**
+     * ファクトリメソッドのアノテーションセット
+     */
     private final AnnotationSet factoryAnnotations;
+    /**
+     * 依存コンポーネントリゾルバのファクトリ
+     */
     private final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory;
-    private final String destroyMethodName;
+    /**
+     * 破棄メソッドの要素名
+     */
+    private final String destroyMethodElementName;
+    /**
+     * 検索キーのファクトリ
+     */
     private final AnnotationComponentKeyFactory componentKeyFactory;
 
+    /**
+     * コンストラクタを生成する。
+     * 
+     * @param injectAnnotations インジェクションアノテーションセット
+     * @param initAnnotations 初期化アノテーションセット
+     * @param destroyAnnotations 破棄アノテーションセット
+     * @param observesAnnotations イベントハンドリングアノテーションセット
+     * @param factoryAnnotations ファクトリメソッドアノテーションセット
+     * @param injectionComponentResolverFactory 依存コンポーネントリゾルバのファクトリ
+     * @param destroyMethodElementName 破棄メソッドの要素名
+     * @param componentKeyFactory 検索キーのファクトリ
+     */
     private AnnotationMemberFactory(final AnnotationSet injectAnnotations,
             final AnnotationSet initAnnotations,
             final AnnotationSet destroyAnnotations, final AnnotationSet observesAnnotations,
             final AnnotationSet factoryAnnotations,
             final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory,
-            final String destroyMethodName,
+            final String destroyMethodElementName,
             final AnnotationComponentKeyFactory componentKeyFactory) {
         this.injectAnnotations = Objects.requireNonNull(injectAnnotations);
         this.initAnnotations = Objects.requireNonNull(initAnnotations);
@@ -72,22 +113,24 @@ public final class AnnotationMemberFactory {
         this.factoryAnnotations = Objects.requireNonNull(factoryAnnotations);
         this.injectionComponentResolverFactory = Objects
                 .requireNonNull(injectionComponentResolverFactory);
-        this.destroyMethodName = Objects.requireNonNull(destroyMethodName);
+        this.destroyMethodElementName = Objects.requireNonNull(destroyMethodElementName);
         this.componentKeyFactory = Objects.requireNonNull(componentKeyFactory);
     }
 
+    /**
+     * コンストラクタでコンポーネントを生成する要素を作成する。
+     * 
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return コンポーネントを生成する要素
+     */
     public Optional<InjectableMember> createConstructor(final Class<?> componentType,
             final ErrorCollector errorCollector) {
-        final Set<Constructor<?>> constructors = new HashSet<>();
-        Constructor<?> noArgConstructor = null;
-        for (final Constructor<?> constructor : componentType.getDeclaredConstructors()) {
-            if (injectAnnotations.isAnnotationPresent(constructor)) {
-                constructors.add(constructor);
-            }
-            if (constructor.getParameterCount() == 0) {
-                noArgConstructor = constructor;
-            }
-        }
+        final Set<Constructor<?>> constructors = Arrays
+                .stream(componentType.getDeclaredConstructors())
+                .filter(injectAnnotations::isAnnotationPresent)
+                .collect(Collectors.toSet());
+
         if (constructors.size() > 1) {
             errorCollector.add(
                     new InjectableConstructorDuplicatedException(
@@ -103,7 +146,14 @@ public final class AnnotationMemberFactory {
             final InjectableConstructor injectableConstructor = new InjectableConstructor(
                     constructor, resolvers);
             return Optional.of(injectableConstructor);
-        } else if (noArgConstructor == null) {
+        }
+
+        final Constructor<?> noArgConstructor = Arrays
+                .stream(componentType.getDeclaredConstructors())
+                .filter(c -> c.getParameterCount() == 0)
+                .findAny().orElse(null);
+
+        if (noArgConstructor == null) {
             errorCollector.add(
                     new InjectableConstructorNotFoundException(
                             "Component [" + componentType.getName()
@@ -119,13 +169,29 @@ public final class AnnotationMemberFactory {
         return Optional.of(injectableConstructor);
     }
 
-    public InjectableMember createFactoryMethod(final ComponentId id, final Method factoryMethod,
+    /**
+     * ファクトリメソッドでコンポーネントを生成する要素を作成する。
+     * 
+     * @param factoryId ファクトリーのID
+     * @param factoryMethod ファクトリメソッド
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return コンポーネントを生成する要素
+     */
+    public InjectableMember createFactoryMethod(final ComponentId factoryId,
+            final Method factoryMethod,
             final ErrorCollector errorCollector) {
         final InjectionComponentResolvers resolvers = injectionComponentResolverFactory
                 .fromMethodParameters(factoryMethod);
-        return new InjectableFactoryMethod(id, factoryMethod, resolvers);
+        return new InjectableFactoryMethod(factoryId, factoryMethod, resolvers);
     }
 
+    /**
+     * インジェクション対象のフィールドとメソッドからなる要素を作成する。
+     * 
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return インジェクション対象のフィールドとメソッドからなる要素
+     */
     public List<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final MethodCollector methodCollector = new MethodCollector();
@@ -177,15 +243,17 @@ public final class AnnotationMemberFactory {
         return injectableMembers;
     }
 
+    /**
+     * イベントをハンドリングするメソッドからなる要素を作成する。
+     * 
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return イベントをハンドリングするメソッドからなる要素
+     */
     public List<ObservesMethod> createObservesMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
-        final MethodCollector methodCollector = new MethodCollector();
-        for (final Class<?> clazz : new ClassInheritances(componentType)) {
-            for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addMethodIfNotOverridden(method);
-            }
-        }
+        final MethodCollector methodCollector = MethodCollector.collectFromClass(componentType);
 
         final List<ObservesMethod> observesMethods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
@@ -198,12 +266,26 @@ public final class AnnotationMemberFactory {
         return observesMethods;
     }
 
+    /**
+     * 初期化メソッドからなる要素を作成する。
+     * 
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return 初期化メソッドからなる要素
+     */
     public Optional<InitMethod> createInitMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         return createLifeCycleMethod("Init", initAnnotations, DefaultInitMethod::new, componentType,
                 errorCollector);
     }
 
+    /**
+     * 破棄メソッドからなる要素を作成する。
+     * 
+     * @param componentType コンポーネントのクラス
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return 破棄メソッドからなる要素
+     */
     public Optional<DestroyMethod> createDestroyMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         return createLifeCycleMethod("Destroy", destroyAnnotations, DefaultDestroyMethod::new,
@@ -216,12 +298,7 @@ public final class AnnotationMemberFactory {
             final Function<Method, T> factory, final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
-        final MethodCollector methodCollector = new MethodCollector();
-        for (final Class<?> clazz : new ClassInheritances(componentType)) {
-            for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addMethodIfNotOverridden(method);
-            }
-        }
+        final MethodCollector methodCollector = MethodCollector.collectFromClass(componentType);
         final List<T> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (annotationSet.isAnnotationPresent(method)) {
@@ -238,20 +315,23 @@ public final class AnnotationMemberFactory {
         return Optional.of(methods.iterator().next());
     }
 
+    /**
+     * ファクトリメソッドで定義されるコンポーネントの破棄メソッドからなる要素を作成する。
+     * 
+     * @param factoryMethod ファクトリメソッド
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return ファクトリメソッドで定義されるコンポーネントの破棄メソッドからなる要素
+     */
     public Optional<DestroyMethod> createFactoryDestroyMethod(final Method factoryMethod,
             final ErrorCollector errorCollector) {
-        return factoryAnnotations.getStringElement(factoryMethod, destroyMethodName)
+        return factoryAnnotations.getStringElement(factoryMethod, destroyMethodElementName)
                 .flatMap(destroy -> {
                     if (destroy.isEmpty()) {
                         return Optional.empty();
                     }
                     final Class<?> componentType = factoryMethod.getReturnType();
-                    final MethodCollector methodCollector = new MethodCollector();
-                    for (final Class<?> clazz : new ClassInheritances(componentType)) {
-                        for (final Method method : clazz.getDeclaredMethods()) {
-                            methodCollector.addMethodIfNotOverridden(method);
-                        }
-                    }
+                    final MethodCollector methodCollector = MethodCollector
+                            .collectFromClass(componentType);
                     final List<Method> methods = new ArrayList<>();
                     for (final Method method : methodCollector.getMethods()) {
                         if (method.getName().equals(destroy)) {
@@ -280,16 +360,20 @@ public final class AnnotationMemberFactory {
                 });
     }
 
+    /**
+     * ファクトリメソッドからなる要素を作成する。
+     * 
+     * @param id ID
+     * @param componentType コンポーネントのクラス
+     * @param componentDefinitionFactory コンポーネント定義のファクトリ
+     * @param errorCollector バリデーションエラーを収集するクラス
+     * @return ファクトリメソッドからなる要素
+     */
     public List<FactoryMethod> createFactoryMethods(final ComponentId id,
             final Class<?> componentType,
             final AnnotationComponentDefinitionFactory componentDefinitionFactory,
             final ErrorCollector errorCollector) {
-        final MethodCollector methodCollector = new MethodCollector();
-        for (final Class<?> clazz : new ClassInheritances(componentType)) {
-            for (final Method method : clazz.getDeclaredMethods()) {
-                methodCollector.addMethodIfNotOverridden(method);
-            }
-        }
+        final MethodCollector methodCollector = MethodCollector.collectFromClass(componentType);
         final List<FactoryMethod> methods = new ArrayList<>();
         for (final Method method : methodCollector.getMethods()) {
             if (factoryAnnotations.isAnnotationPresent(method)) {
@@ -303,27 +387,71 @@ public final class AnnotationMemberFactory {
         return methods;
     }
 
+    /**
+     * デフォルトの設定をしたインスタンスを構築する。
+     * 
+     * @return インスタンス
+     */
     public static AnnotationMemberFactory createDefault() {
         return builder().build();
     }
 
+    /**
+     * ビルダーを生成する。
+     * 
+     * @return ビルダー
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * ビルダー。
+     *
+     */
     public static final class Builder {
 
+        /**
+         * 限定子のアノテーションセット
+         */
         private AnnotationSet qualifierAnnotations = new AnnotationSet(Qualifier.class);
+        /**
+         * インジェクションのアノテーションセット
+         */
         private AnnotationSet injectAnnotations = new AnnotationSet(Inject.class);
+        /**
+         * 初期化のアノテーションセット
+         */
         private AnnotationSet initAnnotations = new AnnotationSet(Init.class);
+        /**
+         * 破棄のアノテーションセット
+         */
         private AnnotationSet destroyAnnotations = new AnnotationSet(Destroy.class);
+        /**
+         * イベントハンドリングアのノテーションセット
+         */
         private AnnotationSet observesAnnotations = new AnnotationSet(Observes.class);
+        /**
+         * ファクトリメソッドのアノテーションセット
+         */
         private AnnotationSet factoryAnnotations = new AnnotationSet(Factory.class);
-        private String destroyMethodName = "destroy";
+        /**
+         * 破棄メソッドの要素名
+         */
+        private String destroyMethodElementName = "destroy";
 
+        /**
+         * インスタンスを生成する。
+         */
         private Builder() {
         }
 
+        /**
+         * 限定子のアノテーションセットを設定する。
+         * 
+         * @param annotations 限定子のアノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder qualifierAnnotations(
                 final Class<? extends Annotation>... annotations) {
@@ -331,41 +459,82 @@ public final class AnnotationMemberFactory {
             return this;
         }
 
+        /**
+         * インジェクションのアノテーションセットを設定する。
+         * 
+         * @param annotations インジェクションのアノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder injectAnnotations(final Class<? extends Annotation>... annotations) {
             this.injectAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
+        /**
+         * 初期化のアノテーションセットを設定する。
+         * 
+         * @param annotations 初期化のアノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder initAnnotations(final Class<? extends Annotation>... annotations) {
             this.initAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
+        /**
+         * 破棄のアノテーションセットを設定する。
+         * 
+         * @param annotations 破棄のアノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder destroyAnnotations(final Class<? extends Annotation>... annotations) {
             this.destroyAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
+        /**
+         * イベントハンドリングアのノテーションセットを設定する。
+         * 
+         * @param annotations イベントハンドリングアのノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder observesAnnotations(final Class<? extends Annotation>... annotations) {
             this.observesAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
+        /**
+         * ファクトリメソッドのアノテーションセットを設定する。
+         * 
+         * @param annotations ファクトリメソッドのアノテーションセット
+         * @return このビルダー自身
+         */
         @SafeVarargs
         public final Builder factoryAnnotations(final Class<? extends Annotation>... annotations) {
             this.factoryAnnotations = new AnnotationSet(annotations);
             return this;
         }
 
-        public Builder destroyMethodName(final String destroyMethodName) {
-            this.destroyMethodName = destroyMethodName;
+        /**
+         * 破棄メソッドの要素名を設定する。
+         * 
+         * @param destroyMethodName 破棄メソッドの要素名
+         * @return このビルダー自身
+         */
+        public Builder destroyMethodElementName(final String destroyMethodName) {
+            this.destroyMethodElementName = destroyMethodName;
             return this;
         }
 
+        /**
+         * コンポーネント定義の構成要素ファクトリを構築する。
+         * 
+         * @return コンポーネント定義の構成要素ファクトリ
+         */
         public AnnotationMemberFactory build() {
             final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory = new AnnotationInjectionComponentResolverFactory(
                     qualifierAnnotations);
@@ -373,7 +542,8 @@ public final class AnnotationMemberFactory {
                     .builder().qualifierAnnotations(qualifierAnnotations).build();
             return new AnnotationMemberFactory(injectAnnotations, initAnnotations,
                     destroyAnnotations, observesAnnotations, factoryAnnotations,
-                    injectionComponentResolverFactory, destroyMethodName, componentKeyFactory);
+                    injectionComponentResolverFactory, destroyMethodElementName,
+                    componentKeyFactory);
         }
     }
 }

@@ -50,7 +50,7 @@ public final class ComponentDefinition<T> {
      */
     private final DestroyMethod destroyMethod;
     /**
-     * コンポーネントのファクトリーメソッド
+     * コンポーネントのファクトリメソッド
      */
     private final List<FactoryMethod> factoryMethods;
     /**
@@ -68,7 +68,7 @@ public final class ComponentDefinition<T> {
      * @param observesMethods イベントハンドラメソッド
      * @param initMethod 初期化メソッド
      * @param destroyMethod 破棄メソッド
-     * @param factoryMethods コンポーネントのファクトリーメソッド
+     * @param factoryMethods コンポーネントのファクトリメソッド
      * @param scope スコープ
      */
     private ComponentDefinition(final ComponentId id,
@@ -145,7 +145,7 @@ public final class ComponentDefinition<T> {
     }
 
     /**
-     * ファクトリーメソッドを適用する。
+     * ファクトリメソッドを適用する。
      * 
      * @param containerBuilder DIコンテナのビルダー
      */
@@ -254,7 +254,7 @@ public final class ComponentDefinition<T> {
          */
         private DestroyMethod destroyMethod = new NoopDestroyMethod();
         /**
-         * コンポーネントのファクトリーメソッド
+         * コンポーネントのファクトリメソッド
          */
         private List<FactoryMethod> factoryMethods = Collections.emptyList();
         /**
@@ -332,9 +332,9 @@ public final class ComponentDefinition<T> {
         }
 
         /**
-         * コンポーネントのファクトリーメソッドを設定する。
+         * コンポーネントのファクトリメソッドを設定する。
          * 
-         * @param factoryMethods コンポーネントのファクトリーメソッド
+         * @param factoryMethods コンポーネントのファクトリメソッド
          * @return このビルダー自身
          */
         public Builder<T> factoryMethods(final List<FactoryMethod> factoryMethods) {

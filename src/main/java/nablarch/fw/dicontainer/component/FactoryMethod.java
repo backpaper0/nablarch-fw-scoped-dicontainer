@@ -3,13 +3,13 @@ package nablarch.fw.dicontainer.component;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 
 /**
- * コンポーネントを生成するファクトリーメソッドを表すインターフェース。
+ * コンポーネントを生成するファクトリメソッドを表すインターフェース。
  *
  */
 public interface FactoryMethod {
 
     /**
-     * ファクトリーメソッドを適用してコンポーネント定義を登録する。
+     * ファクトリメソッドを適用してコンポーネント定義を登録する。
      * 
      * @param containerBuilder DIコンテナのビルダー
      */

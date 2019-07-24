@@ -3,10 +3,22 @@ package nablarch.fw.dicontainer.annotation;
 import java.util.Iterator;
 import java.util.Objects;
 
+/**
+ * スーパークラスを辿ってイテレーションする{@link Iterable}実装クラス。
+ *
+ */
 public final class ClassInheritances implements Iterable<Class<?>> {
 
+    /**
+     * 起点となるクラス
+     */
     private final Class<?> clazz;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param clazz 起点となるクラス
+     */
     public ClassInheritances(final Class<?> clazz) {
         this.clazz = Objects.requireNonNull(clazz);
     }

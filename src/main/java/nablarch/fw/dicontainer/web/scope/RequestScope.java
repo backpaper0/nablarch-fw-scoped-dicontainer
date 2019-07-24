@@ -11,10 +11,22 @@ import nablarch.fw.dicontainer.scope.AbstractScope;
 import nablarch.fw.dicontainer.web.context.RequestContext;
 import nablarch.fw.dicontainer.web.context.RequestContextSupplier;
 
+/**
+ * リクエストスコープ。
+ *
+ */
 public final class RequestScope extends AbstractScope {
 
+    /**
+     * リクエストコンテキストを取得するクラス
+     */
     private final RequestContextSupplier supplier;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param supplier リクエストコンテキストを取得するクラス
+     */
     public RequestScope(final RequestContextSupplier supplier) {
         this.supplier = Objects.requireNonNull(supplier);
     }
@@ -33,6 +45,12 @@ public final class RequestScope extends AbstractScope {
         return 100;
     }
 
+    /**
+     * リクエストコンポーネントを破棄する。
+     * 
+     * @param id ID
+     * @param component コンポーネント
+     */
     public void destroyComponent(final ComponentId id, final Object component) {
         final ComponentDefinition<Object> definition = (ComponentDefinition<Object>) idToDefinition
                 .get(id);

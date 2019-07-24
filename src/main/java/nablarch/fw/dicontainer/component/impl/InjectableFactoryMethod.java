@@ -14,20 +14,20 @@ import nablarch.fw.dicontainer.exception.FactoryMethodSignatureException;
 
 public final class InjectableFactoryMethod implements InjectableMember {
 
-    private final ComponentId componentId;
+    private final ComponentId factoryId;
     private final MethodWrapper method;
     private final InjectionComponentResolvers resolvers;
 
-    public InjectableFactoryMethod(final ComponentId componentId, final Method method,
+    public InjectableFactoryMethod(final ComponentId factoryId, final Method method,
             final InjectionComponentResolvers resolvers) {
-        this.componentId = Objects.requireNonNull(componentId);
+        this.factoryId = Objects.requireNonNull(factoryId);
         this.method = new MethodWrapper(method);
         this.resolvers = Objects.requireNonNull(resolvers);
     }
 
     @Override
     public Object inject(final ContainerImplementer container, final Object component) {
-        final Object factoryComponent = container.getComponent(componentId);
+        final Object factoryComponent = container.getComponent(factoryId);
         final Object[] args = resolvers.resolve(container);
         return method.invoke(factoryComponent, args);
     }

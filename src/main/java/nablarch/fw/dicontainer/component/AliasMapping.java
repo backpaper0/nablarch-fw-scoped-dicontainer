@@ -24,11 +24,7 @@ public final class AliasMapping {
      * @param key
      */
     public void register(final ComponentKey.AliasKey aliasKey, final ComponentKey<?> key) {
-        if (aliasesMap.containsKey(aliasKey) == false) {
-            aliasesMap.put(aliasKey, new HashSet<>());
-        }
-        final Set<ComponentKey<?>> keys = aliasesMap.get(aliasKey);
-        keys.add(key);
+        aliasesMap.computeIfAbsent(aliasKey, a -> new HashSet<>()).add(key);
     }
 
     /**
@@ -38,10 +34,6 @@ public final class AliasMapping {
      * @return 検索キーの集合
      */
     public Set<ComponentKey<?>> find(final ComponentKey.AliasKey aliasKey) {
-        final Set<ComponentKey<?>> keys = aliasesMap.get(aliasKey);
-        if (keys == null) {
-            return Collections.emptySet();
-        }
-        return keys;
+        return aliasesMap.getOrDefault(aliasKey, Collections.emptySet());
     }
 }

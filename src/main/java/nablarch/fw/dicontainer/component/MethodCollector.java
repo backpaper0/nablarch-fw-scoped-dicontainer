@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.annotation.ClassInheritances;
+
 public final class MethodCollector {
 
     private final List<Method> methods = new ArrayList<>();
@@ -62,5 +64,15 @@ public final class MethodCollector {
 
     public List<Method> getMethods() {
         return methods;
+    }
+
+    public static MethodCollector collectFromClass(final Class<?> clazz) {
+        final MethodCollector methodCollector = new MethodCollector();
+        for (final Class<?> c : new ClassInheritances(clazz)) {
+            for (final Method method : c.getDeclaredMethods()) {
+                methodCollector.addMethodIfNotOverridden(method);
+            }
+        }
+        return methodCollector;
     }
 }

@@ -15,18 +15,39 @@ import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 
+/**
+ * シングルトンスコープ。
+ *
+ */
 public final class SingletonScope extends AbstractScope {
 
+    /**
+     * IDとインスタンスホルダーのマッピング
+     */
     private final ConcurrentMap<ComponentId, InstanceHolder> instances = new ConcurrentHashMap<>();
+    /**
+     * イーガーロードをする場合は{@literal true}
+     */
     private final boolean eagerLoad;
-
+    /**
+     * DIコンテナ
+     */
     @Inject
     private ContainerImplementer containerImplementer;
 
+    /**
+     * インスタンスを生成する。
+     * イーガーロードはしない。
+     */
     public SingletonScope() {
         this(false);
     }
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param eagerLoad イーガーロードをする場合は{@literal true}
+     */
     public SingletonScope(final boolean eagerLoad) {
         this.eagerLoad = eagerLoad;
     }
@@ -44,6 +65,11 @@ public final class SingletonScope extends AbstractScope {
         return instanceHolder.get(provider);
     }
 
+    /**
+     * イーガーロードをする場合、すべてのシングルトンコンポーネントを初期化する。
+     * 
+     * @param event DIコンテナの初期化イベント
+     */
     @Observes
     public void init(final ContainerCreated event) {
         if (eagerLoad) {
@@ -53,6 +79,11 @@ public final class SingletonScope extends AbstractScope {
         }
     }
 
+    /**
+     * すべてのシングルトンコンポーネントを破棄する。
+     * 
+     * @param event DIコンテナの破棄イベント
+     */
     @Observes
     public void destroy(final ContainerDestroy event) {
         idToDefinition.forEach((id, definition) -> {
@@ -68,6 +99,10 @@ public final class SingletonScope extends AbstractScope {
         return Integer.MAX_VALUE;
     }
 
+    /**
+     * コンポーネントのインスタンスを保持するクラス。
+     *
+     */
     private static class InstanceHolder {
 
         Object instance;

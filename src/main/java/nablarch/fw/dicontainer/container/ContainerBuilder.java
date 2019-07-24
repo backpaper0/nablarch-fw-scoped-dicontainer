@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.inject.Provider;
+
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.util.annotation.Published;
@@ -13,13 +15,14 @@ import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
+import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.ComponentKey.AliasKey;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.impl.ContainerInjectableMember;
 import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.exception.ContainerException;
-import nablarch.fw.dicontainer.scope.PassthroughScope;
+import nablarch.fw.dicontainer.scope.Scope;
 
 /**
  * DIコンテナのビルダー。
@@ -169,7 +172,7 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
         final ComponentDefinition<ContainerImplementer> definition = ComponentDefinition
                 .builder(ContainerImplementer.class)
                 .injectableConstructor(new ContainerInjectableMember())
-                .scope(new PassthroughScope())
+                .scope(new ContainerScope())
                 .build()
                 .get();
         register(key, definition);
@@ -182,5 +185,26 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
      */
     private BUILDER self() {
         return (BUILDER) this;
+    }
+
+    /**
+     * DIコンテナ専用のスコープ。
+     *
+     */
+    private final class ContainerScope implements Scope {
+
+        @Override
+        public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
+            return provider.get();
+        }
+
+        @Override
+        public int dimensions() {
+            return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public <T> void register(final ComponentDefinition<T> definition) {
+        }
     }
 }

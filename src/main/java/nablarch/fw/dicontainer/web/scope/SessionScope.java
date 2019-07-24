@@ -11,10 +11,22 @@ import nablarch.fw.dicontainer.scope.AbstractScope;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
 
+/**
+ * セッションスコープ。
+ *
+ */
 public final class SessionScope extends AbstractScope {
 
+    /**
+     * セッションコンテキストを取得するクラス
+     */
     private final SessionContextSupplier supplier;
 
+    /**
+     * インスタンスを生成する。
+     * 
+     * @param supplier セッションコンテキストを取得するクラス
+     */
     public SessionScope(final SessionContextSupplier supplier) {
         this.supplier = Objects.requireNonNull(supplier);
     }
@@ -33,6 +45,12 @@ public final class SessionScope extends AbstractScope {
         return 200;
     }
 
+    /**
+     * セッションコンポーネントを破棄する。
+     * 
+     * @param id ID
+     * @param component コンポーネント
+     */
     public void destroyComponent(final ComponentId id, final Object component) {
         final ComponentDefinition<Object> definition = (ComponentDefinition<Object>) idToDefinition
                 .get(id);

@@ -4,6 +4,10 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.component.ComponentId;
 
+/**
+ * プロトタイプスコープ。
+ *
+ */
 public final class PrototypeScope extends AbstractScope {
 
     @Override

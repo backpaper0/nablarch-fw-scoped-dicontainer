@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 import nablarch.core.util.annotation.Published;
 
 /**
- * コンポーネントのメソッドが返す値をコンポーネントとして扱うためのファクトリーメソッドであることを表すアノテーション。
+ * コンポーネントのメソッドが返す値をコンポーネントとして扱うためのファクトリメソッドであることを表すアノテーション。
  * 
  * <p>{@code @Factory}を付与するメソッドは次の制約を守らなければならない。</p>
  * <ul>

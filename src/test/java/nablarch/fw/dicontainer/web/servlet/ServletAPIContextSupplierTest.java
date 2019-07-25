@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.exception.web.WebContextException;
+import nablarch.fw.dicontainer.web.exception.WebContextException;
 
 public class ServletAPIContextSupplierTest {
 

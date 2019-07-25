@@ -6,10 +6,10 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
-import nablarch.fw.dicontainer.exception.web.WebContextException;
 import nablarch.fw.dicontainer.scope.AbstractScope;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
+import nablarch.fw.dicontainer.web.exception.WebContextException;
 
 /**
  * セッションスコープ。

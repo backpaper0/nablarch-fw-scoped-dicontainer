@@ -1,4 +1,4 @@
-package nablarch.fw.dicontainer.exception.web;
+package nablarch.fw.dicontainer.web.exception;
 
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.web.context.RequestContext;

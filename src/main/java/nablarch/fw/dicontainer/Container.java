@@ -41,13 +41,6 @@ public interface Container {
     //    <T> Set<T> getComponents(Class<T> key);
 
     /**
-     * イベントを発火させる。
-     * 
-     * @param event イベント
-     */
-    void fire(Object event);
-
-    /**
      * DIコンテナを破棄する。
      * 
      */

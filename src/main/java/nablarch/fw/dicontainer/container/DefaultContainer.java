@@ -13,10 +13,11 @@ import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
+import nablarch.fw.dicontainer.event.EventTrigger;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
-public final class DefaultContainer implements ContainerImplementer {
+public final class DefaultContainer implements ContainerImplementer, EventTrigger {
 
     private static final Logger logger = LoggerManager.get(DefaultContainer.class);
     private final ComponentDefinitionRepository definitions;

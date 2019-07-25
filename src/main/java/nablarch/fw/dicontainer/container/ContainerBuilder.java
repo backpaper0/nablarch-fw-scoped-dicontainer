@@ -167,10 +167,10 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
      * 
      */
     private void registerContainer() {
-        final ComponentKey<ContainerImplementer> key = new ComponentKey<>(
-                ContainerImplementer.class);
-        final ComponentDefinition<ContainerImplementer> definition = ComponentDefinition
-                .builder(ContainerImplementer.class)
+        final ComponentKey<DefaultContainer> key = new ComponentKey<>(
+                DefaultContainer.class);
+        final ComponentDefinition<DefaultContainer> definition = ComponentDefinition
+                .builder(DefaultContainer.class)
                 .injectableConstructor(new ContainerInjectableMember())
                 .scope(new ContainerScope())
                 .build()

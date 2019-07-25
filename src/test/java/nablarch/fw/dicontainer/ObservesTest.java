@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
+import nablarch.fw.dicontainer.event.EventTrigger;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
 
@@ -15,10 +16,11 @@ public class ObservesTest {
         final Container container = AnnotationContainerBuilder.createDefault()
                 .register(Observer.class)
                 .build();
+        final EventTrigger trigger = container.getComponent(EventTrigger.class);
 
         assertFalse(Observer.called);
 
-        container.fire(new EventObject());
+        trigger.fire(new EventObject());
 
         assertTrue(Observer.called);
     }

@@ -68,11 +68,6 @@ public final class TinyContainer implements ContainerImplementer {
     }
 
     @Override
-    public void fire(final Object event) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void destroy() {
         throw new UnsupportedOperationException();
     }

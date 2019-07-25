@@ -50,10 +50,6 @@ public final class ComponentDefinition<T> {
      */
     private final DestroyMethod destroyMethod;
     /**
-     * コンポーネントのファクトリメソッド
-     */
-    private final List<FactoryMethod> factoryMethods;
-    /**
      * スコープ
      */
     private final Scope scope;
@@ -68,7 +64,6 @@ public final class ComponentDefinition<T> {
      * @param observesMethods イベントハンドラメソッド
      * @param initMethod 初期化メソッド
      * @param destroyMethod 破棄メソッド
-     * @param factoryMethods コンポーネントのファクトリメソッド
      * @param scope スコープ
      */
     private ComponentDefinition(final ComponentId id,
@@ -78,7 +73,6 @@ public final class ComponentDefinition<T> {
             final List<ObservesMethod> observesMethods,
             final InitMethod initMethod,
             final DestroyMethod destroyMethod,
-            final List<FactoryMethod> factoryMethods,
             final Scope scope) {
         this.id = Objects.requireNonNull(id);
         this.componentType = Objects.requireNonNull(componentType);
@@ -87,7 +81,6 @@ public final class ComponentDefinition<T> {
         this.observesMethods = Objects.requireNonNull(observesMethods);
         this.initMethod = Objects.requireNonNull(initMethod);
         this.destroyMethod = Objects.requireNonNull(destroyMethod);
-        this.factoryMethods = Objects.requireNonNull(factoryMethods);
         this.scope = Objects.requireNonNull(scope);
 
         this.scope.register(this);
@@ -117,9 +110,6 @@ public final class ComponentDefinition<T> {
         }
         initMethod.validate(containerBuilder, this);
         destroyMethod.validate(containerBuilder, this);
-        for (final FactoryMethod factoryMethod : factoryMethods) {
-            factoryMethod.validate(containerBuilder, this);
-        }
     }
 
     /**
@@ -141,17 +131,6 @@ public final class ComponentDefinition<T> {
         injectableConstructor.validateCycleDependency(context.createSubContext());
         for (final InjectableMember injectableMember : injectableMembers) {
             injectableMember.validateCycleDependency(context.createSubContext());
-        }
-    }
-
-    /**
-     * ファクトリメソッドを適用する。
-     * 
-     * @param containerBuilder DIコンテナのビルダー
-     */
-    public void applyFactories(final ContainerBuilder<?> containerBuilder) {
-        for (final FactoryMethod factoryMethod : factoryMethods) {
-            factoryMethod.apply(containerBuilder);
         }
     }
 
@@ -254,10 +233,6 @@ public final class ComponentDefinition<T> {
          */
         private DestroyMethod destroyMethod = new NoopDestroyMethod();
         /**
-         * コンポーネントのファクトリメソッド
-         */
-        private List<FactoryMethod> factoryMethods = Collections.emptyList();
-        /**
          * スコープ
          */
         private Scope scope;
@@ -332,17 +307,6 @@ public final class ComponentDefinition<T> {
         }
 
         /**
-         * コンポーネントのファクトリメソッドを設定する。
-         * 
-         * @param factoryMethods コンポーネントのファクトリメソッド
-         * @return このビルダー自身
-         */
-        public Builder<T> factoryMethods(final List<FactoryMethod> factoryMethods) {
-            this.factoryMethods = factoryMethods;
-            return this;
-        }
-
-        /**
          * スコープを設定する。
          * 
          * @param scope スコープ
@@ -367,7 +331,7 @@ public final class ComponentDefinition<T> {
             }
             final ComponentDefinition<T> cd = new ComponentDefinition<>(id, componentType,
                     injectableConstructor, injectableMembers, observesMethods, initMethod,
-                    destroyMethod, factoryMethods, scope);
+                    destroyMethod, scope);
             return Optional.of(cd);
         }
     }

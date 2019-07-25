@@ -1,6 +1,5 @@
 package nablarch.fw.dicontainer.scope;
 
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 import nablarch.fw.dicontainer.component.ErrorCollector;
@@ -21,16 +20,6 @@ public interface ScopeDecider {
      * @return スコープ
      */
     Optional<Scope> fromComponentClass(Class<?> componentType,
-            ErrorCollector errorCollector);
-
-    /**
-     * ファクトリメソッドが持つアノテーションからスコープを決定する。
-     * 
-     * @param factoryMethod ファクトリメソッド
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return スコープ
-     */
-    Optional<Scope> fromFactoryMethod(Method factoryMethod,
             ErrorCollector errorCollector);
 
     /**

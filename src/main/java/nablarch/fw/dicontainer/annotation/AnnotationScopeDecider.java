@@ -1,7 +1,6 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,13 +70,6 @@ public final class AnnotationScopeDecider implements ScopeDecider {
     public Optional<Scope> fromComponentClass(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Source source = new ComponentClassSource(componentType);
-        return source.decide(errorCollector);
-    }
-
-    @Override
-    public Optional<Scope> fromFactoryMethod(final Method factoryMethod,
-            final ErrorCollector errorCollector) {
-        final Source source = new FactoryMethodSource(factoryMethod);
         return source.decide(errorCollector);
     }
 
@@ -298,37 +290,6 @@ public final class AnnotationScopeDecider implements ScopeDecider {
                     "Scope could not be decided from ["
                             + annotation.getName() + "] annotated to [" + componentType.getName()
                             + "]");
-        }
-    }
-
-    private final class FactoryMethodSource extends Source {
-
-        private final Method factoryMethod;
-
-        public FactoryMethodSource(final Method factoryMethod) {
-            this.factoryMethod = Objects.requireNonNull(factoryMethod);
-        }
-
-        @Override
-        protected Annotation[] getAnnotations() {
-            return factoryMethod.getAnnotations();
-        }
-
-        @Override
-        protected ScopeDuplicatedException newScopeDuplicatedException() {
-            return new ScopeDuplicatedException(
-                    "Factory method [" + factoryMethod.getDeclaringClass().getName() + "#"
-                            + factoryMethod.getName() + "] can configured only one scope.");
-        }
-
-        @Override
-        protected ScopeNotFoundException newScopeNotFoundException(
-                final Class<? extends Annotation> annotation) {
-            return new ScopeNotFoundException(
-                    "Scope could not be decided from ["
-                            + annotation.getName() + "] annotated to ["
-                            + factoryMethod.getDeclaringClass().getName() + "#"
-                            + factoryMethod.getName() + "]");
         }
     }
 

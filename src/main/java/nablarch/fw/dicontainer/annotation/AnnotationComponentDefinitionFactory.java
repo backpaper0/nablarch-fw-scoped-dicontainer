@@ -1,16 +1,13 @@
 package nablarch.fw.dicontainer.annotation;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
-import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
-import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
@@ -61,8 +58,6 @@ public final class AnnotationComponentDefinitionFactory implements ComponentDefi
                 errorCollector);
         final Optional<DestroyMethod> destroyMethod = memberFactory
                 .createDestroyMethod(componentType, errorCollector);
-        final List<FactoryMethod> factoryMethods = memberFactory.createFactoryMethods(builder.id(),
-                componentType, this, errorCollector);
         final Optional<Scope> scope = scopeDecider.fromComponentClass(componentType,
                 errorCollector);
 
@@ -74,28 +69,6 @@ public final class AnnotationComponentDefinitionFactory implements ComponentDefi
         return builder
                 .injectableMembers(injectableMembers)
                 .observesMethods(observesMethods)
-                .factoryMethods(factoryMethods)
-                .build();
-    }
-
-    @Override
-    public <T> Optional<ComponentDefinition<T>> fromFactoryMethod(final ComponentId factoryId,
-            final Method factoryMethod, final ErrorCollector errorCollector) {
-        final Class<T> componentType = (Class<T>) factoryMethod.getReturnType();
-        final Builder<T> builder = ComponentDefinition.builder(componentType);
-
-        final InjectableMember injectableConstructor = memberFactory.createFactoryMethod(factoryId,
-                factoryMethod, errorCollector);
-        final Optional<DestroyMethod> destroyMethod = memberFactory.createFactoryDestroyMethod(
-                factoryMethod,
-                errorCollector);
-        final Optional<Scope> scope = scopeDecider.fromFactoryMethod(factoryMethod, errorCollector);
-
-        destroyMethod.ifPresent(builder::destroyMethod);
-        scope.ifPresent(builder::scope);
-
-        return builder
-                .injectableConstructor(injectableConstructor)
                 .build();
     }
 }

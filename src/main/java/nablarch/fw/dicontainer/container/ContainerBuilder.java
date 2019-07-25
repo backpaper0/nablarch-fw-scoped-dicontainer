@@ -99,7 +99,6 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
             aliasesMap.register(aliasKey, key);
         }
         definitions.register(key, definition);
-        definition.applyFactories(this);
         if (logger.isDebugEnabled()) {
             logger.logDebug("Component definition registered. key=" + key);
         }

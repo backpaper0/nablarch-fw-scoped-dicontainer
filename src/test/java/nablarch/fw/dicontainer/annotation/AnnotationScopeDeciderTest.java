@@ -47,28 +47,6 @@ public class AnnotationScopeDeciderTest {
         assertSame(defaultScope, scope);
     }
 
-    @Test
-    public void singletonFromFactoryMethod() throws Exception {
-        final Scope scope = decider
-                .fromFactoryMethod(Ddd.class.getDeclaredMethod("singleton"), errorCollector).get();
-        assertEquals(SingletonScope.class, scope.getClass());
-    }
-
-    @Test
-    public void prototypeFromFactoryMethod() throws Exception {
-        final Scope scope = decider
-                .fromFactoryMethod(Ddd.class.getDeclaredMethod("prototype"), errorCollector).get();
-        assertEquals(PrototypeScope.class, scope.getClass());
-    }
-
-    @Test
-    public void defaultScopeFromFactoryMethod() throws Exception {
-        final Scope scope = decider
-                .fromFactoryMethod(Ddd.class.getDeclaredMethod("defaultScope"), errorCollector)
-                .get();
-        assertSame(defaultScope, scope);
-    }
-
     @Singleton
     static class Aaa {
     }
@@ -78,21 +56,5 @@ public class AnnotationScopeDeciderTest {
     }
 
     static class Ccc {
-    }
-
-    static class Ddd {
-        @Singleton
-        Object singleton() {
-            return null;
-        }
-
-        @Prototype
-        Object prototype() {
-            return null;
-        }
-
-        Object defaultScope() {
-            return null;
-        }
     }
 }

@@ -1,7 +1,6 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
 
@@ -35,13 +34,6 @@ public final class AnnotationComponentKeyFactory implements ComponentKeyFactory 
         final Set<Annotation> qualifiers = qualifierAnnotations
                 .filter(componentType.getAnnotations());
         return new ComponentKey<>(componentType, qualifiers);
-    }
-
-    @Override
-    public ComponentKey<?> fromFactoryMethod(final Method factoryMethod) {
-        final Set<Annotation> qualifiers = qualifierAnnotations
-                .filter(factoryMethod.getAnnotations());
-        return new ComponentKey<>(factoryMethod.getReturnType(), qualifiers);
     }
 
     /**

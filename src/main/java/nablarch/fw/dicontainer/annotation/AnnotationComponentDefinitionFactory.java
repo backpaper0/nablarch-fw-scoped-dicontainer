@@ -14,22 +14,25 @@ import nablarch.fw.dicontainer.component.FactoryMethod;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
+import nablarch.fw.dicontainer.component.factory.ComponentDefinitionFactory;
+import nablarch.fw.dicontainer.component.factory.MemberFactory;
 import nablarch.fw.dicontainer.scope.Scope;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 
 /**
  * アノテーションをもとにコンポーネント定義を生成するファクトリ。
  *
  */
-public final class AnnotationComponentDefinitionFactory {
+public final class AnnotationComponentDefinitionFactory implements ComponentDefinitionFactory {
 
     /**
      * コンポーネント定義の構成要素のファクトリ
      */
-    private final AnnotationMemberFactory memberFactory;
+    private final MemberFactory memberFactory;
     /**
      * スコープを決定するクラス
      */
-    private final AnnotationScopeDecider scopeDecider;
+    private final ScopeDecider scopeDecider;
 
     /**
      * インスタンスを生成する。
@@ -37,20 +40,13 @@ public final class AnnotationComponentDefinitionFactory {
      * @param memberFactory コンポーネント定義の構成要素のファクトリ
      * @param scopeDecider スコープを決定するクラス
      */
-    public AnnotationComponentDefinitionFactory(final AnnotationMemberFactory memberFactory,
-            final AnnotationScopeDecider scopeDecider) {
+    public AnnotationComponentDefinitionFactory(final MemberFactory memberFactory,
+            final ScopeDecider scopeDecider) {
         this.memberFactory = Objects.requireNonNull(memberFactory);
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
     }
 
-    /**
-     * コンポーネントのクラスをもとにコンポーネント定義を生成する。
-     * 
-     * @param <T> コンポーネントの型
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return コンポーネント定義
-     */
+    @Override
     public <T> Optional<ComponentDefinition<T>> fromComponentClass(final Class<T> componentType,
             final ErrorCollector errorCollector) {
         final Builder<T> builder = ComponentDefinition.builder(componentType);
@@ -82,15 +78,7 @@ public final class AnnotationComponentDefinitionFactory {
                 .build();
     }
 
-    /**
-     * ファクトリメソッドをもとにコンポーネント定義を生成する。
-     * 
-     * @param <T> コンポーネントの型
-     * @param factoryId ファクトリのID
-     * @param factoryMethod ファクトリメソッド
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return コンポーネント定義
-     */
+    @Override
     public <T> Optional<ComponentDefinition<T>> fromFactoryMethod(final ComponentId factoryId,
             final Method factoryMethod, final ErrorCollector errorCollector) {
         final Class<T> componentType = (Class<T>) factoryMethod.getReturnType();

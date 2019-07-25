@@ -10,6 +10,7 @@ import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
 import nablarch.fw.dicontainer.annotation.AnnotationSet;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 
 /**
  * アノテーションをもとに自動でコンポーネントを登録してDIコンテナを構築するファクトリ。
@@ -32,7 +33,7 @@ public final class AnnotationAutoContainerFactory {
     /**
      * スコープを決定するクラス
      */
-    private final AnnotationScopeDecider scopeDecider;
+    private final ScopeDecider scopeDecider;
 
     /**
      * インスタンスを生成する。
@@ -44,7 +45,7 @@ public final class AnnotationAutoContainerFactory {
      */
     private AnnotationAutoContainerFactory(final AnnotationSet targetAnnotations,
             final Iterable<TraversalConfig> traversalConfigs, final boolean eagerLoad,
-            final AnnotationScopeDecider scopeDecider) {
+            final ScopeDecider scopeDecider) {
         this.targetAnnotations = Objects.requireNonNull(targetAnnotations);
         this.traversalConfigs = Objects.requireNonNull(traversalConfigs);
         this.eagerLoad = eagerLoad;
@@ -124,7 +125,7 @@ public final class AnnotationAutoContainerFactory {
         /**
          * スコープを決定するクラス
          */
-        private AnnotationScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
+        private ScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
 
         /**
          * インスタンスを生成する。
@@ -173,7 +174,7 @@ public final class AnnotationAutoContainerFactory {
          * @param scopeDecider スコープを決定するクラス
          * @return このビルダー自身
          */
-        public Builder scopeDecider(final AnnotationScopeDecider scopeDecider) {
+        public Builder scopeDecider(final ScopeDecider scopeDecider) {
             this.scopeDecider = scopeDecider;
             return this;
         }

@@ -6,11 +6,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import nablarch.core.log.Logger;
+import nablarch.core.log.LoggerManager;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentKey;
+import nablarch.fw.dicontainer.component.factory.ComponentDefinitionFactory;
+import nablarch.fw.dicontainer.component.factory.ComponentKeyFactory;
+import nablarch.fw.dicontainer.component.factory.MemberFactory;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.InvalidComponentException;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 
 /**
  * アノテーションをもとにDIコンテナを構築するビルダー。
@@ -19,26 +25,30 @@ import nablarch.fw.dicontainer.exception.InvalidComponentException;
 public final class AnnotationContainerBuilder extends ContainerBuilder<AnnotationContainerBuilder> {
 
     /**
+     * ロガー
+     */
+    private static final Logger logger = LoggerManager.get(AnnotationContainerBuilder.class);
+    /**
      * 検索キーのファクトリ
      */
-    private final AnnotationComponentKeyFactory componentKeyFactory;
+    private final ComponentKeyFactory componentKeyFactory;
     /**
      * スコープを決定するクラス
      */
-    private final AnnotationScopeDecider scopeDecider;
+    private final ScopeDecider scopeDecider;
     /**
      * コンポーネント定義の構成要素ファクトリ
      */
-    private final AnnotationMemberFactory memberFactory;
+    private final MemberFactory memberFactory;
     /**
      * コンポーネント定義のファクトリ
      */
-    private final AnnotationComponentDefinitionFactory componentDefinitionFactory;
+    private final ComponentDefinitionFactory componentDefinitionFactory;
 
-    private AnnotationContainerBuilder(final AnnotationComponentKeyFactory componentKeyFactory,
-            final AnnotationScopeDecider scopeDecider,
-            final AnnotationMemberFactory memberFactory,
-            final AnnotationComponentDefinitionFactory componentDefinitionFactory) {
+    private AnnotationContainerBuilder(final ComponentKeyFactory componentKeyFactory,
+            final ScopeDecider scopeDecider,
+            final MemberFactory memberFactory,
+            final ComponentDefinitionFactory componentDefinitionFactory) {
         this.componentKeyFactory = Objects.requireNonNull(componentKeyFactory);
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
         this.memberFactory = Objects.requireNonNull(memberFactory);
@@ -155,20 +165,20 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         /**
          * 検索キーのファクトリ
          */
-        private AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
+        private ComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
                 .createDefault();
         /**
          * スコープを決定するクラス
          */
-        private AnnotationScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
+        private ScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
         /**
          * コンポーネント定義の構成要素ファクトリ
          */
-        private AnnotationMemberFactory memberFactory = AnnotationMemberFactory.createDefault();
+        private MemberFactory memberFactory = AnnotationMemberFactory.createDefault();
         /**
          * コンポーネント定義のファクトリ
          */
-        private AnnotationComponentDefinitionFactory componentDefinitionFactory;
+        private ComponentDefinitionFactory componentDefinitionFactory;
 
         /**
          * インスタンスを生成する。
@@ -184,8 +194,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @param componentKeyFactory 検索キーのファクトリ
          * @return このビルダー自身
          */
-        public Builder componentKeyFactory(
-                final AnnotationComponentKeyFactory componentKeyFactory) {
+        public Builder componentKeyFactory(final ComponentKeyFactory componentKeyFactory) {
             this.componentKeyFactory = componentKeyFactory;
             return this;
         }
@@ -196,7 +205,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @param scopeDecider スコープを決定するクラス
          * @return このビルダー自身
          */
-        public Builder scopeDecider(final AnnotationScopeDecider scopeDecider) {
+        public Builder scopeDecider(final ScopeDecider scopeDecider) {
             this.scopeDecider = scopeDecider;
             this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
                     memberFactory, scopeDecider);
@@ -209,7 +218,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @param memberFactory コンポーネント定義の構成要素ファクトリ
          * @return このビルダー自身
          */
-        public Builder memberFactory(final AnnotationMemberFactory memberFactory) {
+        public Builder memberFactory(final MemberFactory memberFactory) {
             this.memberFactory = memberFactory;
             this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
                     memberFactory, scopeDecider);
@@ -223,7 +232,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @return このビルダー自身
          */
         public Builder componentDefinitionFactory(
-                final AnnotationComponentDefinitionFactory componentDefinitionFactory) {
+                final ComponentDefinitionFactory componentDefinitionFactory) {
             this.componentDefinitionFactory = componentDefinitionFactory;
             return this;
         }
@@ -235,8 +244,17 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @return このビルダー自身
          */
         public Builder eagerLoad(final boolean eagerLoad) {
-            scopeDecider(
-                    AnnotationScopeDecider.builderFrom(scopeDecider).eagerLoad(eagerLoad).build());
+            if (scopeDecider instanceof AnnotationScopeDecider) {
+                scopeDecider(
+                        AnnotationScopeDecider.builderFrom((AnnotationScopeDecider) scopeDecider)
+                                .eagerLoad(eagerLoad).build());
+            } else {
+                if (logger.isWarnEnabled()) {
+                    logger.logWarn(
+                            "Not supported [eagerLoad] because [scopeDecider] is not instance of "
+                                    + AnnotationScopeDecider.class.getName() + ".");
+                }
+            }
             return this;
         }
 

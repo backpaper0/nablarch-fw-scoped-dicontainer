@@ -16,14 +16,16 @@ import javax.inject.Provider;
 
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
+import nablarch.fw.dicontainer.component.factory.InjectionComponentResolverFactory;
 import nablarch.fw.dicontainer.component.impl.DefaultInjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 
 /**
- * 依存コンポーネントのリゾルバを生成するファクトリクラス。
+ * 依存コンポーネントのリゾルバを生成するファクトリ。
  *
  */
-public final class AnnotationInjectionComponentResolverFactory {
+public final class DefaultInjectionComponentResolverFactory
+        implements InjectionComponentResolverFactory {
 
     /**
      * 限定子のアノテーションセット
@@ -35,36 +37,21 @@ public final class AnnotationInjectionComponentResolverFactory {
      * 
      * @param qualifierAnnotations 限定子のアノテーションセット
      */
-    public AnnotationInjectionComponentResolverFactory(final AnnotationSet qualifierAnnotations) {
+    public DefaultInjectionComponentResolverFactory(final AnnotationSet qualifierAnnotations) {
         this.qualifierAnnotations = Objects.requireNonNull(qualifierAnnotations);
     }
 
-    /**
-     * フィールドをもとに依存コンポーネントのリゾルバを生成する。
-     * 
-     * @param field フィールド
-     * @return 依存コンポーネントのリゾルバ
-     */
+    @Override
     public InjectionComponentResolver fromField(final Field field) {
         return new FieldSource(field).create();
     }
 
-    /**
-     * メソッドのパラメータをもとに依存コンポーネントのリゾルバを生成する。
-     * 
-     * @param method メソッド
-     * @return 依存コンポーネントのリゾルバ
-     */
+    @Override
     public InjectionComponentResolvers fromMethodParameters(final Method method) {
         return fromExecutable(method);
     }
 
-    /**
-     * コンストラクタのパラメータをもとに依存コンポーネントのリゾルバを生成する。
-     * 
-     * @param constructor コンストラクタ
-     * @return 依存コンポーネントのリゾルバ
-     */
+    @Override
     public InjectionComponentResolvers fromConstructorParameters(
             final Constructor<?> constructor) {
         return fromExecutable(constructor);

@@ -12,10 +12,11 @@ import org.junit.Test;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.TinyContainer;
 import nablarch.fw.dicontainer.annotation.AnnotationMemberFactory;
+import nablarch.fw.dicontainer.component.factory.MemberFactory;
 
 public class InjectableConstructorTest {
 
-    private final AnnotationMemberFactory factory = AnnotationMemberFactory.createDefault();
+    private final MemberFactory factory = AnnotationMemberFactory.createDefault();
     private final ErrorCollector errorCollector = ErrorCollector.newInstance();
 
     @Test

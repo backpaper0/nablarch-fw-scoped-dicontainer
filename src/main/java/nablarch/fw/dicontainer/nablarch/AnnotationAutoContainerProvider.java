@@ -13,6 +13,7 @@ import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import nablarch.fw.dicontainer.exception.ContainerException;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 import nablarch.fw.dicontainer.web.RequestScoped;
 import nablarch.fw.dicontainer.web.SessionScoped;
 import nablarch.fw.dicontainer.web.context.RequestContextSupplier;
@@ -31,7 +32,7 @@ public final class AnnotationAutoContainerProvider implements Initializable {
 
     @Override
     public void initialize() {
-        final AnnotationScopeDecider scopeDecider = AnnotationScopeDecider.builder()
+        final ScopeDecider scopeDecider = AnnotationScopeDecider.builder()
                 .addScope(RequestScoped.class, new RequestScope(requestContextSupplier))
                 .addScope(SessionScoped.class, new SessionScope(sessionContextSupplier))
                 .build();

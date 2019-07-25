@@ -8,12 +8,13 @@ import java.util.Set;
 import javax.inject.Qualifier;
 
 import nablarch.fw.dicontainer.component.ComponentKey;
+import nablarch.fw.dicontainer.component.factory.ComponentKeyFactory;
 
 /**
  * アノテーションをもとに検索キーを生成するファクトリクラス。
  *
  */
-public final class AnnotationComponentKeyFactory {
+public final class AnnotationComponentKeyFactory implements ComponentKeyFactory {
 
     /**
      * 限定子のアノテーションセット
@@ -29,24 +30,14 @@ public final class AnnotationComponentKeyFactory {
         this.qualifierAnnotations = Objects.requireNonNull(qualifierAnnotations);
     }
 
-    /**
-     * コンポーネントのクラスをもとに検索キーを生成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @return 検索キー
-     */
+    @Override
     public <T> ComponentKey<T> fromComponentClass(final Class<T> componentType) {
         final Set<Annotation> qualifiers = qualifierAnnotations
                 .filter(componentType.getAnnotations());
         return new ComponentKey<>(componentType, qualifiers);
     }
 
-    /**
-     * ファクトリメソッドをもとに検索キーを生成する。
-     * 
-     * @param factoryMethod ファクトリメソッド
-     * @return 検索キー
-     */
+    @Override
     public ComponentKey<?> fromFactoryMethod(final Method factoryMethod) {
         final Set<Annotation> qualifiers = qualifierAnnotations
                 .filter(factoryMethod.getAnnotations());

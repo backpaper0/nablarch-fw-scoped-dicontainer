@@ -13,11 +13,12 @@ import nablarch.fw.dicontainer.Prototype;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.Scope;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 import nablarch.fw.dicontainer.scope.SingletonScope;
 
 public class AnnotationScopeDeciderTest {
 
-    private AnnotationScopeDecider decider;
+    private ScopeDecider decider;
     private Scope defaultScope;
     private ErrorCollector errorCollector;
 

@@ -20,19 +20,21 @@ import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
+import nablarch.fw.dicontainer.component.factory.MemberFactory;
 import nablarch.fw.dicontainer.component.impl.PassthroughInjectableMember;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.ScopeDuplicatedException;
 import nablarch.fw.dicontainer.exception.ScopeNotFoundException;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.Scope;
+import nablarch.fw.dicontainer.scope.ScopeDecider;
 import nablarch.fw.dicontainer.scope.SingletonScope;
 
 /**
  * アノテーションをもとにしてスコープを決定するクラス。
  *
  */
-public final class AnnotationScopeDecider {
+public final class AnnotationScopeDecider implements ScopeDecider {
 
     /**
      * スコープのメタアノテーションセット
@@ -65,40 +67,23 @@ public final class AnnotationScopeDecider {
         this.scopes = Objects.requireNonNull(scopes);
     }
 
-    /**
-     * コンポーネントのクラスが持つアノテーションからスコープを決定する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return スコープ
-     */
+    @Override
     public Optional<Scope> fromComponentClass(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Source source = new ComponentClassSource(componentType);
         return source.decide(errorCollector);
     }
 
-    /**
-     * ファクトリメソッドが持つアノテーションからスコープを決定する。
-     * 
-     * @param factoryMethod ファクトリメソッド
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return スコープ
-     */
+    @Override
     public Optional<Scope> fromFactoryMethod(final Method factoryMethod,
             final ErrorCollector errorCollector) {
         final Source source = new FactoryMethodSource(factoryMethod);
         return source.decide(errorCollector);
     }
 
-    /**
-     * スコープをコンポーネント登録する。
-     * 
-     * @param builder DIコンテナのビルダー
-     * @param memberFactory TODO
-     */
+    @Override
     public void registerScopes(final ContainerBuilder<?> builder,
-            final AnnotationMemberFactory memberFactory) {
+            final MemberFactory memberFactory) {
         for (final Scope scope : scopes.values()) {
             registerScope(builder, memberFactory, scope);
         }
@@ -115,7 +100,7 @@ public final class AnnotationScopeDecider {
      * @param scope スコープ
      */
     private <T extends Scope> void registerScope(final ContainerBuilder<?> builder,
-            final AnnotationMemberFactory memberFactory, final T scope) {
+            final MemberFactory memberFactory, final T scope) {
 
         final ErrorCollector errorCollector = ErrorCollector.wrap(builder);
 

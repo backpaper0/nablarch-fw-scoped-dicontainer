@@ -34,6 +34,10 @@ import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.MethodCollector;
 import nablarch.fw.dicontainer.component.ObservesMethod;
+import nablarch.fw.dicontainer.component.factory.ComponentDefinitionFactory;
+import nablarch.fw.dicontainer.component.factory.ComponentKeyFactory;
+import nablarch.fw.dicontainer.component.factory.InjectionComponentResolverFactory;
+import nablarch.fw.dicontainer.component.factory.MemberFactory;
 import nablarch.fw.dicontainer.component.impl.DefaultDestroyMethod;
 import nablarch.fw.dicontainer.component.impl.DefaultFactoryMethod;
 import nablarch.fw.dicontainer.component.impl.DefaultInitMethod;
@@ -52,7 +56,7 @@ import nablarch.fw.dicontainer.exception.LifeCycleMethodNotFoundException;
  * アノテーションをもとにコンポーネント定義の構成要素を生成するファクトリクラス。
  *
  */
-public final class AnnotationMemberFactory {
+public final class AnnotationMemberFactory implements MemberFactory {
 
     /**
      * インジェクションのアノテーションセット
@@ -77,7 +81,7 @@ public final class AnnotationMemberFactory {
     /**
      * 依存コンポーネントリゾルバのファクトリ
      */
-    private final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory;
+    private final InjectionComponentResolverFactory injectionComponentResolverFactory;
     /**
      * 破棄メソッドの要素名
      */
@@ -85,7 +89,7 @@ public final class AnnotationMemberFactory {
     /**
      * 検索キーのファクトリ
      */
-    private final AnnotationComponentKeyFactory componentKeyFactory;
+    private final ComponentKeyFactory componentKeyFactory;
 
     /**
      * コンストラクタを生成する。
@@ -103,9 +107,9 @@ public final class AnnotationMemberFactory {
             final AnnotationSet initAnnotations,
             final AnnotationSet destroyAnnotations, final AnnotationSet observesAnnotations,
             final AnnotationSet factoryAnnotations,
-            final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory,
+            final InjectionComponentResolverFactory injectionComponentResolverFactory,
             final String destroyMethodElementName,
-            final AnnotationComponentKeyFactory componentKeyFactory) {
+            final ComponentKeyFactory componentKeyFactory) {
         this.injectAnnotations = Objects.requireNonNull(injectAnnotations);
         this.initAnnotations = Objects.requireNonNull(initAnnotations);
         this.destroyAnnotations = Objects.requireNonNull(destroyAnnotations);
@@ -117,13 +121,7 @@ public final class AnnotationMemberFactory {
         this.componentKeyFactory = Objects.requireNonNull(componentKeyFactory);
     }
 
-    /**
-     * コンストラクタでコンポーネントを生成する要素を作成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return コンポーネントを生成する要素
-     */
+    @Override
     public Optional<InjectableMember> createConstructor(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Set<Constructor<?>> constructors = Arrays
@@ -169,14 +167,7 @@ public final class AnnotationMemberFactory {
         return Optional.of(injectableConstructor);
     }
 
-    /**
-     * ファクトリメソッドでコンポーネントを生成する要素を作成する。
-     * 
-     * @param factoryId ファクトリーのID
-     * @param factoryMethod ファクトリメソッド
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return コンポーネントを生成する要素
-     */
+    @Override
     public InjectableMember createFactoryMethod(final ComponentId factoryId,
             final Method factoryMethod,
             final ErrorCollector errorCollector) {
@@ -185,13 +176,7 @@ public final class AnnotationMemberFactory {
         return new InjectableFactoryMethod(factoryId, factoryMethod, resolvers);
     }
 
-    /**
-     * インジェクション対象のフィールドとメソッドからなる要素を作成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return インジェクション対象のフィールドとメソッドからなる要素
-     */
+    @Override
     public List<InjectableMember> createFieldsAndMethods(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final MethodCollector methodCollector = new MethodCollector();
@@ -243,13 +228,7 @@ public final class AnnotationMemberFactory {
         return injectableMembers;
     }
 
-    /**
-     * イベントをハンドリングするメソッドからなる要素を作成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return イベントをハンドリングするメソッドからなる要素
-     */
+    @Override
     public List<ObservesMethod> createObservesMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
 
@@ -266,26 +245,14 @@ public final class AnnotationMemberFactory {
         return observesMethods;
     }
 
-    /**
-     * 初期化メソッドからなる要素を作成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return 初期化メソッドからなる要素
-     */
+    @Override
     public Optional<InitMethod> createInitMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         return createLifeCycleMethod("Init", initAnnotations, DefaultInitMethod::new, componentType,
                 errorCollector);
     }
 
-    /**
-     * 破棄メソッドからなる要素を作成する。
-     * 
-     * @param componentType コンポーネントのクラス
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return 破棄メソッドからなる要素
-     */
+    @Override
     public Optional<DestroyMethod> createDestroyMethod(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         return createLifeCycleMethod("Destroy", destroyAnnotations, DefaultDestroyMethod::new,
@@ -315,13 +282,7 @@ public final class AnnotationMemberFactory {
         return Optional.of(methods.iterator().next());
     }
 
-    /**
-     * ファクトリメソッドで定義されるコンポーネントの破棄メソッドからなる要素を作成する。
-     * 
-     * @param factoryMethod ファクトリメソッド
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return ファクトリメソッドで定義されるコンポーネントの破棄メソッドからなる要素
-     */
+    @Override
     public Optional<DestroyMethod> createFactoryDestroyMethod(final Method factoryMethod,
             final ErrorCollector errorCollector) {
         return factoryAnnotations.getStringElement(factoryMethod, destroyMethodElementName)
@@ -360,18 +321,10 @@ public final class AnnotationMemberFactory {
                 });
     }
 
-    /**
-     * ファクトリメソッドからなる要素を作成する。
-     * 
-     * @param id ID
-     * @param componentType コンポーネントのクラス
-     * @param componentDefinitionFactory コンポーネント定義のファクトリ
-     * @param errorCollector バリデーションエラーを収集するクラス
-     * @return ファクトリメソッドからなる要素
-     */
+    @Override
     public List<FactoryMethod> createFactoryMethods(final ComponentId id,
             final Class<?> componentType,
-            final AnnotationComponentDefinitionFactory componentDefinitionFactory,
+            final ComponentDefinitionFactory componentDefinitionFactory,
             final ErrorCollector errorCollector) {
         final MethodCollector methodCollector = MethodCollector.collectFromClass(componentType);
         final List<FactoryMethod> methods = new ArrayList<>();
@@ -536,9 +489,9 @@ public final class AnnotationMemberFactory {
          * @return コンポーネント定義の構成要素ファクトリ
          */
         public AnnotationMemberFactory build() {
-            final AnnotationInjectionComponentResolverFactory injectionComponentResolverFactory = new AnnotationInjectionComponentResolverFactory(
+            final InjectionComponentResolverFactory injectionComponentResolverFactory = new DefaultInjectionComponentResolverFactory(
                     qualifierAnnotations);
-            final AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
+            final ComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
                     .builder().qualifierAnnotations(qualifierAnnotations).build();
             return new AnnotationMemberFactory(injectAnnotations, initAnnotations,
                     destroyAnnotations, observesAnnotations, factoryAnnotations,

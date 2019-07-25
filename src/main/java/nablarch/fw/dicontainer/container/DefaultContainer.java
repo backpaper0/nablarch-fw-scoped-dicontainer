@@ -1,6 +1,7 @@
 package nablarch.fw.dicontainer.container;
 
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -67,6 +68,20 @@ public final class DefaultContainer implements ContainerImplementer, EventTrigge
     @Override
     public <T> T getComponent(final Class<T> key, final Annotation... qualifiers) {
         return getComponent(new ComponentKey<>(key, qualifiers));
+    }
+
+    @Override
+    public <T> Set<T> getComponents(final Class<T> key) {
+        final ComponentKey<T> exactKey = new ComponentKey<>(key);
+        final Set<ComponentKey<?>> alterKeys = aliasMapping.find(exactKey.asAliasKey());
+        final Set<ComponentKey<?>> keys = new HashSet<>(alterKeys.size() + 1);
+        keys.add(exactKey);
+        keys.addAll(alterKeys);
+        final Set<?> components = keys.stream().map(definitions::find)
+                .filter(Objects::nonNull)
+                .map(a -> a.getComponent(this))
+                .collect(Collectors.toSet());
+        return (Set<T>) components;
     }
 
     @Override

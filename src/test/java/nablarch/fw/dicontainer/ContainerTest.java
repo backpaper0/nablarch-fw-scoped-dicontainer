@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -273,6 +275,67 @@ public class ContainerTest {
         assertTrue(component1.getClass() == Qualifier2.class);
     }
 
+    @Test
+    public void getComponents() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Qualifier2.class)
+                .register(Qualifier3.class)
+                .build();
+
+        final Set<Qualifier1> components = container.getComponents(Qualifier1.class);
+        final Set<Class<?>> componentClasses = components.stream().map(Qualifier1::getClass)
+                .collect(Collectors.toSet());
+
+        assertEquals(2, componentClasses.size());
+        assertTrue(componentClasses.contains(Qualifier2.class));
+        assertTrue(componentClasses.contains(Qualifier3.class));
+    }
+
+    @Test
+    public void getComponentsSingle() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Aaa.class)
+                .build();
+
+        final Set<Aaa> components = container.getComponents(Aaa.class);
+        final Aaa component = container.getComponent(Aaa.class);
+
+        assertEquals(1, components.size());
+        assertEquals(component, components.iterator().next());
+    }
+
+    @Test
+    public void getComponentsAll() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .register(Jjj1.class)
+                .register(Jjj2.class)
+                .register(Jjj3.class)
+                .build();
+
+        final Set<Jjj1> components = container.getComponents(Jjj1.class);
+        final Set<Class<?>> componentClasses = components.stream().map(Jjj1::getClass)
+                .collect(Collectors.toSet());
+
+        assertEquals(3, components.size());
+        assertTrue(componentClasses.contains(Jjj1.class));
+        assertTrue(componentClasses.contains(Jjj2.class));
+        assertTrue(componentClasses.contains(Jjj3.class));
+    }
+
+    @Test
+    public void getComponentsNoComponents() throws Exception {
+
+        final Container container = AnnotationContainerBuilder.createDefault()
+                .build();
+
+        final Set<Aaa> components = container.getComponents(Aaa.class);
+
+        assertEquals(0, components.size());
+    }
+
     @Singleton
     private static class Aaa {
     }
@@ -475,5 +538,17 @@ public class ContainerTest {
 
     @Named("bar")
     private static class Qualifier3 implements Qualifier1 {
+    }
+
+    @Singleton
+    private static class Jjj1 {
+    }
+
+    @Singleton
+    private static class Jjj2 extends Jjj1 {
+    }
+
+    @Singleton
+    private static class Jjj3 extends Jjj1 {
     }
 }

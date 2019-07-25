@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import nablarch.fw.dicontainer.annotation.AnnotationComponentKeyFactory;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
@@ -65,6 +66,11 @@ public final class TinyContainer implements ContainerImplementer {
     @Override
     public <T> T getComponent(final Class<T> key, final Annotation... qualifiers) {
         return getComponent(new ComponentKey<>(key, qualifiers));
+    }
+
+    @Override
+    public <T> Set<T> getComponents(final Class<T> key) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

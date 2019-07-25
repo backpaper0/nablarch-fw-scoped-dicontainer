@@ -4,25 +4,25 @@ import java.lang.reflect.Constructor;
 import java.util.Objects;
 
 import nablarch.fw.dicontainer.component.ComponentDefinition;
-import nablarch.fw.dicontainer.component.InjectableMember;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.reflect.ConstructorWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
-public final class InjectableConstructor implements InjectableMember {
+public final class DefaultInjectableConstructor implements InjectableConstructor {
 
     private final ConstructorWrapper constructor;
     private final InjectionComponentResolvers resolvers;
 
-    public InjectableConstructor(final Constructor<?> constructor,
+    public DefaultInjectableConstructor(final Constructor<?> constructor,
             final InjectionComponentResolvers resolvers) {
         this.constructor = new ConstructorWrapper(constructor);
         this.resolvers = Objects.requireNonNull(resolvers);
     }
 
     @Override
-    public Object inject(final ContainerImplementer container, final Object component) {
+    public Object inject(final ContainerImplementer container) {
         final Object[] args = resolvers.resolve(container);
         return constructor.newInstance(args);
     }

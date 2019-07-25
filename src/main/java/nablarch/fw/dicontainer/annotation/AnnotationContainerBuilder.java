@@ -4,7 +4,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
@@ -59,11 +58,11 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
      * コンポーネント定義を登録する。
      * 
      * @param <T> コンポーネントの型
-     * @param keyFactory 検索キーのファクトリ
+     * @param key 検索キー
      * @param componentType コンポーネントのクラス
      * @return このビルダー自身
      */
-    private <T> AnnotationContainerBuilder register(final Supplier<ComponentKey<T>> keyFactory,
+    private <T> AnnotationContainerBuilder register(final ComponentKey<T> key,
             final Class<T> componentType) {
 
         if (componentType.isAnnotation()) {
@@ -97,7 +96,6 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
             return this;
         }
 
-        final ComponentKey<T> key = keyFactory.get();
         final Optional<ComponentDefinition<T>> definition = componentDefinitionFactory
                 .fromComponentClass(componentType, errorCollector);
         definition.ifPresent(a -> register(key, a));
@@ -112,9 +110,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
      * @return このビルダー自身
      */
     public <T> AnnotationContainerBuilder register(final Class<T> componentType) {
-        final Supplier<ComponentKey<T>> keyFactory = () -> componentKeyFactory
-                .fromComponentClass(componentType);
-        return register(keyFactory, componentType);
+        final ComponentKey<T> key = componentKeyFactory.fromComponentClass(componentType);
+        return register(key, componentType);
     }
 
     /**
@@ -127,9 +124,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
      */
     public <T> AnnotationContainerBuilder register(final Class<T> componentType,
             final Annotation... qualifiers) {
-        final Supplier<ComponentKey<T>> keyFactory = () -> new ComponentKey<>(componentType,
-                qualifiers);
-        return register(keyFactory, componentType);
+        final ComponentKey<T> key = new ComponentKey<>(componentType, qualifiers);
+        return register(key, componentType);
     }
 
     @Override

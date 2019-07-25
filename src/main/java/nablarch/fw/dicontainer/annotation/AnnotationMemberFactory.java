@@ -25,6 +25,7 @@ import nablarch.fw.dicontainer.Observes;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.InitMethod;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.MethodCollector;
@@ -33,8 +34,8 @@ import nablarch.fw.dicontainer.component.factory.InjectionComponentResolverFacto
 import nablarch.fw.dicontainer.component.factory.MemberFactory;
 import nablarch.fw.dicontainer.component.impl.DefaultDestroyMethod;
 import nablarch.fw.dicontainer.component.impl.DefaultInitMethod;
+import nablarch.fw.dicontainer.component.impl.DefaultInjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.DefaultObservesMethod;
-import nablarch.fw.dicontainer.component.impl.InjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.InjectableField;
 import nablarch.fw.dicontainer.component.impl.InjectableMethod;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
@@ -92,7 +93,7 @@ public final class AnnotationMemberFactory implements MemberFactory {
     }
 
     @Override
-    public Optional<InjectableMember> createConstructor(final Class<?> componentType,
+    public Optional<InjectableConstructor> createConstructor(final Class<?> componentType,
             final ErrorCollector errorCollector) {
         final Set<Constructor<?>> constructors = Arrays
                 .stream(componentType.getDeclaredConstructors())
@@ -111,7 +112,7 @@ public final class AnnotationMemberFactory implements MemberFactory {
             final Constructor<?> constructor = constructors.iterator().next();
             final InjectionComponentResolvers resolvers = injectionComponentResolverFactory
                     .fromConstructorParameters(constructor);
-            final InjectableConstructor injectableConstructor = new InjectableConstructor(
+            final DefaultInjectableConstructor injectableConstructor = new DefaultInjectableConstructor(
                     constructor, resolvers);
             return Optional.of(injectableConstructor);
         }
@@ -132,7 +133,7 @@ public final class AnnotationMemberFactory implements MemberFactory {
         }
 
         final InjectionComponentResolvers resolvers = InjectionComponentResolvers.empty();
-        final InjectableConstructor injectableConstructor = new InjectableConstructor(
+        final DefaultInjectableConstructor injectableConstructor = new DefaultInjectableConstructor(
                 noArgConstructor, resolvers);
         return Optional.of(injectableConstructor);
     }

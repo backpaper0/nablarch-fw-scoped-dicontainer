@@ -17,10 +17,11 @@ import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
 import nablarch.fw.dicontainer.component.factory.MemberFactory;
-import nablarch.fw.dicontainer.component.impl.PassthroughInjectableMember;
+import nablarch.fw.dicontainer.component.impl.PassthroughInjectableConstructor;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.ScopeDuplicatedException;
 import nablarch.fw.dicontainer.exception.ScopeNotFoundException;
@@ -98,7 +99,7 @@ public final class AnnotationScopeDecider implements ScopeDecider {
 
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
-        final InjectableMember injectableConstructor = new PassthroughInjectableMember(scope);
+        final InjectableConstructor injectableConstructor = new PassthroughInjectableConstructor(scope);
         final List<InjectableMember> injectableMembers = memberFactory
                 .createFieldsAndMethods(componentType, errorCollector);
         final List<ObservesMethod> observesMethods = memberFactory.createObservesMethod(

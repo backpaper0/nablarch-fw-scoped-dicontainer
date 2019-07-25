@@ -13,13 +13,13 @@ import nablarch.fw.dicontainer.scope.SingletonScope;
 public class ComponentDefinitionTest {
 
     private final ComponentDefinition<?> cd1 = ComponentDefinition.builder(getClass())
-            .injectableConstructor(new MockInjectableMember())
+            .injectableConstructor(new MockInjectableConstructor())
             .scope(new PrototypeScope())
             .build()
             .get();
 
     private final ComponentDefinition<?> cd2 = ComponentDefinition.builder(getClass())
-            .injectableConstructor(new MockInjectableMember())
+            .injectableConstructor(new MockInjectableConstructor())
             .scope(new SingletonScope())
             .build()
             .get();
@@ -32,10 +32,10 @@ public class ComponentDefinitionTest {
         assertTrue(cd2.isNarrowScope(cd2));
     }
 
-    private static class MockInjectableMember implements InjectableMember {
+    private static class MockInjectableConstructor implements InjectableConstructor {
 
         @Override
-        public Object inject(final ContainerImplementer container, final Object component) {
+        public Object inject(final ContainerImplementer container) {
             return null;
         }
 

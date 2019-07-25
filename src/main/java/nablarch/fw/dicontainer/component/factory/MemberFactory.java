@@ -6,6 +6,7 @@ import java.util.Optional;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.InitMethod;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
 
@@ -22,7 +23,7 @@ public interface MemberFactory {
      * @param errorCollector バリデーションエラーを収集するクラス
      * @return コンポーネントを生成する要素
      */
-    Optional<InjectableMember> createConstructor(Class<?> componentType,
+    Optional<InjectableConstructor> createConstructor(Class<?> componentType,
             ErrorCollector errorCollector);
 
     /**

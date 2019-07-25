@@ -30,9 +30,9 @@ public final class ComponentDefinition<T> {
      */
     private final Class<T> componentType;
     /**
-     * コンポーネントを生成するコンストラクタ・メソッド
+     * コンポーネントを生成するコンストラクタ・プロバイダ
      */
-    private final InjectableMember injectableConstructor;
+    private final InjectableConstructor injectableConstructor;
     /**
      * インジェクションされるメソッド・フィールド
      */
@@ -68,7 +68,7 @@ public final class ComponentDefinition<T> {
      */
     private ComponentDefinition(final ComponentId id,
             final Class<T> componentType,
-            final InjectableMember injectableConstructor,
+            final InjectableConstructor injectableConstructor,
             final List<InjectableMember> injectableMembers,
             final List<ObservesMethod> observesMethods,
             final InitMethod initMethod,
@@ -145,7 +145,7 @@ public final class ComponentDefinition<T> {
         final Provider<T> provider = new Provider<T>() {
             @Override
             public T get() {
-                final Object component = injectableConstructor.inject(container, null);
+                final Object component = injectableConstructor.inject(container);
                 for (final InjectableMember injectableMember : injectableMembers) {
                     injectableMember.inject(container, component);
                 }
@@ -215,7 +215,7 @@ public final class ComponentDefinition<T> {
         /**
          * コンポーネントを生成するコンストラクタ・メソッド
          */
-        private InjectableMember injectableConstructor;
+        private InjectableConstructor injectableConstructor;
         /**
          * インジェクションされるメソッド・フィールド
          */
@@ -257,7 +257,7 @@ public final class ComponentDefinition<T> {
          * @return このビルダー自身
          */
         public Builder<T> injectableConstructor(
-                final InjectableMember injectableConstructor) {
+                final InjectableConstructor injectableConstructor) {
             this.injectableConstructor = injectableConstructor;
             return this;
         }

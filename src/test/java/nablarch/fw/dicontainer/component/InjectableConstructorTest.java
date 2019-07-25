@@ -21,25 +21,25 @@ public class InjectableConstructorTest {
 
     @Test
     public void fromClass() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Aaa.class, errorCollector)
+        final InjectableConstructor creator = factory.createConstructor(Aaa.class, errorCollector)
                 .get();
         final TinyContainer container = new TinyContainer();
-        final Aaa component = (Aaa) creator.inject(container, null);
+        final Aaa component = (Aaa) creator.inject(container);
         assertTrue(component.called);
     }
 
     @Test
     public void fromClassWithInjection() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Bbb.class, errorCollector)
+        final InjectableConstructor creator = factory.createConstructor(Bbb.class, errorCollector)
                 .get();
         final TinyContainer container = new TinyContainer(Aaa.class);
-        final Bbb component = (Bbb) creator.inject(container, null);
+        final Bbb component = (Bbb) creator.inject(container);
         assertTrue(component.called);
     }
 
     @Test
     public void fromClassWithQualifierParameter() throws Exception {
-        final InjectableMember creator = factory.createConstructor(Ddd.class, errorCollector)
+        final InjectableConstructor creator = factory.createConstructor(Ddd.class, errorCollector)
                 .get();
         final UUID uuid1 = UUID.randomUUID();
         final UUID uuid2 = UUID.randomUUID();
@@ -50,7 +50,7 @@ public class InjectableConstructorTest {
                 .register(
                         new ComponentKey<>(Ccc.class, new NamedImpl("second")),
                         new Ccc(uuid2));
-        final Ddd component = (Ddd) creator.inject(container, null);
+        final Ddd component = (Ddd) creator.inject(container);
         assertEquals(uuid1, component.ccc1.value);
         assertEquals(uuid2, component.ccc2.value);
     }

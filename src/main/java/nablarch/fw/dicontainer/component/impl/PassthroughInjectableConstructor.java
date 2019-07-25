@@ -1,16 +1,24 @@
 package nablarch.fw.dicontainer.component.impl;
 
+import java.util.Objects;
+
 import nablarch.fw.dicontainer.component.ComponentDefinition;
-import nablarch.fw.dicontainer.component.InjectableMember;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
-public final class ContainerInjectableMember implements InjectableMember {
+public final class PassthroughInjectableConstructor implements InjectableConstructor {
+
+    private final Object instance;
+
+    public PassthroughInjectableConstructor(final Object instance) {
+        this.instance = Objects.requireNonNull(instance);
+    }
 
     @Override
-    public Object inject(final ContainerImplementer container, final Object component) {
-        return container;
+    public Object inject(final ContainerImplementer container) {
+        return instance;
     }
 
     @Override

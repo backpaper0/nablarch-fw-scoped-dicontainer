@@ -19,7 +19,7 @@ import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.ComponentKey.AliasKey;
 import nablarch.fw.dicontainer.component.ErrorCollector;
-import nablarch.fw.dicontainer.component.impl.ContainerInjectableMember;
+import nablarch.fw.dicontainer.component.impl.ContainerInjectableConstructor;
 import nablarch.fw.dicontainer.event.ContainerCreated;
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.scope.Scope;
@@ -170,7 +170,7 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
                 DefaultContainer.class);
         final ComponentDefinition<DefaultContainer> definition = ComponentDefinition
                 .builder(DefaultContainer.class)
-                .injectableConstructor(new ContainerInjectableMember())
+                .injectableConstructor(new ContainerInjectableConstructor())
                 .scope(new ContainerScope())
                 .build()
                 .get();

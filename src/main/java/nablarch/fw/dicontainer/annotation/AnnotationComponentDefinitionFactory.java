@@ -9,6 +9,7 @@ import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.component.InitMethod;
+import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.ObservesMethod;
 import nablarch.fw.dicontainer.component.factory.ComponentDefinitionFactory;
@@ -48,7 +49,7 @@ public final class AnnotationComponentDefinitionFactory implements ComponentDefi
             final ErrorCollector errorCollector) {
         final Builder<T> builder = ComponentDefinition.builder(componentType);
 
-        final Optional<InjectableMember> injectableConstructor = memberFactory
+        final Optional<InjectableConstructor> injectableConstructor = memberFactory
                 .createConstructor(componentType, errorCollector);
         final List<InjectableMember> injectableMembers = memberFactory
                 .createFieldsAndMethods(componentType, errorCollector);

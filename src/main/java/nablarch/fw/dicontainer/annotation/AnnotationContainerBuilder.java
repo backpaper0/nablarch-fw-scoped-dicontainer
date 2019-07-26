@@ -180,8 +180,6 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * インスタンスを生成する。
          */
         private Builder() {
-            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
-                    memberFactory, scopeDecider);
         }
 
         /**
@@ -203,8 +201,6 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          */
         public Builder scopeDecider(final ScopeDecider scopeDecider) {
             this.scopeDecider = scopeDecider;
-            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
-                    memberFactory, scopeDecider);
             return this;
         }
 
@@ -216,8 +212,6 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          */
         public Builder memberFactory(final MemberFactory memberFactory) {
             this.memberFactory = memberFactory;
-            this.componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
-                    memberFactory, scopeDecider);
             return this;
         }
 
@@ -260,6 +254,10 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
          * @return DIコンテナのビルダー
          */
         public AnnotationContainerBuilder build() {
+            if (componentDefinitionFactory == null) {
+                componentDefinitionFactory(
+                        new AnnotationComponentDefinitionFactory(memberFactory, scopeDecider));
+            }
             return new AnnotationContainerBuilder(componentKeyFactory, scopeDecider, memberFactory,
                     componentDefinitionFactory);
         }

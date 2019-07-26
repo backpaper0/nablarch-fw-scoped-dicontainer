@@ -12,9 +12,6 @@ import org.junit.runners.Suite;
 
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
-import nablarch.fw.dicontainer.annotation.auto.ClassFilter;
-import nablarch.fw.dicontainer.annotation.auto.ClassTraverser;
-import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
 
 public class ClassTraverserTest {
 
@@ -22,7 +19,7 @@ public class ClassTraverserTest {
     public void traverseDirectory() throws Exception {
         final ClassLoader classLoader = getClass().getClassLoader();
         final ClassTraverser traverser = new ClassTraverser(classLoader,
-                AnnotationContainerBuilder.class, ClassFilter.allClasses());
+                Container.class, ClassFilter.allClasses());
         final Set<Class<?>> classes = new HashSet<>();
         traverser.traverse(classes::add);
 
@@ -35,7 +32,7 @@ public class ClassTraverserTest {
     @Test
     public void traverseJarFile() throws Exception {
         final ClassLoader classLoader = getClass().getClassLoader();
-        final ClassTraverser traverser = new ClassTraverser(classLoader, Suite.class,
+        final ClassTraverser traverser = new ClassTraverser(classLoader, Test.class,
                 ClassFilter.allClasses());
         final Set<Class<?>> classes = new HashSet<>();
         traverser.traverse(classes::add);

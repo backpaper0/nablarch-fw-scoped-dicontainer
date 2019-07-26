@@ -90,32 +90,40 @@ public final class ClassTraverser {
 
     private void traverseDirectory(final Consumer<Class<?>> consumer, final Path directory)
             throws IOException {
+        final String baseClassPackage = getBaseClassPackage();
         try (Stream<Path> stream = Files.walk(directory)) {
             stream.filter(Files::isRegularFile)
                     .filter(file -> file.getFileName().toString().endsWith(CLASSFILE_SUFFIX))
                     .forEach(file -> {
-                        loadClass(consumer, directory.relativize(file).toString());
+                        loadClass(consumer, directory.relativize(file).toString(),
+                                baseClassPackage);
                     });
         }
     }
 
     private void traverseJarFile(final Consumer<Class<?>> consumer, final Path jarFile)
             throws IOException {
+        final String baseClassPackage = getBaseClassPackage();
         try (JarInputStream in = new JarInputStream(Files.newInputStream(jarFile))) {
             JarEntry entry = null;
             while (null != (entry = in.getNextJarEntry())) {
                 if (entry.isDirectory() == false && entry.getName().endsWith(CLASSFILE_SUFFIX)) {
-                    loadClass(consumer, entry.getName());
+                    loadClass(consumer, entry.getName(), baseClassPackage);
                 }
             }
         }
     }
 
-    private void loadClass(final Consumer<Class<?>> consumer, final String classFileName) {
+    private String getBaseClassPackage() {
+        return baseClass.getPackage().getName();
+    }
+
+    private void loadClass(final Consumer<Class<?>> consumer, final String classFileName,
+            final String baseClassPackage) {
         try {
             final String className = classFileName.replace('/', '.').substring(0,
                     classFileName.length() - CLASSFILE_SUFFIX.length());
-            if (classFilter.select(className)) {
+            if (className.startsWith(baseClassPackage) && classFilter.select(className)) {
                 final Class<?> clazz = Class.forName(className, false, classLoader);
                 consumer.accept(clazz);
             }

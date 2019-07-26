@@ -1,15 +1,9 @@
 package nablarch.fw.dicontainer.annotation.auto;
 
-import java.lang.annotation.Annotation;
 import java.util.Objects;
-
-import javax.inject.Qualifier;
-import javax.inject.Scope;
 
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
-import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
-import nablarch.fw.dicontainer.scope.ScopeDecider;
 
 /**
  * アノテーションをもとに自動でコンポーネントを登録してDIコンテナを構築するファクトリ。
@@ -18,30 +12,30 @@ import nablarch.fw.dicontainer.scope.ScopeDecider;
 public final class AnnotationAutoContainerFactory {
 
     /**
+     * DIコンテナのビルダー
+     */
+    private final AnnotationContainerBuilder containerBuilder;
+    /**
      * ディレクトリトラバーサルの設定
      */
     private final Iterable<TraversalConfig> traversalConfigs;
     /**
-     * イーガーロードする場合は{@literal true}
+     * コンポーネントとみなすための条件
      */
-    private final boolean eagerLoad;
-    /**
-     * スコープを決定するクラス
-     */
-    private final ScopeDecider scopeDecider;
+    private final ComponentPredicate predicate;
 
     /**
      * インスタンスを生成する。
      * 
+     * @param containerBuilder DIコンテナのビルダー
      * @param traversalConfigs ディレクトリトラバーサルの設定
-     * @param eagerLoad イーガーロードする場合は{@literal true}
-     * @param scopeDecider スコープを決定するクラス
+     * @param predicate コンポーネントとみなすための条件
      */
-    private AnnotationAutoContainerFactory(final Iterable<TraversalConfig> traversalConfigs,
-            final boolean eagerLoad, final ScopeDecider scopeDecider) {
+    public AnnotationAutoContainerFactory(final AnnotationContainerBuilder containerBuilder,
+            final Iterable<TraversalConfig> traversalConfigs, final ComponentPredicate predicate) {
+        this.containerBuilder = Objects.requireNonNull(containerBuilder);
         this.traversalConfigs = Objects.requireNonNull(traversalConfigs);
-        this.eagerLoad = eagerLoad;
-        this.scopeDecider = Objects.requireNonNull(scopeDecider);
+        this.predicate = Objects.requireNonNull(predicate);
     }
 
     /**
@@ -50,9 +44,6 @@ public final class AnnotationAutoContainerFactory {
      * @return DIコンテナ
      */
     public Container create() {
-        final AnnotationContainerBuilder builder = AnnotationContainerBuilder.builder()
-                .scopeDecider(scopeDecider)
-                .eagerLoad(eagerLoad).build();
         for (final TraversalConfig traversalConfig : traversalConfigs) {
             final ClassLoader classLoader = traversalConfig.getClass().getClassLoader();
             final Class<?> baseClass = traversalConfig.getClass();
@@ -60,109 +51,11 @@ public final class AnnotationAutoContainerFactory {
             final ClassTraverser classTraverser = new ClassTraverser(classLoader, baseClass,
                     classFilter);
             classTraverser.traverse(clazz -> {
-                if (isTarget(clazz)) {
-                    builder.register(clazz);
+                if (predicate.test(clazz)) {
+                    containerBuilder.register(clazz);
                 }
             });
         }
-        return builder.build();
-    }
-
-    private boolean isTarget(final Class<?> clazz) {
-        for (final Annotation annotation : clazz.getAnnotations()) {
-            final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType.isAnnotationPresent(Scope.class)
-                    || annotationType.isAnnotationPresent(Qualifier.class)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * デフォルトの設定をしたインスタンスを構築する。
-     * 
-     * @return インスタンス
-     */
-    public static AnnotationAutoContainerFactory createDefault() {
-        return builder().build();
-    }
-
-    /**
-     * ビルダーを生成する。
-     * 
-     * @return ビルダー
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * ビルダー。
-     *
-     */
-    public static final class Builder {
-
-        /**
-         * ディレクトリトラバーサルの設定
-         */
-        private Iterable<TraversalConfig> traversalConfigs;
-        /**
-         * イーガーロードする場合は{@literal true}
-         */
-        private boolean eagerLoad;
-        /**
-         * スコープを決定するクラス
-         */
-        private ScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
-
-        /**
-         * インスタンスを生成する。
-         * 
-         */
-        private Builder() {
-        }
-
-        /**
-         * ディレクトリトラバーサルの設定を設定する。
-         * 
-         * @param traversalConfigs ディレクトリトラバーサルの設定
-         * @return このビルダー自身
-         */
-        public Builder traversalConfigs(final Iterable<TraversalConfig> traversalConfigs) {
-            this.traversalConfigs = traversalConfigs;
-            return this;
-        }
-
-        /**
-         * イーガーロードをするかどうかを設定する。
-         * 
-         * @param eagerLoad イーガーロードする場合は{@literal true}
-         * @return このビルダー自身
-         */
-        public Builder eagerLoad(final boolean eagerLoad) {
-            this.eagerLoad = eagerLoad;
-            return this;
-        }
-
-        /**
-         * スコープを決定するクラスを設定する。
-         * 
-         * @param scopeDecider スコープを決定するクラス
-         * @return このビルダー自身
-         */
-        public Builder scopeDecider(final ScopeDecider scopeDecider) {
-            this.scopeDecider = scopeDecider;
-            return this;
-        }
-
-        /**
-         * インスタンスを構築する。
-         * 
-         * @return 構築されたインスタンス
-         */
-        public AnnotationAutoContainerFactory build() {
-            return new AnnotationAutoContainerFactory(traversalConfigs, eagerLoad, scopeDecider);
-        }
+        return containerBuilder.build();
     }
 }

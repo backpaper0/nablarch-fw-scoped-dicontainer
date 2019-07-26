@@ -18,6 +18,7 @@ import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
 import nablarch.fw.dicontainer.web.context.RequestContext;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 
+@Deprecated
 public final class ServletAPIContext implements RequestContext, SessionContext {
 
     private final HttpServletRequest request;

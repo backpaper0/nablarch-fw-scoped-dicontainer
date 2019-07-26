@@ -1,6 +1,5 @@
 package nablarch.fw.dicontainer.nablarch;
 
-import java.lang.annotation.Annotation;
 import java.util.ServiceLoader;
 
 import nablarch.core.log.Logger;
@@ -48,11 +47,6 @@ public final class AnnotationAutoContainerProvider implements Initializable {
             }
             throw e;
         }
-    }
-
-    @SafeVarargs
-    public final void setTargetAnnotations(final Class<? extends Annotation>... annotations) {
-        builder.targetAnnotations(annotations);
     }
 
     public void traversalConfigs(final Iterable<TraversalConfig> traversalConfigs) {

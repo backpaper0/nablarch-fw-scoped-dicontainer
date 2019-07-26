@@ -6,6 +6,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.inject.Provider;
+import javax.inject.Qualifier;
 
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
@@ -26,20 +28,6 @@ import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
  */
 public final class DefaultInjectionComponentResolverFactory
         implements InjectionComponentResolverFactory {
-
-    /**
-     * 限定子のアノテーションセット
-     */
-    private final AnnotationSet qualifierAnnotations;
-
-    /**
-     * インスタンスを生成する。
-     * 
-     * @param qualifierAnnotations 限定子のアノテーションセット
-     */
-    public DefaultInjectionComponentResolverFactory(final AnnotationSet qualifierAnnotations) {
-        this.qualifierAnnotations = Objects.requireNonNull(qualifierAnnotations);
-    }
 
     @Override
     public InjectionComponentResolver fromField(final Field field) {
@@ -76,7 +64,9 @@ public final class DefaultInjectionComponentResolverFactory
         protected abstract ParameterizedType getGenericComponentType();
 
         public InjectionComponentResolver create() {
-            final Set<Annotation> qualifiers = qualifierAnnotations.filter(getAnnotations());
+            final Set<Annotation> qualifiers = Arrays.stream(getAnnotations())
+                    .filter(a -> a.annotationType().isAnnotationPresent(Qualifier.class))
+                    .collect(Collectors.toSet());
 
             final boolean provider = getComponentType().equals(Provider.class);
             final Class<?> componentType;

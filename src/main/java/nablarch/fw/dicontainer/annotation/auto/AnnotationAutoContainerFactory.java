@@ -9,7 +9,6 @@ import javax.inject.Scope;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
-import nablarch.fw.dicontainer.annotation.AnnotationSet;
 import nablarch.fw.dicontainer.scope.ScopeDecider;
 
 /**
@@ -18,10 +17,6 @@ import nablarch.fw.dicontainer.scope.ScopeDecider;
  */
 public final class AnnotationAutoContainerFactory {
 
-    /**
-     * コンポーネントとみなす条件となるアノテーションセット
-     */
-    private final AnnotationSet targetAnnotations;
     /**
      * ディレクトリトラバーサルの設定
      */
@@ -38,15 +33,12 @@ public final class AnnotationAutoContainerFactory {
     /**
      * インスタンスを生成する。
      * 
-     * @param targetAnnotations コンポーネントとみなす条件となるアノテーションセット
      * @param traversalConfigs ディレクトリトラバーサルの設定
      * @param eagerLoad イーガーロードする場合は{@literal true}
      * @param scopeDecider スコープを決定するクラス
      */
-    private AnnotationAutoContainerFactory(final AnnotationSet targetAnnotations,
-            final Iterable<TraversalConfig> traversalConfigs, final boolean eagerLoad,
-            final ScopeDecider scopeDecider) {
-        this.targetAnnotations = Objects.requireNonNull(targetAnnotations);
+    private AnnotationAutoContainerFactory(final Iterable<TraversalConfig> traversalConfigs,
+            final boolean eagerLoad, final ScopeDecider scopeDecider) {
         this.traversalConfigs = Objects.requireNonNull(traversalConfigs);
         this.eagerLoad = eagerLoad;
         this.scopeDecider = Objects.requireNonNull(scopeDecider);
@@ -79,7 +71,8 @@ public final class AnnotationAutoContainerFactory {
     private boolean isTarget(final Class<?> clazz) {
         for (final Annotation annotation : clazz.getAnnotations()) {
             final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (targetAnnotations.isAnnotationPresent(annotationType)) {
+            if (annotationType.isAnnotationPresent(Scope.class)
+                    || annotationType.isAnnotationPresent(Qualifier.class)) {
                 return true;
             }
         }
@@ -111,10 +104,6 @@ public final class AnnotationAutoContainerFactory {
     public static final class Builder {
 
         /**
-         * コンポーネントとみなす条件となるアノテーションセット
-         */
-        private AnnotationSet targetAnnotations = new AnnotationSet(Scope.class, Qualifier.class);
-        /**
          * ディレクトリトラバーサルの設定
          */
         private Iterable<TraversalConfig> traversalConfigs;
@@ -132,18 +121,6 @@ public final class AnnotationAutoContainerFactory {
          * 
          */
         private Builder() {
-        }
-
-        /**
-         * コンポーネントとみなす条件となるアノテーションセットを設定する。
-         * 
-         * @param annotations コンポーネントとみなす条件となるアノテーションセット
-         * @return このビルダー自身
-         */
-        @SafeVarargs
-        public final Builder targetAnnotations(final Class<? extends Annotation>... annotations) {
-            this.targetAnnotations = new AnnotationSet(annotations);
-            return this;
         }
 
         /**
@@ -185,8 +162,7 @@ public final class AnnotationAutoContainerFactory {
          * @return 構築されたインスタンス
          */
         public AnnotationAutoContainerFactory build() {
-            return new AnnotationAutoContainerFactory(targetAnnotations, traversalConfigs,
-                    eagerLoad, scopeDecider);
+            return new AnnotationAutoContainerFactory(traversalConfigs, eagerLoad, scopeDecider);
         }
     }
 }

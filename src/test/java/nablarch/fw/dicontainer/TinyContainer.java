@@ -15,8 +15,7 @@ import nablarch.fw.dicontainer.container.ContainerImplementer;
 public final class TinyContainer implements ContainerImplementer {
 
     private final Map<ComponentKey<?>, Object> components = new HashMap<>();
-    private final AnnotationComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
-            .createDefault();
+    private final AnnotationComponentKeyFactory componentKeyFactory = new AnnotationComponentKeyFactory();
 
     public TinyContainer(final Class<?>... componentTypes) {
         for (final Class<?> componentType : componentTypes) {

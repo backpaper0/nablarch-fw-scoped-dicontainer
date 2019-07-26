@@ -161,8 +161,7 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         /**
          * 検索キーのファクトリ
          */
-        private ComponentKeyFactory componentKeyFactory = AnnotationComponentKeyFactory
-                .createDefault();
+        private ComponentKeyFactory componentKeyFactory = new AnnotationComponentKeyFactory();
         /**
          * スコープを決定するクラス
          */
@@ -170,7 +169,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
         /**
          * コンポーネント定義の構成要素ファクトリ
          */
-        private MemberFactory memberFactory = AnnotationMemberFactory.createDefault();
+        private MemberFactory memberFactory = new AnnotationMemberFactory(
+                new DefaultInjectionComponentResolverFactory());
         /**
          * コンポーネント定義のファクトリ
          */

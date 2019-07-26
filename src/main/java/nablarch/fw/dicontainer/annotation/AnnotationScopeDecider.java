@@ -1,12 +1,14 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -37,10 +39,6 @@ import nablarch.fw.dicontainer.scope.SingletonScope;
 public final class AnnotationScopeDecider implements ScopeDecider {
 
     /**
-     * スコープのメタアノテーションセット
-     */
-    private final AnnotationSet scopeAnnotations;
-    /**
      * デフォルトのスコープ
      */
     private final Scope defaultScope;
@@ -56,13 +54,11 @@ public final class AnnotationScopeDecider implements ScopeDecider {
     /**
      * インスタンスを生成する。
      * 
-     * @param scopeAnnotations スコープのメタアノテーションセット
      * @param defaultScope デフォルトのスコープ
      * @param scopes アノテーションとスコープのマッピング
      */
-    private AnnotationScopeDecider(final AnnotationSet scopeAnnotations, final Scope defaultScope,
+    private AnnotationScopeDecider(final Scope defaultScope,
             final Map<Class<? extends Annotation>, Scope> scopes) {
-        this.scopeAnnotations = Objects.requireNonNull(scopeAnnotations);
         this.defaultScope = Objects.requireNonNull(defaultScope);
         this.scopes = Objects.requireNonNull(scopes);
     }
@@ -99,7 +95,8 @@ public final class AnnotationScopeDecider implements ScopeDecider {
 
         final Class<T> componentType = (Class<T>) scope.getClass();
         final ComponentKey<T> key = new ComponentKey<>(componentType);
-        final InjectableConstructor injectableConstructor = new PassthroughInjectableConstructor(scope);
+        final InjectableConstructor injectableConstructor = new PassthroughInjectableConstructor(
+                scope);
         final List<InjectableMember> injectableMembers = memberFactory
                 .createFieldsAndMethods(componentType, errorCollector);
         final List<ObservesMethod> observesMethods = memberFactory.createObservesMethod(
@@ -146,7 +143,6 @@ public final class AnnotationScopeDecider implements ScopeDecider {
      */
     public static Builder builderFrom(final AnnotationScopeDecider source) {
         final Builder builder = builder();
-        builder.scopeAnnotations = builder.scopeAnnotations;
         builder.defaultScope = builder.defaultScope;
         builder.scopes.putAll(source.scopes);
         return builder;
@@ -158,10 +154,6 @@ public final class AnnotationScopeDecider implements ScopeDecider {
      */
     public static final class Builder {
 
-        /**
-         * スコープのメタアノテーションセット
-         */
-        private AnnotationSet scopeAnnotations = new AnnotationSet(javax.inject.Scope.class);
         /**
          * デフォルトのスコープ
          */
@@ -179,17 +171,6 @@ public final class AnnotationScopeDecider implements ScopeDecider {
             this.scopes.put(Prototype.class, prototypeScope);
             this.scopes.put(Singleton.class, new SingletonScope());
             this.defaultScope = prototypeScope;
-        }
-
-        /**
-         * スコープのメタアノテーションセットを設定する。
-         * 
-         * @param annotations スコープのメタアノテーションセット
-         * @return このビルダー自身
-         */
-        public Builder scopeAnnotations(final Class<? extends Annotation> annotations) {
-            this.scopeAnnotations = new AnnotationSet(annotations);
-            return this;
         }
 
         /**
@@ -233,7 +214,7 @@ public final class AnnotationScopeDecider implements ScopeDecider {
          * @return 構築されたインスタンス
          */
         public AnnotationScopeDecider build() {
-            return new AnnotationScopeDecider(scopeAnnotations, defaultScope, scopes);
+            return new AnnotationScopeDecider(defaultScope, scopes);
         }
     }
 
@@ -247,7 +228,9 @@ public final class AnnotationScopeDecider implements ScopeDecider {
                 Class<? extends Annotation> annotation);
 
         private Optional<Scope> decide(final ErrorCollector errorCollector) {
-            final Set<Annotation> annotations = scopeAnnotations.filter(getAnnotations());
+            final Set<Annotation> annotations = Arrays.stream(getAnnotations())
+                    .filter(a -> a.annotationType().isAnnotationPresent(javax.inject.Scope.class))
+                    .collect(Collectors.toSet());
             if (annotations.isEmpty()) {
                 return Optional.of(defaultScope);
             } else if (annotations.size() > 1) {

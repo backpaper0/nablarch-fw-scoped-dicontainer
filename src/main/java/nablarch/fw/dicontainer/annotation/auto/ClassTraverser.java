@@ -121,7 +121,7 @@ public final class ClassTraverser {
     private void loadClass(final Consumer<Class<?>> consumer, final String classFileName,
             final String baseClassPackage) {
         try {
-            final String className = classFileName.replace('/', '.').substring(0,
+            final String className = classFileName.replace('/', '.').replace('\\', '.').substring(0,
                     classFileName.length() - CLASSFILE_SUFFIX.length());
             if (className.startsWith(baseClassPackage) && classFilter.select(className)) {
                 final Class<?> clazz = Class.forName(className, false, classLoader);

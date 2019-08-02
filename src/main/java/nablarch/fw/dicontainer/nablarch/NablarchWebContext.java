@@ -31,7 +31,7 @@ public final class NablarchWebContext implements RequestContext, SessionContext 
     @Override
     public <T> T getSessionComponent(final ComponentId id, final Provider<T> provider) {
         final String name = NAME_PREFIX + id;
-        Object component = SessionUtil.get(ctx, name);
+        Object component = SessionUtil.orNull(ctx, name);
         if (component == null) {
             component = provider.get();
             SessionUtil.put(ctx, name, component);

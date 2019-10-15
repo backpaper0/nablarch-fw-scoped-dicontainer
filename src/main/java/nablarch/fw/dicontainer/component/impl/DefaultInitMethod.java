@@ -8,10 +8,18 @@ import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodSignatureException;
 
+/**
+ * {@link InitMethod}のデフォルト実装クラス。
+ */
 public final class DefaultInitMethod implements InitMethod {
 
+    /** 初期化メソッド */
     private final MethodWrapper method;
 
+    /**
+     * コンストラクタ。
+     * @param method 初期化メソッド
+     */
     public DefaultInitMethod(final Method method) {
         this.method = new MethodWrapper(method);
     }
@@ -32,7 +40,7 @@ public final class DefaultInitMethod implements InitMethod {
 
         if (method.getParameterCount() > 0) {
             containerBuilder.addError(new LifeCycleMethodSignatureException(
-                    "Init method [" + method + "] must no parameter."));
+                    "Init method [" + method + "] must have no parameter."));
             return;
         }
     }

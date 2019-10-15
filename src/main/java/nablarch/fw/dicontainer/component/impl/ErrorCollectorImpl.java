@@ -10,9 +10,15 @@ import nablarch.fw.dicontainer.component.ErrorCollector;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import nablarch.fw.dicontainer.exception.ContainerException;
 
+/**
+ * {@link ErrorCollector}実装クラス。
+ */
 public final class ErrorCollectorImpl implements ErrorCollector {
 
+    /** 収集した例外 */
     private final List<ContainerException> exceptions = new ArrayList<>();
+
+    /** 無視する例外クラス */
     private final Set<Class<? extends ContainerException>> ignoreExceptionClasses = new HashSet<>();
 
     @Override

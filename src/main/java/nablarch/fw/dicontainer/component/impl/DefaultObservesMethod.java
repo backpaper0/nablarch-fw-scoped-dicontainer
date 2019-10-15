@@ -8,10 +8,18 @@ import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.ObserverMethodSignatureException;
 
+/**
+ * {@link ObservesMethod}のデフォルト実装クラス。
+ */
 public final class DefaultObservesMethod implements ObservesMethod {
 
+    /** メソッド */
     private final MethodWrapper method;
 
+    /**
+     * コンストラクタ。
+     * @param method メソッド
+     */
     public DefaultObservesMethod(final Method method) {
         this.method = new MethodWrapper(method);
     }

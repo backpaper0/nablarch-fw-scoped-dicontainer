@@ -11,11 +11,22 @@ import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
+/**
+ * インジェクションされるメソッドを表す{@link InjectableMember}実装クラス。
+ */
 public final class InjectableMethod implements InjectableMember {
 
+    /** メソッド */
     private final MethodWrapper method;
+
+    /** コンポーネント解決クラス */
     private final InjectionComponentResolvers resolvers;
 
+    /**
+     * コンストラクタ。
+     * @param method メソッド
+     * @param resolvers コンポーネント解決クラス
+     */
     public InjectableMethod(final Method method, final InjectionComponentResolvers resolvers) {
         this.method = new MethodWrapper(method);
         this.resolvers = Objects.requireNonNull(resolvers);

@@ -4,6 +4,9 @@ import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.DestroyMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 
+/**
+ * 何もしない{@link DestroyMethod}実装クラス。
+ */
 public final class NoopDestroyMethod implements DestroyMethod {
 
     @Override

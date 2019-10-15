@@ -10,11 +10,22 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
+/**
+ * {@link InjectableConstructor}のデフォルト実装クラス。
+ */
 public final class DefaultInjectableConstructor implements InjectableConstructor {
 
+    /** コンストラクタ */
     private final ConstructorWrapper constructor;
+
+    /** コンポーネント解決クラス */
     private final InjectionComponentResolvers resolvers;
 
+    /**
+     * コンストラクタ。
+     * @param constructor 本クラスで管理するコンストラクタメソッド
+     * @param resolvers コンポーネント解決クラス
+     */
     public DefaultInjectableConstructor(final Constructor<?> constructor,
             final InjectionComponentResolvers resolvers) {
         this.constructor = new ConstructorWrapper(constructor);

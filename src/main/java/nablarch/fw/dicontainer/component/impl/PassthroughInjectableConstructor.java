@@ -8,10 +8,19 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
+/**
+ * 格納したインスタンスをそのまま返却する{@link InjectableConstructor}実装クラス。
+ */
 public final class PassthroughInjectableConstructor implements InjectableConstructor {
 
+    /** 生成済みインスタンス */
     private final Object instance;
 
+    /**
+     * コンストラクタ。
+     * ここで指定されたインスタンスが{@link #inject(ContainerImplementer)}で返却される。
+     * @param instance インスタンス
+     */
     public PassthroughInjectableConstructor(final Object instance) {
         this.instance = Objects.requireNonNull(instance);
     }

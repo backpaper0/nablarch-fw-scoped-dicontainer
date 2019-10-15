@@ -12,11 +12,21 @@ import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
+/**
+ * インジェクションされるフィールドを表す{@link InjectableMember}実装クラス。
+ */
 public final class InjectableField implements InjectableMember {
-
+    /** フィールド */
     private final FieldWrapper field;
+
+    /** コンポーネント解決クラス */
     private final InjectionComponentResolver resolver;
 
+    /**
+     * コンストラクタ。
+     * @param field フィールド
+     * @param resolver コンポーネント解決クラス
+     */
     public InjectableField(final Field field,
             final InjectionComponentResolver resolver) {
         this.field = new FieldWrapper(field);

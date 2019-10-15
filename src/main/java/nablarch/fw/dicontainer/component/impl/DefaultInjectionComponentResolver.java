@@ -15,11 +15,22 @@ import nablarch.fw.dicontainer.exception.InjectionComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectionComponentNotFoundException;
 import nablarch.fw.dicontainer.exception.InvalidInjectionScopeException;
 
+/**
+ * {@link InjectionComponentResolver}のデフォルト実装クラス。
+ */
 public final class DefaultInjectionComponentResolver implements InjectionComponentResolver {
 
+    /** コンポーネントの検索キー */
     private final ComponentKey<?> key;
+
+    /** {@link Provider}を使用するかどうか */
     private final boolean provider;
 
+    /**
+     * コンストラクタ。
+     * @param key コンポーネント検索キー
+     * @param provider {@link Provider}を使用するかどうか
+     */
     public DefaultInjectionComponentResolver(final ComponentKey<?> key, final boolean provider) {
         this.key = Objects.requireNonNull(key);
         this.provider = provider;

@@ -194,6 +194,16 @@ public final class AnnotationMemberFactory implements MemberFactory {
                 errorCollector);
     }
 
+    /**
+     * ライフサイクルメソッドを生成する。
+     * @param name 名前
+     * @param annotationClass アノテーションクラス
+     * @param factory ファクトリ
+     * @param componentType コンポーネントの型
+     * @param errorCollector バリデーションエラー収集クラス
+     * @param <T> ライフサイクルメソッドの型
+     * @return ライフサイクルメソッド
+     */
     private static <T> Optional<T> createLifeCycleMethod(final String name,
             final Class<? extends Annotation> annotationClass,
             final Function<Method, T> factory, final Class<?> componentType,

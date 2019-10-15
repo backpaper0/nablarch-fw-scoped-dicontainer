@@ -88,6 +88,12 @@ public final class ClassTraverser {
         }
     }
 
+    /**
+     * ディレクトリトラバーサルを行う。
+     *
+     * @param consumer 見つかったクラスに適用する処理
+     * @param directory 対象ディレクトリ
+     */
     private void traverseDirectory(final Consumer<Class<?>> consumer, final Path directory)
             throws IOException {
         final String baseClassPackage = getBaseClassPackage();
@@ -101,6 +107,12 @@ public final class ClassTraverser {
         }
     }
 
+    /**
+     * jarファイルのトラバースを行う。
+     * @param consumer 見つかったクラスに適用する処理
+     * @param jarFile 対象jarファイル
+     * @throws IOException 予期しない入出力例外
+     */
     private void traverseJarFile(final Consumer<Class<?>> consumer, final Path jarFile)
             throws IOException {
         final String baseClassPackage = getBaseClassPackage();
@@ -114,10 +126,21 @@ public final class ClassTraverser {
         }
     }
 
+    /**
+     * 起点クラスのパッケージ名を取得する。
+     * @return パッケージ名
+     */
     private String getBaseClassPackage() {
         return baseClass.getPackage().getName();
     }
 
+    /**
+     * クラスをロードする。
+     *
+     * @param consumer 見つかったクラスに適用する処理
+     * @param classFileName クラスファイル名
+     * @param baseClassPackage 起点クラスのパッケージ
+     */
     private void loadClass(final Consumer<Class<?>> consumer, final String classFileName,
             final String baseClassPackage) {
         try {

@@ -26,7 +26,7 @@ public interface ScopeDecider {
      * スコープをコンポーネント登録する。
      * 
      * @param builder DIコンテナのビルダー
-     * @param memberFactory TODO
+     * @param memberFactory コンポーネント定義の構成要素を生成するファクトリ
      */
     void registerScopes(ContainerBuilder<?> builder,
             MemberFactory memberFactory);

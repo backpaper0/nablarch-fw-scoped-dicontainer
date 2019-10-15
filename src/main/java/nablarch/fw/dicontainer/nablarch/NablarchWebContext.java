@@ -8,11 +8,22 @@ import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.web.context.RequestContext;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 
+/**
+ * Nablarch WebアプリケーションでDIコンテナを使用する際の
+ * {@link RequestContext}、{@link SessionContext}実装クラス。
+ */
 public final class NablarchWebContext implements RequestContext, SessionContext {
 
+    /** 名前の接頭辞 */
     private static final String NAME_PREFIX = "components:";
+
+    /** 実行コンテキスト */
     private final ExecutionContext ctx;
 
+    /**
+     * コンストラクタ。
+     * @param ctx 実行コンテキスト
+     */
     public NablarchWebContext(final ExecutionContext ctx) {
         this.ctx = ctx;
     }

@@ -45,6 +45,11 @@ public final class DefaultInjectionComponentResolverFactory
         return fromExecutable(constructor);
     }
 
+    /**
+     * {@link Executable}から{@link InjectionComponentResolvers}を生成する。
+     * @param executable
+     * @return
+     */
     private InjectionComponentResolvers fromExecutable(
             final Executable executable) {
         final List<InjectionComponentResolver> resolvers = IntStream
@@ -55,6 +60,9 @@ public final class DefaultInjectionComponentResolverFactory
         return new InjectionComponentResolvers(resolvers);
     }
 
+    /**
+     * コンポーネント
+     */
     private abstract class Source {
 
         protected abstract Annotation[] getAnnotations();

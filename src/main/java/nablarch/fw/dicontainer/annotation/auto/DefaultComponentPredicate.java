@@ -5,6 +5,12 @@ import java.lang.annotation.Annotation;
 import javax.inject.Qualifier;
 import javax.inject.Scope;
 
+/**
+ * {@link ComponentPredicate}のデフォルト実装クラス。
+ *
+ * 対象クラスに{@link Scope}または{@link Qualifier}アノテーションが付与されていた場合、
+ * コンポーネントであると判定する。
+ */
 public final class DefaultComponentPredicate implements ComponentPredicate {
 
     @Override

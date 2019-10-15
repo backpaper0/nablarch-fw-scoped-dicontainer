@@ -8,10 +8,18 @@ import nablarch.fw.dicontainer.component.impl.reflect.MethodWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.exception.LifeCycleMethodSignatureException;
 
+/**
+ * {@link DestroyMethod}のデフォルト実装クラス。
+ */
 public final class DefaultDestroyMethod implements DestroyMethod {
 
+    /** 破棄メソッド */
     private final MethodWrapper method;
 
+    /**
+     * コンストラクタ。
+     * @param method 破棄メソッド
+     */
     public DefaultDestroyMethod(final Method method) {
         this.method = new MethodWrapper(method);
     }

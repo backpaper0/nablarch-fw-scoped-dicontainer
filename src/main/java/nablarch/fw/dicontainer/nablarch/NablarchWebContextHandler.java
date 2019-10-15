@@ -8,6 +8,11 @@ import nablarch.fw.dicontainer.web.context.SessionContext;
 import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
 import nablarch.fw.dicontainer.web.exception.WebContextException;
 
+/**
+ * Nablarchで{@link NablarchWebContext}を管理するための{@link Handler}実装クラス。
+ *
+ *
+ */
 public final class NablarchWebContextHandler
         implements Handler<Object, Object>, RequestContextSupplier, SessionContextSupplier {
 

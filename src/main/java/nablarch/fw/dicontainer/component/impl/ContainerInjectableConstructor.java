@@ -6,6 +6,10 @@ import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
+/**
+ *  インジェクションされるコンストラクタを表す{@link InjectableConstructor}実装クラス。
+ *  与えられた{@link ContainerImplementer}をそのまま返却する。
+ */
 public final class ContainerInjectableConstructor implements InjectableConstructor {
 
     @Override

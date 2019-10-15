@@ -85,7 +85,7 @@ public final class AnnotationScopeDecider implements ScopeDecider {
      * スコープをコンポーネント登録する。
      * 
      * @param builder DIコンテナのビルダー
-     * @param memberFactory TODO
+     * @param memberFactory {@link MemberFactory}実装
      * @param scope スコープ
      */
     private <T extends Scope> void registerScope(final ContainerBuilder<?> builder,

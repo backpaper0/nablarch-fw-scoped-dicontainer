@@ -18,12 +18,24 @@ import nablarch.fw.dicontainer.event.EventTrigger;
 import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
+/**
+ * {@link ContainerImplementer}のデフォルト実装クラス。
+ */
 public final class DefaultContainer implements ContainerImplementer, EventTrigger {
-
+    /** ロガー */
     private static final Logger logger = LoggerManager.get(DefaultContainer.class);
+
+    /** コンポーネント定義のリポジトリ */
     private final ComponentDefinitionRepository definitions;
+
+    /** エイリアスキーと検索キーのマッピング */
     private final AliasMapping aliasMapping;
 
+    /**
+     * コンストラクタ。
+     * @param definitionsMap コンポーネント定義のリポジトリ
+     * @param aliasesMap エイリアスキーと検索キーのマッピング
+     */
     public DefaultContainer(final ComponentDefinitionRepository definitionsMap,
             final AliasMapping aliasesMap) {
         this.definitions = Objects.requireNonNull(definitionsMap);

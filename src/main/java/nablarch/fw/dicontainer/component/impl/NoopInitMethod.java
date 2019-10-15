@@ -4,6 +4,9 @@ import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InitMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 
+/**
+ * 何もしない{@link InitMethod}実装クラス。
+ */
 public final class NoopInitMethod implements InitMethod {
 
     @Override

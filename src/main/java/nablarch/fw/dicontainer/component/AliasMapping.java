@@ -20,8 +20,8 @@ public final class AliasMapping {
     /**
      * エイリアスキーと検索キーをマッピングする。
      * 
-     * @param aliasKey
-     * @param key
+     * @param aliasKey エイリアスキー
+     * @param key 検索キー
      */
     public void register(final ComponentKey.AliasKey aliasKey, final ComponentKey<?> key) {
         aliasesMap.computeIfAbsent(aliasKey, a -> new HashSet<>()).add(key);

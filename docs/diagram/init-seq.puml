@@ -1,0 +1,11 @@
+@startuml
+
+BasicApplicationInitializer -> AnnotationAutoContainerProvider: initialize
+AnnotationAutoContainerProvider -> AnnotationAutoContainerFactory: create
+AnnotationAutoContainerProvider -> ServiceLoader: load
+ServiceLoader -> TraversalConfigImpl: instantiate（コンポーネント探す時の設定）
+AnnotationAutoContainerFactory -> AnnotationContainerBuilder : build
+AnnotationContainerBuilder -> DefaultContainer: instantiate
+
+@enduml
+

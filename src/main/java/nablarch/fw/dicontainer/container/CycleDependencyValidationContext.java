@@ -83,7 +83,7 @@ public final class CycleDependencyValidationContext {
                     .findAny()
                     .get();
             containerBuilder.addError(
-                    new CycleInjectionException("Dependency between [" + target + "] and ["
+                    new CycleInjectionException("Dependency between [" + target + "] and ["
                             + cd + "] is cycled."));
             return;
         }

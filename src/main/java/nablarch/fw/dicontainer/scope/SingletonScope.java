@@ -59,7 +59,7 @@ public final class SingletonScope extends AbstractScope {
             instanceHolder = new InstanceHolder();
             final InstanceHolder previous = instances.putIfAbsent(id, instanceHolder);
             if (previous != null && instanceHolder != previous) {
-                instanceHolder = previous;
+                instanceHolder = previous;     // getからputIfAbsentまでの間に競合が発生した場合、先にputされたvalueを使う
             }
         }
         return instanceHolder.get(provider);

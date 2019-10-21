@@ -62,6 +62,15 @@ public class ComponentKeyTest {
         assertThat(key.equals("this is String"), is(false));
     }
 
+    @Test
+    public void testAliasKeyEquals() {
+        ComponentKey<?> key = new ComponentKey<>(Aaa.class);
+        AliasKey aliasKey = key.asAliasKey();
+        assertThat(aliasKey.equals(aliasKey), is(true));
+        assertThat(aliasKey.equals(null), is(false));
+        assertThat(aliasKey.equals("this is String"), is(false));
+    }
+
     static class Aaa {
     }
 

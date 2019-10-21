@@ -1,5 +1,6 @@
 package nablarch.fw.dicontainer.component;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -47,5 +48,16 @@ public class ComponentDefinitionTest {
         @Override
         public void validateCycleDependency(final CycleDependencyValidationContext context) {
         }
+    }
+
+    @Test
+    public void testGetId() {
+        assertNotNull(cd1.getId());
+    }
+
+    @Test
+    public void builderGeneratesComponentId() {
+        ComponentId generatedId = ComponentDefinition.builder(getClass()).id();
+        assertNotNull(generatedId);
     }
 }

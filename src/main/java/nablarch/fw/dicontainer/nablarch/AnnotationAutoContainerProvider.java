@@ -1,8 +1,5 @@
 package nablarch.fw.dicontainer.nablarch;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.ServiceLoader;
 
 import nablarch.core.log.Logger;
@@ -33,7 +30,7 @@ import nablarch.fw.dicontainer.web.scope.SessionScope;
 public final class AnnotationAutoContainerProvider implements Initializable {
 
     /** ロガー */
-    private static final Logger logger = LoggerManager.get(AnnotationAutoContainerProvider.class);
+    private static final Logger LOGGER = LoggerManager.get(AnnotationAutoContainerProvider.class);
 
     /** クラスのトラバース設定 */
     private Iterable<TraversalConfig> traversalConfigs = ServiceLoader.load(TraversalConfig.class);
@@ -61,9 +58,10 @@ public final class AnnotationAutoContainerProvider implements Initializable {
             final Container container = factory.create();
             ContainerImplementers.set((ContainerImplementer) container);
         } catch (final ContainerCreationException e) {
-            if (logger.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.logDebug("Container Creation failed. see following messages for detail.");
                 for (final ContainerException ce : e.getExceptions()) {
-                    logger.logDebug(ce.getMessage());
+                    LOGGER.logDebug(ce.getMessage());
                 }
             }
             throw e;

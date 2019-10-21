@@ -2,8 +2,11 @@ package nablarch.fw.dicontainer.annotation.auto;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.security.ProtectionDomain;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,4 +45,16 @@ public class ClassTraverserTest {
         assertTrue(classes.contains(Suite.class));
         assertTrue(classes.contains(Assert.class));
     }
+
+    /** baseClassが{@link ProtectionDomain#getCodeSource()}でnullを返すとき、処理が中断されること。*/
+    @Test
+    public void traverseFailsOnSpecifyJavaLangClass() {
+        final ClassLoader classLoader = getClass().getClassLoader();
+        final ClassTraverser traverser = new ClassTraverser(classLoader,
+                String.class, ClassFilter.allClasses());
+        traverser.traverse(aClass -> { });
+    }
+
+
+
 }

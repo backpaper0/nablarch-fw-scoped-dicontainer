@@ -30,7 +30,7 @@ public final class ClassTraverser {
     /**
      * ロガー
      */
-    private static final Logger logger = LoggerManager.get(ClassTraverser.class);
+    private static final Logger LOGGER = LoggerManager.get(ClassTraverser.class);
     /**
      * 見つけたクラスをロードするためのクラスローダー
      */
@@ -66,8 +66,8 @@ public final class ClassTraverser {
     public void traverse(final Consumer<Class<?>> consumer) {
         final CodeSource codeSource = baseClass.getProtectionDomain().getCodeSource();
         if (codeSource == null) {
-            if (logger.isDebugEnabled()) {
-                logger.logDebug("Can not traverse configured by [" + baseClass.getName() + "]");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.logDebug("Can not traverse configured by [" + baseClass.getName() + "]");
             }
             return;
         }

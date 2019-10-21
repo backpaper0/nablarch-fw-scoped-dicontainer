@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import nablarch.fw.dicontainer.container.ContainerImplementer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +46,11 @@ public class SessionComponentTest {
                 .addScope(SessionScoped.class, sessionScope)
                 .build();
         builder = AnnotationContainerBuilder.builder().scopeDecider(decider).build();
+    }
+
+    @After
+    public void clearRepository() {
+        ContainerImplementers.clear();
     }
 
     @Test

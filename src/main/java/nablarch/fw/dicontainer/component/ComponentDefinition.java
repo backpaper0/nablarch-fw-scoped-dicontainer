@@ -7,10 +7,10 @@ import java.util.Optional;
 
 import javax.inject.Provider;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.impl.NoopDestroyMethod;
 import nablarch.fw.dicontainer.component.impl.NoopInitMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.scope.Scope;
 
@@ -140,7 +140,7 @@ public final class ComponentDefinition<T> {
      * @param container DIコンテナ
      * @return コンポーネント
      */
-    public T getComponent(final ContainerImplementer container) {
+    public T getComponent(final Container container) {
         Objects.requireNonNull(container);
         final Provider<T> provider = new Provider<T>() {
             @Override
@@ -162,7 +162,7 @@ public final class ComponentDefinition<T> {
      * @param container DIコンテナ
      * @param event イベント
      */
-    public void fire(final ContainerImplementer container, final Object event) {
+    public void fire(final Container container, final Object event) {
         for (final ObservesMethod observesMethod : observesMethods) {
             if (observesMethod.isTarget(event)) {
                 final T component = getComponent(container);

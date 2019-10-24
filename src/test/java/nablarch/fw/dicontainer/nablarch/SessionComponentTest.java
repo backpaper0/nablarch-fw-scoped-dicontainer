@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.inject.Named;
 
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

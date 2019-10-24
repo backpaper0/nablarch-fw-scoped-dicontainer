@@ -10,9 +10,8 @@ import nablarch.fw.dicontainer.annotation.AnnotationComponentKeyFactory;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 
-public final class TinyContainer implements ContainerImplementer {
+public final class TinyContainer implements Container {
 
     private final Map<ComponentKey<?>, Object> components = new HashMap<>();
     private final AnnotationComponentKeyFactory componentKeyFactory = new AnnotationComponentKeyFactory();
@@ -40,16 +39,6 @@ public final class TinyContainer implements ContainerImplementer {
     public TinyContainer register(final ComponentKey<?> key, final Object value) {
         components.put(key, value);
         return this;
-    }
-
-    @Override
-    public <T> T getComponent(final ComponentId id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> ComponentDefinition<T> getComponentDefinition(final ComponentId id) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

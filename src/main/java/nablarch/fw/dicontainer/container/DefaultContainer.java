@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
@@ -19,9 +20,9 @@ import nablarch.fw.dicontainer.exception.ComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
 /**
- * {@link ContainerImplementer}のデフォルト実装クラス。
+ * {@link Container}のデフォルト実装クラス。
  */
-public final class DefaultContainer implements ContainerImplementer, EventTrigger {
+public final class DefaultContainer implements Container, EventTrigger {
     /** ロガー */
     private static final Logger logger = LoggerManager.get(DefaultContainer.class);
 
@@ -42,16 +43,7 @@ public final class DefaultContainer implements ContainerImplementer, EventTrigge
         this.aliasMapping = Objects.requireNonNull(aliasesMap);
     }
 
-    @Override
-    public <T> T getComponent(final ComponentId id) {
-        final ComponentDefinition<T> definition = definitions.get(id);
-        return definition.getComponent(this);
-    }
 
-    @Override
-    public <T> ComponentDefinition<T> getComponentDefinition(final ComponentId id) {
-        return definitions.get(id);
-    }
 
     @Override
     public <T> T getComponent(final ComponentKey<T> key) {

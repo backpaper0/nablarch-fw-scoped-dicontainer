@@ -3,8 +3,8 @@ package nablarch.fw.dicontainer.component;
 import java.util.HashMap;
 import java.util.Map;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 
 /**
@@ -72,7 +72,7 @@ public final class ComponentDefinitionRepository {
      * @param container DIコンテナ
      * @param event イベント
      */
-    public void fire(final ContainerImplementer container, final Object event) {
+    public void fire(final Container container, final Object event) {
         for (final ComponentDefinition<?> definition : idToDefinition.values()) {
             definition.fire(container, event);
         }

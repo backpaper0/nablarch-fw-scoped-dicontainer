@@ -1,7 +1,7 @@
 package nablarch.fw.dicontainer.component;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 /**
@@ -17,7 +17,7 @@ public interface InjectableMember {
      * @param component インジェクション対象のコンポーネント
      * @return コンストラクタ・メソッドの場合は戻り値が返される。フィールドの場合は{@literal null}が返される。
      */
-    Object inject(ContainerImplementer container, Object component);
+    Object inject(Container container, Object component);
 
     /**
      * バリデーションを行う。

@@ -12,7 +12,6 @@ import nablarch.fw.dicontainer.annotation.auto.AnnotationAutoContainerFactory;
 import nablarch.fw.dicontainer.annotation.auto.ComponentPredicate;
 import nablarch.fw.dicontainer.annotation.auto.DefaultComponentPredicate;
 import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.scope.ScopeDecider;
@@ -56,7 +55,7 @@ public final class AnnotationAutoContainerProvider implements Initializable {
                 annotationContainerBuilder(), traversalConfigs, componentPredicate);
         try {
             final Container container = factory.create();
-            ContainerImplementers.set((ContainerImplementer) container);
+            ContainerImplementers.set(container);
         } catch (final ContainerCreationException e) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.logDebug("Container Creation failed. see following messages for detail.");

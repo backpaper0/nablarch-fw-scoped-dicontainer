@@ -4,7 +4,6 @@ import java.util.Collections;
 
 import nablarch.core.repository.SystemRepository;
 import nablarch.fw.dicontainer.Container;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 
 /**
  * {@link ContainerImplementer}の管理クラス。
@@ -17,23 +16,23 @@ public final class ContainerImplementers {
     }
 
     /**
-     * {@link ContainerImplementer}を取得する。
-     * @return {@link SystemRepository}に格納された{@link ContainerImplementer}
+     * {@link Container}を取得する。
+     * @return {@link SystemRepository}に格納された{@link Container}
      */
-    public static ContainerImplementer get() {
+    public static Container get() {
         return SystemRepository.get(name());
     }
 
     /**
-     * {@link ContainerImplementer}を設定する。
-     * @param container {@link SystemRepository}に格納する{@link ContainerImplementer}インスタンス
+     * {@link Container}を設定する。
+     * @param container {@link SystemRepository}に格納する{@link Container}インスタンス
      */
-    public static void set(final ContainerImplementer container) {
+    public static void set(final Container container) {
         SystemRepository.load(() -> Collections.singletonMap(name(), container));
     }
 
     /**
-     * {@link ContainerImplementer}を{@link SystemRepository}から削除する。
+     * {@link Container}を{@link SystemRepository}から削除する。
      */
     public static void clear() {
         SystemRepository.load(() -> Collections.singletonMap(name(), null));

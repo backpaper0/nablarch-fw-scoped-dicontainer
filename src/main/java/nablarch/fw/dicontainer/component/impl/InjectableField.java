@@ -3,12 +3,12 @@ package nablarch.fw.dicontainer.component.impl;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectableMember;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.component.impl.reflect.FieldWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.StaticInjectionException;
 
@@ -34,7 +34,7 @@ public final class InjectableField implements InjectableMember {
     }
 
     @Override
-    public Object inject(final ContainerImplementer container, final Object component) {
+    public Object inject(final Container container, final Object component) {
         final Object value = resolver.resolve(container);
         field.set(component, value);
         return null;

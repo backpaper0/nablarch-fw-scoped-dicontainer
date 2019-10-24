@@ -1,11 +1,10 @@
 package nablarch.fw.dicontainer.nablarch;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.Init;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
-import nablarch.fw.dicontainer.nablarch.RequestComponentTest.Aaa;
 import org.junit.Test;
 
 import javax.inject.Singleton;
@@ -28,7 +27,7 @@ public class AnnotationAutoContainerProviderTest {
         sut.setSessionContextSupplier(supplier);
         sut.initialize();
 
-        ContainerImplementer containerImplementer = ContainerImplementers.get();
+        Container containerImplementer = ContainerImplementers.get();
         assertNotNull(containerImplementer);
     }
 
@@ -38,7 +37,7 @@ public class AnnotationAutoContainerProviderTest {
         sut.setAnnotationContainerBuilder(AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class));
         sut.initialize();
-        ContainerImplementer containerImplementer = ContainerImplementers.get();
+        Container containerImplementer = ContainerImplementers.get();
         Aaa component = containerImplementer.getComponent(Aaa.class);
         assertNotNull(component);
     }

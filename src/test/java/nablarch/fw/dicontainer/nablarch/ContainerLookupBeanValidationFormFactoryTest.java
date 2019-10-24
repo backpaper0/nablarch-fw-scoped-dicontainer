@@ -1,7 +1,6 @@
 package nablarch.fw.dicontainer.nablarch;
 
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import org.junit.Test;
 
 import javax.inject.Singleton;

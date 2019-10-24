@@ -1,9 +1,9 @@
 package nablarch.fw.dicontainer.component;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.annotation.AnnotationComponentKeyFactory;
 import nablarch.fw.dicontainer.component.factory.ComponentKeyFactory;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 import nablarch.fw.dicontainer.scope.SingletonScope;
@@ -43,7 +43,7 @@ public class ComponentDefinitionRepositoryTest {
 
     private InjectableConstructor injectableConstructor = new InjectableConstructor() {
         @Override
-        public Object inject(ContainerImplementer container) {
+        public Object inject(Container container) {
             return null;
         }
 

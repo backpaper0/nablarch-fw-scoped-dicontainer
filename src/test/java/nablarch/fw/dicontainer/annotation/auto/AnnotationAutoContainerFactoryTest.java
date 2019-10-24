@@ -46,7 +46,6 @@ import nablarch.fw.dicontainer.component.impl.DefaultInjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.InjectableField;
 import nablarch.fw.dicontainer.component.impl.InjectionComponentResolvers;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 import nablarch.fw.dicontainer.scope.ScopeDecider;
@@ -233,7 +232,7 @@ public class AnnotationAutoContainerFactoryTest {
         }
 
         @Override
-        public Object resolve(final ContainerImplementer container) {
+        public Object resolve(final Container container) {
             return LoggerManager.get(field.getType());
         }
 

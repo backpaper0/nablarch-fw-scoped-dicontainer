@@ -5,11 +5,11 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.exception.InjectionComponentDuplicatedException;
 import nablarch.fw.dicontainer.exception.InjectionComponentNotFoundException;
@@ -37,7 +37,7 @@ public final class DefaultInjectionComponentResolver implements InjectionCompone
     }
 
     @Override
-    public Object resolve(final ContainerImplementer container) {
+    public Object resolve(final Container container) {
         if (provider) {
             return new Provider<Object>() {
                 @Override

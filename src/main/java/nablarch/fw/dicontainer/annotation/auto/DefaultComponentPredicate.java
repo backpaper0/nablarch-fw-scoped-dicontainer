@@ -17,8 +17,7 @@ public final class DefaultComponentPredicate implements ComponentPredicate {
     public boolean test(final Class<?> clazz) {
         for (final Annotation annotation : clazz.getAnnotations()) {
             final Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType.isAnnotationPresent(Scope.class)
-                    || annotationType.isAnnotationPresent(Qualifier.class)) {
+            if (annotationType.isAnnotationPresent(Scope.class) || annotationType.isAnnotationPresent(Qualifier.class)) {
                 return true;
             }
         }

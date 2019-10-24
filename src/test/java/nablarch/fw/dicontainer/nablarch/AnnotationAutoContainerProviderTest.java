@@ -29,7 +29,7 @@ public class AnnotationAutoContainerProviderTest {
         sut.initialize();
 
         ContainerImplementer containerImplementer = ContainerImplementers.get();
-        System.out.println("containerImplementer = " + containerImplementer);
+        assertNotNull(containerImplementer);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class AnnotationAutoContainerProviderTest {
     }
 
     @Test(expected = ContainerCreationException.class)
-    public void test2() {
+    public void 不正なコンポーネントを登録した場合_初期化時に例外が発生すること() {
         sut.setAnnotationContainerBuilder(AnnotationContainerBuilder.createDefault()
                 .register(InvalidComponent.class));
         sut.initialize();

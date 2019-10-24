@@ -239,11 +239,8 @@ public final class AnnotationContainerBuilder extends ContainerBuilder<Annotatio
                         AnnotationScopeDecider.builderFrom((AnnotationScopeDecider) scopeDecider)
                                 .eagerLoad(eagerLoad).build());
             } else {
-                if (logger.isWarnEnabled()) {
-                    logger.logWarn(
-                            "Not supported [eagerLoad] because [scopeDecider] is not instance of "
-                                    + AnnotationScopeDecider.class.getName() + ".");
-                }
+                logger.logWarn("Not supported [eagerLoad] because [scopeDecider] is not instance of "
+                                + AnnotationScopeDecider.class.getName() + ".");
             }
             return this;
         }

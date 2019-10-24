@@ -12,6 +12,6 @@ public class ClassTraversingException extends ContainerException {
      * @param t ディレクトリトラバーサル中に発生した例外
      */
     public ClassTraversingException(final Throwable t) {
-        super(t);
+        super(t);  // TODO 呼び出し元が発生し得ないルート。
     }
 }

@@ -19,4 +19,7 @@ public class OverrideDemo2 extends OverrideDemo1 {
 
     public void method4() {
     }
+
+    public void method5(String arg) {   // overload method.
+    }
 }

@@ -24,21 +24,25 @@ public class MethodCollectorTest {
         final Method demo1Method2 = OverrideDemo1.class.getDeclaredMethod("method2");
         final Method demo1Method3 = OverrideDemo1.class.getDeclaredMethod("method3");
         final Method demo1Method4 = OverrideDemo1.class.getDeclaredMethod("method4");
+        final Method demo1Method5 = OverrideDemo1.class.getDeclaredMethod("method5");
 
         final Method demo2Method1 = OverrideDemo2.class.getDeclaredMethod("method1");
         final Method demo2Method2 = OverrideDemo2.class.getDeclaredMethod("method2");
         final Method demo2Method3 = OverrideDemo2.class.getDeclaredMethod("method3");
         final Method demo2Method4 = OverrideDemo2.class.getDeclaredMethod("method4");
+        final Method demo2Method5 = OverrideDemo2.class.getDeclaredMethod("method5", String.class);
 
         collector.addMethodIfNotOverridden(demo2Method1);
         collector.addMethodIfNotOverridden(demo2Method2);
         collector.addMethodIfNotOverridden(demo2Method3);
         collector.addMethodIfNotOverridden(demo2Method4);
+        collector.addMethodIfNotOverridden(demo2Method5);
 
         collector.addMethodIfNotOverridden(demo1Method1);
         collector.addMethodIfNotOverridden(demo1Method2);
         collector.addMethodIfNotOverridden(demo1Method3);
         collector.addMethodIfNotOverridden(demo1Method4);
+        collector.addMethodIfNotOverridden(demo1Method5);
 
         final List<Method> methods = collector.getMethods();
 
@@ -47,7 +51,10 @@ public class MethodCollectorTest {
                 demo2Method2,
                 demo2Method3,
                 demo2Method4,
-                demo1Method4);
+                demo2Method5,
+                demo1Method4,
+                demo1Method5
+        );
 
         assertEquals(expected, methods);
     }

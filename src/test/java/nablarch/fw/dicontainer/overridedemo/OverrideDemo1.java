@@ -13,4 +13,7 @@ public class OverrideDemo1 {
 
     private void method4() {
     }
+
+    public void method5() {
+    }
 }

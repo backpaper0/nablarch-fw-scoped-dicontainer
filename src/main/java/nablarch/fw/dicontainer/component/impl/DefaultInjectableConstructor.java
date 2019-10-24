@@ -3,11 +3,11 @@ package nablarch.fw.dicontainer.component.impl;
 import java.lang.reflect.Constructor;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.component.impl.reflect.ConstructorWrapper;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 /**
@@ -33,7 +33,7 @@ public final class DefaultInjectableConstructor implements InjectableConstructor
     }
 
     @Override
-    public Object inject(final ContainerImplementer container) {
+    public Object inject(final Container container) {
         final Object[] args = resolvers.resolve(container);
         return constructor.newInstance(args);
     }

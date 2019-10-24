@@ -2,10 +2,10 @@ package nablarch.fw.dicontainer.component.impl;
 
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectableConstructor;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 /**
@@ -18,7 +18,7 @@ public final class PassthroughInjectableConstructor implements InjectableConstru
 
     /**
      * コンストラクタ。
-     * ここで指定されたインスタンスが{@link #inject(ContainerImplementer)}で返却される。
+     * ここで指定されたインスタンスが{@link #inject(Container)}で返却される。
      * @param instance インスタンス
      */
     public PassthroughInjectableConstructor(final Object instance) {
@@ -26,7 +26,7 @@ public final class PassthroughInjectableConstructor implements InjectableConstru
     }
 
     @Override
-    public Object inject(final ContainerImplementer container) {
+    public Object inject(final Container container) {
         return instance;
     }
 

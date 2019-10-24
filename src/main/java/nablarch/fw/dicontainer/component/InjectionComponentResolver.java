@@ -1,7 +1,7 @@
 package nablarch.fw.dicontainer.component;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 /**
@@ -16,7 +16,7 @@ public interface InjectionComponentResolver {
      * @param container DIコンテナ
      * @return 解決されたコンポーネント
      */
-    Object resolve(ContainerImplementer container);
+    Object resolve(Container container);
 
     /**
      * バリデーションを行う。

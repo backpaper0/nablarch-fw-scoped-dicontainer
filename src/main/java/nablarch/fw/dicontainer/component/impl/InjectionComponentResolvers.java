@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.InjectionComponentResolver;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 
 /**
@@ -40,7 +40,7 @@ public final class InjectionComponentResolvers {
      * @param container DIコンテナ
      * @return 解決されたコンポーネント
      */
-    public Object[] resolve(final ContainerImplementer container) {
+    public Object[] resolve(final Container container) {
         return resolvers.stream().map(resolver -> resolver.resolve(container)).toArray();
     }
 

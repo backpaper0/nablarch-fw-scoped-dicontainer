@@ -35,9 +35,7 @@ public final class MethodWrapper {
         }
         try {
             return method.invoke(obj, args);
-        } catch (final IllegalAccessException e) {
-            throw new ReflectionException(e);
-        } catch (final IllegalArgumentException e) {
+        } catch (final IllegalAccessException | IllegalArgumentException e) {
             throw new ReflectionException(e);
         } catch (final InvocationTargetException e) {
             throw new ReflectionException(e.getTargetException());

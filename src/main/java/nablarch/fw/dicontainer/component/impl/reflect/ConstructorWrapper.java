@@ -32,11 +32,7 @@ public final class ConstructorWrapper {
         }
         try {
             return constructor.newInstance(initargs);
-        } catch (final InstantiationException e) {
-            throw new ReflectionException(e);
-        } catch (final IllegalAccessException e) {
-            throw new ReflectionException(e);
-        } catch (final IllegalArgumentException e) {
+        } catch (final InstantiationException | IllegalAccessException | IllegalArgumentException e) {
             throw new ReflectionException(e);
         } catch (final InvocationTargetException e) {
             throw new ReflectionException(e.getTargetException());

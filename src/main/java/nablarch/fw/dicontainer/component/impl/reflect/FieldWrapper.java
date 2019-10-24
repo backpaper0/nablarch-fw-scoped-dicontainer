@@ -32,9 +32,7 @@ public final class FieldWrapper {
         }
         try {
             field.set(obj, value);
-        } catch (final IllegalArgumentException e) {
-            throw new ReflectionException(e);
-        } catch (final IllegalAccessException e) {
+        } catch (final IllegalArgumentException | IllegalAccessException e) {
             throw new ReflectionException(e);
         }
     }

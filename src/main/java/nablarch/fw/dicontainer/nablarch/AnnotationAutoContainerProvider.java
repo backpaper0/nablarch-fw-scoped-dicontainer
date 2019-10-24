@@ -1,8 +1,5 @@
 package nablarch.fw.dicontainer.nablarch;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.ServiceLoader;
 
 import nablarch.core.log.Logger;
@@ -15,7 +12,6 @@ import nablarch.fw.dicontainer.annotation.auto.AnnotationAutoContainerFactory;
 import nablarch.fw.dicontainer.annotation.auto.ComponentPredicate;
 import nablarch.fw.dicontainer.annotation.auto.DefaultComponentPredicate;
 import nablarch.fw.dicontainer.annotation.auto.TraversalConfig;
-import nablarch.fw.dicontainer.container.ContainerImplementer;
 import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import nablarch.fw.dicontainer.exception.ContainerException;
 import nablarch.fw.dicontainer.scope.ScopeDecider;
@@ -33,7 +29,7 @@ import nablarch.fw.dicontainer.web.scope.SessionScope;
 public final class AnnotationAutoContainerProvider implements Initializable {
 
     /** ロガー */
-    private static final Logger logger = LoggerManager.get(AnnotationAutoContainerProvider.class);
+    private static final Logger LOGGER = LoggerManager.get(AnnotationAutoContainerProvider.class);
 
     /** クラスのトラバース設定 */
     private Iterable<TraversalConfig> traversalConfigs = ServiceLoader.load(TraversalConfig.class);
@@ -59,11 +55,12 @@ public final class AnnotationAutoContainerProvider implements Initializable {
                 annotationContainerBuilder(), traversalConfigs, componentPredicate);
         try {
             final Container container = factory.create();
-            ContainerImplementers.set((ContainerImplementer) container);
+            ContainerImplementers.set(container);
         } catch (final ContainerCreationException e) {
-            if (logger.isDebugEnabled()) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.logDebug("Container Creation failed. see following messages for detail.");
                 for (final ContainerException ce : e.getExceptions()) {
-                    logger.logDebug(ce.getMessage());
+                    LOGGER.logDebug(ce.getMessage());
                 }
             }
             throw e;

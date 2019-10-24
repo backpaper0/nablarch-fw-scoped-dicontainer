@@ -1,5 +1,6 @@
 package nablarch.fw.dicontainer;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import java.util.Set;
@@ -44,6 +45,30 @@ public class ComponentKeyTest {
                 new ComponentKey<>(Ccc2.class).asAliasKey())
                 .collect(Collectors.toSet());
         assertEquals(expected, aliasKeys);
+    }
+
+    @Test
+    public void testGetFullyQualifiedClassName() {
+        ComponentKey<?> key = new ComponentKey<>(Aaa.class);
+        assertThat(key.getFullyQualifiedClassName(),
+                is("nablarch.fw.dicontainer.ComponentKeyTest$Aaa"));
+    }
+
+    @Test
+    public void testEquals() {
+        ComponentKey<?> key = new ComponentKey<>(Aaa.class);
+        assertThat(key.equals(key), is(true));
+        assertThat(key.equals(null), is(false));
+        assertThat(key.equals("this is String"), is(false));
+    }
+
+    @Test
+    public void testAliasKeyEquals() {
+        ComponentKey<?> key = new ComponentKey<>(Aaa.class);
+        AliasKey aliasKey = key.asAliasKey();
+        assertThat(aliasKey.equals(aliasKey), is(true));
+        assertThat(aliasKey.equals(null), is(false));
+        assertThat(aliasKey.equals("this is String"), is(false));
     }
 
     static class Aaa {

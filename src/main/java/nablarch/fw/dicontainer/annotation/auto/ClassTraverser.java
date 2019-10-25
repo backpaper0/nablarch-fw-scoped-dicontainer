@@ -66,9 +66,7 @@ public final class ClassTraverser {
     public void traverse(final Consumer<Class<?>> consumer) {
         final CodeSource codeSource = baseClass.getProtectionDomain().getCodeSource();
         if (codeSource == null) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.logDebug("Can not traverse configured by [" + baseClass.getName() + "]");
-            }
+            LOGGER.logDebug("Can not traverse configured by [" + baseClass.getName() + "]");
             return;
         }
 

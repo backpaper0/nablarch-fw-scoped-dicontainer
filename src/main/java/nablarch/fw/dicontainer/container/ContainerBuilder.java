@@ -59,9 +59,7 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
      */
     public ContainerBuilder() {
         this.startedAt = System.nanoTime();
-        if (logger.isInfoEnabled()) {
-            logger.logInfo("Start building a Container.");
-        }
+        logger.logInfo("Start building a Container.");
     }
 
     /**
@@ -71,10 +69,8 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
      * @return このビルダー自身
      */
     public BUILDER ignoreError(final Class<? extends ContainerException> ignoreMe) {
-        if (logger.isDebugEnabled()) {
-            logger.logDebug(
-                    "Ignore error during building Container. ignored class=" + ignoreMe.getName());
-        }
+        logger.logDebug("Ignore error during building Container. ignored class=" + ignoreMe.getName());
+
         errorCollector.ignore(ignoreMe);
         return self();
     }
@@ -89,19 +85,17 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
      */
     public <T> BUILDER register(final ComponentKey<T> key,
             final ComponentDefinition<T> definition) {
-        if (logger.isDebugEnabled()) {
-            logger.logDebug("Start registering component definition. key=" + key);
-        }
+
+        logger.logDebug("Start registering component definition. key=" + key);
+
         for (final AliasKey aliasKey : key.aliasKeys()) {
-            if (logger.isDebugEnabled()) {
-                logger.logDebug("Register alias key [" + aliasKey + "] for [" + key + "]");
-            }
+            logger.logDebug("Register alias key [" + aliasKey + "] for [" + key + "]");
             aliasesMap.register(aliasKey, key);
         }
         definitions.register(key, definition);
-        if (logger.isDebugEnabled()) {
-            logger.logDebug("Component definition registered. key=" + key);
-        }
+
+        logger.logDebug("Component definition registered. key=" + key);
+
         return self();
     }
 
@@ -153,10 +147,10 @@ public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
         definitions.validate(this);
         errorCollector.throwExceptionIfExistsError();
         final DefaultContainer container = new DefaultContainer(definitions, aliasesMap);
-        if (logger.isInfoEnabled()) {
-            final long time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
-            logger.logInfo("Built Container. " + time + "(msec)");
-        }
+
+        final long time = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedAt);
+        logger.logInfo("Built Container. " + time + "(msec)");
+
         container.fire(new ContainerCreated());
         return container;
     }

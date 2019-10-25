@@ -90,9 +90,7 @@ public final class DefaultContainer implements Container, EventTrigger {
 
     @Override
     public void fire(final Object event) {
-        if (logger.isDebugEnabled()) {
-            logger.logDebug("Fire event [" + event + "]");
-        }
+        logger.logDebug("Fire event [" + event + "]");
         definitions.fire(this, event);
     }
 

@@ -60,6 +60,8 @@ public class ComponentKeyTest {
         assertThat(key.equals(key), is(true));
         assertThat(key.equals(null), is(false));
         assertThat(key.equals("this is String"), is(false));
+        ComponentKey<?> key2 = new ComponentKey<>(Bbb3.class);
+        assertThat(key.equals(key2), is(false));
     }
 
     @Test
@@ -69,6 +71,11 @@ public class ComponentKeyTest {
         assertThat(aliasKey.equals(aliasKey), is(true));
         assertThat(aliasKey.equals(null), is(false));
         assertThat(aliasKey.equals("this is String"), is(false));
+
+        ComponentKey<?> key2 = new ComponentKey<>(Bbb3.class);
+        AliasKey aliasKey2 = key2.asAliasKey();
+        assertThat(aliasKey.equals(aliasKey2), is(false));
+
     }
 
     static class Aaa {

@@ -45,15 +45,4 @@ public final class RequestScope extends AbstractScope {
         return 100;
     }
 
-    /**
-     * リクエストコンポーネントを破棄する。
-     * 
-     * @param id ID
-     * @param component コンポーネント
-     */
-    public void destroyComponent(final ComponentId id, final Object component) {
-        final ComponentDefinition<Object> definition = (ComponentDefinition<Object>) idToDefinition
-                .get(id);
-        definition.destroyComponent(component);
-    }
 }

@@ -45,15 +45,4 @@ public final class SessionScope extends AbstractScope {
         return 200;
     }
 
-    /**
-     * セッションコンポーネントを破棄する。
-     * 
-     * @param id ID
-     * @param component コンポーネント
-     */
-    public void destroyComponent(final ComponentId id, final Object component) {
-        final ComponentDefinition<Object> definition = (ComponentDefinition<Object>) idToDefinition
-                .get(id);
-        definition.destroyComponent(component);
-    }
 }

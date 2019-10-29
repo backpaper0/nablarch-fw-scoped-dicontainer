@@ -119,6 +119,7 @@ public class BazImpl {}
 
 初期化、破棄を行うライフサイクルメソッドをサポートしている。
 それぞれ`@Init`、`@Destroy`というアノテーションを引数なしのメソッドに付ける。
+ただし、`@Destory`はシングルトン(`@Singleton`)でのみ有効である。
 
 ```java
 @Init

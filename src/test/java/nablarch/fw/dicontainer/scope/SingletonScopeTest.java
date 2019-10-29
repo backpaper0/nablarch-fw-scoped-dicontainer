@@ -68,6 +68,22 @@ public class SingletonScopeTest {
         scope.destroy(new ContainerDestroy());
     }
 
+    /** InstanceHolder#get(javax.inject.Provider)のtry-finallyのカバレッジを満たすためのテスト. */
+    @Test(expected = RuntimeException.class)
+    public void testGetHandleException() {
+
+        Builder<Aaa> builder = ComponentDefinition.builder(Aaa.class);
+        ComponentId id = builder.id();
+        ComponentDefinition<Aaa> def = builder.injectableConstructor(new MockInjectableConstructor())
+                .scope(new SingletonScope())
+                .build()
+                .get();
+        scope.register(def);
+        scope.getComponent(id, () -> {
+            throw new RuntimeException("for test.");
+        });
+    }
+
     static class Aaa {
     }
 

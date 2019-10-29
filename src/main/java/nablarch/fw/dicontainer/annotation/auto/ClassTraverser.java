@@ -21,7 +21,7 @@ import nablarch.fw.dicontainer.exception.ClassTraversingException;
  * ディレクトリトラバーサルを行って見つけたクラスに特定の処理を行うクラス。
  *
  */
-public final class ClassTraverser {
+public class ClassTraverser {
 
     /**
      * クラスファイルの拡張子
@@ -71,18 +71,28 @@ public final class ClassTraverser {
         }
 
         try {
-            final URI location = codeSource.getLocation().toURI();
-
-            final Path fileOrDir = Paths.get(location);
-
-            if (Files.isDirectory(fileOrDir)) {
-                traverseDirectory(consumer, fileOrDir);
-            } else {
-                traverseJarFile(consumer, fileOrDir);
-            }
-
+            traverse(consumer, codeSource);
         } catch (final URISyntaxException | IOException e) {
             throw new ClassTraversingException(e);
+        }
+    }
+
+    /**
+     * ディレクトリトラバーサルを行う。
+     * @param consumer 見つかったクラスに適用する処理
+     * @param codeSource {@link CodeSource}
+     * @throws URISyntaxException {@link CodeSource}から{@link URI}への変換が失敗した場合
+     * @throws IOException 予期しない入出力例外
+     */
+    void traverse(Consumer<Class<?>> consumer, CodeSource codeSource) throws URISyntaxException, IOException {
+        final URI location = codeSource.getLocation().toURI();
+
+        final Path fileOrDir = Paths.get(location);
+
+        if (Files.isDirectory(fileOrDir)) {
+            traverseDirectory(consumer, fileOrDir);
+        } else {
+            traverseJarFile(consumer, fileOrDir);
         }
     }
 
@@ -141,13 +151,24 @@ public final class ClassTraverser {
      */
     private void loadClass(final Consumer<Class<?>> consumer, final String classFileName,
             final String baseClassPackage) {
+
+        final String className = classFileName.replace('/', '.').replace('\\', '.').substring(0,
+                classFileName.length() - CLASSFILE_SUFFIX.length());
+        if (className.startsWith(baseClassPackage) && classFilter.select(className)) {
+            final Class<?> clazz = forName(className, classLoader);
+            consumer.accept(clazz);
+        }
+    }
+
+    /**
+     * クラスの完全修飾名から{@link Class}を取得する。
+     * @param className クラス名
+     * @param classLoader クラスローダー
+     * @return {@link Class}
+     */
+    static Class<?> forName(String className, ClassLoader classLoader) {
         try {
-            final String className = classFileName.replace('/', '.').replace('\\', '.').substring(0,
-                    classFileName.length() - CLASSFILE_SUFFIX.length());
-            if (className.startsWith(baseClassPackage) && classFilter.select(className)) {
-                final Class<?> clazz = Class.forName(className, false, classLoader);
-                consumer.accept(clazz);
-            }
+            return Class.forName(className, false, classLoader);
         } catch (final ClassNotFoundException e) {
             throw new ClassTraversingException(e);
         }

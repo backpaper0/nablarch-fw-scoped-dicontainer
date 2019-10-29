@@ -1,15 +1,12 @@
 package nablarch.fw.dicontainer.component;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
-
-import nablarch.fw.dicontainer.Container;
-import org.junit.Test;
-
-import nablarch.fw.dicontainer.container.ContainerBuilder;
-import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
 import nablarch.fw.dicontainer.scope.PrototypeScope;
 import nablarch.fw.dicontainer.scope.SingletonScope;
+import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ComponentDefinitionTest {
 
@@ -31,23 +28,6 @@ public class ComponentDefinitionTest {
         assertFalse(cd2.isNarrowScope(cd1));
         assertTrue(cd1.isNarrowScope(cd1));
         assertTrue(cd2.isNarrowScope(cd2));
-    }
-
-    private static class MockInjectableConstructor implements InjectableConstructor {
-
-        @Override
-        public Object inject(final Container container) {
-            return null;
-        }
-
-        @Override
-        public void validate(final ContainerBuilder<?> containerBuilder,
-                final ComponentDefinition<?> self) {
-        }
-
-        @Override
-        public void validateCycleDependency(final CycleDependencyValidationContext context) {
-        }
     }
 
     @Test

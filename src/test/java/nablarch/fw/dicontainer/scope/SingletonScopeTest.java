@@ -1,14 +1,19 @@
 package nablarch.fw.dicontainer.scope;
 
-import static org.junit.Assert.*;
-
-import java.util.concurrent.TimeUnit;
-
-import javax.inject.Provider;
-
+import nablarch.fw.dicontainer.component.ComponentDefinition;
+import nablarch.fw.dicontainer.component.ComponentDefinition.Builder;
+import nablarch.fw.dicontainer.component.ComponentId;
+import nablarch.fw.dicontainer.component.MockInjectableConstructor;
+import nablarch.fw.dicontainer.event.ContainerDestroy;
 import org.junit.Test;
 
-import nablarch.fw.dicontainer.component.ComponentId;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SingletonScopeTest {
 
@@ -42,6 +47,27 @@ public class SingletonScopeTest {
         assertTrue(components[0] == components[1]);
     }
 
+
+
+    /**
+     * コンポーネントがnullの場合、{@link ComponentDefinition#destroyComponent(Object)}
+     * の呼び出しがスキップされること。
+     */
+    @Test
+    public void testDestroySkip() {
+        Builder<Aaa> builder = ComponentDefinition.builder(Aaa.class);
+        ComponentId id = builder.id();
+        ComponentDefinition<Aaa> def = builder.injectableConstructor(new MockInjectableConstructor())
+                .scope(new SingletonScope())
+                .build()
+                .get();
+        scope.register(def);
+        final Aaa component1 = scope.getComponent(id, () -> null);
+        assertNull(component1);
+
+        scope.destroy(new ContainerDestroy());
+    }
+
     static class Aaa {
     }
 
@@ -53,5 +79,10 @@ public class SingletonScopeTest {
                 throw new AssertionError();
             }
         }
+    }
+
+    @Singleton
+    static class Ccc {
+
     }
 }

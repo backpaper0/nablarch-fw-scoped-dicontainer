@@ -105,13 +105,16 @@ public class ClassTraverser {
     private void traverseDirectory(final Consumer<Class<?>> consumer, final Path directory)
             throws IOException {
         final String baseClassPackage = getBaseClassPackage();
-        try (Stream<Path> stream = Files.walk(directory)) {
+        Stream<Path> stream = Files.walk(directory);
+        try {
             stream.filter(Files::isRegularFile)
                     .filter(file -> file.getFileName().toString().endsWith(CLASSFILE_SUFFIX))
                     .forEach(file -> {
                         loadClass(consumer, directory.relativize(file).toString(),
                                 baseClassPackage);
                     });
+        } finally {
+            stream.close();
         }
     }
 
@@ -124,13 +127,16 @@ public class ClassTraverser {
     private void traverseJarFile(final Consumer<Class<?>> consumer, final Path jarFile)
             throws IOException {
         final String baseClassPackage = getBaseClassPackage();
-        try (JarInputStream in = new JarInputStream(Files.newInputStream(jarFile))) {
+        JarInputStream in = new JarInputStream(Files.newInputStream(jarFile));
+        try {
             JarEntry entry = null;
             while (null != (entry = in.getNextJarEntry())) {
                 if (entry.isDirectory() == false && entry.getName().endsWith(CLASSFILE_SUFFIX)) {
                     loadClass(consumer, entry.getName(), baseClassPackage);
                 }
             }
+        } finally {
+            in.close();
         }
     }
 

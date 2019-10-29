@@ -55,7 +55,7 @@ public final class AnnotationAutoContainerProvider implements Initializable {
                 annotationContainerBuilder(), traversalConfigs, componentPredicate);
         try {
             final Container container = factory.create();
-            ContainerImplementers.set(container);
+            Containers.set(container);
         } catch (final ContainerCreationException e) {
             LOGGER.logDebug("Container Creation failed. see following messages for detail.");
             for (final ContainerException ce : e.getExceptions()) {

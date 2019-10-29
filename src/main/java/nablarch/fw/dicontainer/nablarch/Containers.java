@@ -6,13 +6,13 @@ import nablarch.core.repository.SystemRepository;
 import nablarch.fw.dicontainer.Container;
 
 /**
- * {@link ContainerImplementer}の管理クラス。
- * {@link SystemRepository}を使用して、{@link ContainerImplementer}の取得や登録、削除を行う。
+ * {@link Container}の管理クラス。
+ * {@link SystemRepository}を使用して、{@link Container}の取得や登録、削除を行う。
  */
-public final class ContainerImplementers {
+public final class Containers {
 
     /** プライベートコンストラクタ。 */
-    private ContainerImplementers() {
+    private Containers() {
     }
 
     /**

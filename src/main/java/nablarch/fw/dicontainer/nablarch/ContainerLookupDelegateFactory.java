@@ -10,7 +10,7 @@ public final class ContainerLookupDelegateFactory implements DelegateFactory {
 
     @Override
     public Object create(final Class<?> clazz) {
-        final Container container = ContainerImplementers.get();
+        final Container container = Containers.get();
         return container.getComponent(clazz);
     }
 }

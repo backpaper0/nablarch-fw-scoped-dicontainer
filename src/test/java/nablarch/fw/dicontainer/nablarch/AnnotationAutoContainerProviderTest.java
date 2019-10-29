@@ -27,7 +27,7 @@ public class AnnotationAutoContainerProviderTest {
         sut.setSessionContextSupplier(supplier);
         sut.initialize();
 
-        Container containerImplementer = ContainerImplementers.get();
+        Container containerImplementer = Containers.get();
         assertNotNull(containerImplementer);
     }
 
@@ -37,7 +37,7 @@ public class AnnotationAutoContainerProviderTest {
         sut.setAnnotationContainerBuilder(AnnotationContainerBuilder.createDefault()
                 .register(Aaa.class));
         sut.initialize();
-        Container containerImplementer = ContainerImplementers.get();
+        Container containerImplementer = Containers.get();
         Aaa component = containerImplementer.getComponent(Aaa.class);
         assertNotNull(component);
     }

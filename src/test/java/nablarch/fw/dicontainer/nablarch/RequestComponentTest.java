@@ -14,8 +14,6 @@ import nablarch.fw.dicontainer.Destroy;
 import nablarch.fw.dicontainer.NamedImpl;
 import nablarch.fw.dicontainer.annotation.AnnotationContainerBuilder;
 import nablarch.fw.dicontainer.annotation.AnnotationScopeDecider;
-import nablarch.fw.dicontainer.nablarch.ContainerImplementers;
-import nablarch.fw.dicontainer.nablarch.NablarchWebContextHandler;
 import nablarch.fw.dicontainer.web.RequestScoped;
 import nablarch.fw.dicontainer.web.exception.WebContextException;
 import nablarch.fw.dicontainer.web.scope.RequestScope;
@@ -38,7 +36,7 @@ public class RequestComponentTest {
 
     @After
     public void tearDown() throws Exception {
-        ContainerImplementers.clear();
+        Containers.clear();
     }
 
     @Test

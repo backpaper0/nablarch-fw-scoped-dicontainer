@@ -49,7 +49,7 @@ public class SessionComponentTest {
 
     @After
     public void clearRepository() {
-        ContainerImplementers.clear();
+        Containers.clear();
     }
 
     @Test

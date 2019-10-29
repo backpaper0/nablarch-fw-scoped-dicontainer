@@ -10,7 +10,7 @@ public final class ContainerLookupBeanValidationFormFactory implements BeanValid
 
     @Override
     public <T> T create(final Class<T> formClass) {
-        final Container container = ContainerImplementers.get();
+        final Container container = Containers.get();
         return container.getComponent(formClass);
     }
 }

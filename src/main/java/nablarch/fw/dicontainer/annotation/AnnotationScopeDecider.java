@@ -143,7 +143,7 @@ public final class AnnotationScopeDecider implements ScopeDecider {
      */
     public static Builder builderFrom(final AnnotationScopeDecider source) {
         final Builder builder = builder();
-        builder.defaultScope = builder.defaultScope;
+        builder.defaultScope = source.defaultScope;
         builder.scopes.putAll(source.scopes);
         return builder;
     }
@@ -281,7 +281,7 @@ public final class AnnotationScopeDecider implements ScopeDecider {
      * スコープをコンポーネント登録する際に使用するためのスコープ。
      *
      */
-    private final class ScopeScope implements Scope {
+    private static final class ScopeScope implements Scope {
 
         @Override
         public <T> T getComponent(final ComponentId id, final Provider<T> provider) {

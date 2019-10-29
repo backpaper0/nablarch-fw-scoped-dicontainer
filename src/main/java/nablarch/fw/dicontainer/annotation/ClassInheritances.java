@@ -1,6 +1,7 @@
 package nablarch.fw.dicontainer.annotation;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 /**
@@ -36,6 +37,9 @@ public final class ClassInheritances implements Iterable<Class<?>> {
 
             @Override
             public Class<?> next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 final Class<?> returnValue = c;
                 c = c.getSuperclass();
                 return returnValue;

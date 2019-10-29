@@ -3,6 +3,7 @@ package nablarch.fw.dicontainer.annotation;
 import static org.junit.Assert.*;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.junit.Test;
 
@@ -38,6 +39,18 @@ public class ClassInheritancesTest {
 
         final Iterator<Class<?>> it = classInheritances.iterator();
         assertFalse(it.hasNext());
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void throwNoSuchElementException() {
+        final ClassInheritances classInheritances = new ClassInheritances(Aaa1.class);
+        final Iterator<Class<?>> it = classInheritances.iterator();
+        try {
+            it.next();
+        } catch (RuntimeException e) {
+            throw new AssertionError("exception must not be thrown.", e);
+        }
+        it.next();  // should throw exception.
     }
 
     private static class Aaa1 {

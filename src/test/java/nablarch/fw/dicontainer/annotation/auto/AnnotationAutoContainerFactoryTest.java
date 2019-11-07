@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import nablarch.fw.dicontainer.exception.ContainerCreationException;
 import org.junit.Test;
 
 import nablarch.core.log.Logger;
@@ -127,6 +128,31 @@ public class AnnotationAutoContainerFactoryTest {
         final CustomLogger component1 = container.getComponent(CustomLogger.class);
         assertNotNull(component1);
         assertNotNull(component1.getLogger());
+    }
+
+    @Test
+    public void testDefaultPackageTraversalConfig() throws Exception {
+        Class<?> clazz = Class.forName("DefaultPackageTraversalConfig");
+        TraversalConfig config = (TraversalConfig) clazz.newInstance();
+        Iterable<TraversalConfig> traversalConfigs = Collections.singleton(config);
+        ScopeDecider scopeDecider = AnnotationScopeDecider.createDefault();
+        final MemberFactory memberFactory = new CustomLoggerMemberFactory();
+        final ComponentDefinitionFactory componentDefinitionFactory = new AnnotationComponentDefinitionFactory(
+                memberFactory, scopeDecider);
+        final AnnotationContainerBuilder containerBuilder = AnnotationContainerBuilder
+                .builder()
+                .componentDefinitionFactory(componentDefinitionFactory)
+                .scopeDecider(scopeDecider)
+                .build();
+        final ComponentPredicate predicate = a -> true;
+        final AnnotationAutoContainerFactory factory = new AnnotationAutoContainerFactory(
+                containerBuilder, traversalConfigs, predicate);
+        try {
+            final Container container = factory.create();
+            fail();
+        } catch (ContainerCreationException e) {
+            // 他のテストケースで使用する不正なコンポーネントをトラバースした際に、例外が発生する。
+        }
     }
 
     private static final class CustomMemberFactory implements MemberFactory {

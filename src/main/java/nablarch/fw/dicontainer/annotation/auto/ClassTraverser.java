@@ -88,11 +88,12 @@ public class ClassTraverser {
         final URI location = codeSource.getLocation().toURI();
 
         final Path fileOrDir = Paths.get(location);
-
+        final String baseClassPackage = getBaseClassPackage();
+        LOGGER.logInfo("base class package = [" + baseClassPackage + "]");
         if (Files.isDirectory(fileOrDir)) {
-            traverseDirectory(consumer, fileOrDir);
+            traverseDirectory(consumer, fileOrDir, baseClassPackage);
         } else {
-            traverseJarFile(consumer, fileOrDir);
+            traverseJarFile(consumer, fileOrDir, baseClassPackage);
         }
     }
 
@@ -102,9 +103,9 @@ public class ClassTraverser {
      * @param consumer 見つかったクラスに適用する処理
      * @param directory 対象ディレクトリ
      */
-    private void traverseDirectory(final Consumer<Class<?>> consumer, final Path directory)
+    private void traverseDirectory(final Consumer<Class<?>> consumer, final Path directory, String baseClassPackage)
             throws IOException {
-        final String baseClassPackage = getBaseClassPackage();
+
         Stream<Path> stream = Files.walk(directory);
         try {
             stream.filter(Files::isRegularFile)
@@ -124,9 +125,9 @@ public class ClassTraverser {
      * @param jarFile 対象jarファイル
      * @throws IOException 予期しない入出力例外
      */
-    private void traverseJarFile(final Consumer<Class<?>> consumer, final Path jarFile)
+    private void traverseJarFile(final Consumer<Class<?>> consumer, final Path jarFile, String baseClassPackage)
             throws IOException {
-        final String baseClassPackage = getBaseClassPackage();
+
         JarInputStream in = new JarInputStream(Files.newInputStream(jarFile));
         try {
             JarEntry entry = null;
@@ -145,7 +146,8 @@ public class ClassTraverser {
      * @return パッケージ名
      */
     private String getBaseClassPackage() {
-        return baseClass.getPackage().getName();
+        Package p = baseClass.getPackage();
+        return p == null ? "" : p.getName();
     }
 
     /**

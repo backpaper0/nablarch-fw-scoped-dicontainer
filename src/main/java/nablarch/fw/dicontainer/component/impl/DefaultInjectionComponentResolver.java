@@ -1,5 +1,9 @@
 package nablarch.fw.dicontainer.component.impl;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,12 +30,18 @@ public final class DefaultInjectionComponentResolver implements InjectionCompone
     /** {@link Provider}を使用するかどうか */
     private final boolean provider;
 
+
+    private final Member source;
+
     /**
      * コンストラクタ。
+     * @param source メンバー
      * @param key コンポーネント検索キー
      * @param provider {@link Provider}を使用するかどうか
      */
-    public DefaultInjectionComponentResolver(final ComponentKey<?> key, final boolean provider) {
+    public DefaultInjectionComponentResolver(final Member source, final ComponentKey<?> key,
+            final boolean provider) {
+        this.source = source;
         this.key = Objects.requireNonNull(key);
         this.provider = provider;
     }
@@ -55,7 +65,9 @@ public final class DefaultInjectionComponentResolver implements InjectionCompone
         final Set<ComponentDefinition<?>> definitions = containerBuilder
                 .findComponentDefinitions(key);
         if (definitions.isEmpty()) {
-            containerBuilder.addError(new InjectionComponentNotFoundException("key=" + key));
+            String sourceName = sourceName();
+            containerBuilder.addError(new InjectionComponentNotFoundException(
+                    "Injection component not found at " + sourceName + ": key=" + key));
         } else if (definitions.size() > 1) {
             containerBuilder.addError(new InjectionComponentDuplicatedException(
                     "key=" + key + ", definitions=" + definitions));
@@ -69,6 +81,19 @@ public final class DefaultInjectionComponentResolver implements InjectionCompone
                 containerBuilder.validateCycleDependency(key, self);
             }
         }
+    }
+
+    private String sourceName() {
+        Class<?> declaringClass = source.getDeclaringClass();
+        String className = declaringClass.getName();
+        String memberName;
+        if (source instanceof Constructor) {
+            // ConstructorのgetNameはFQCNを返すため、クラス名を取得
+            memberName = declaringClass.getSimpleName();
+        } else {
+            memberName = source.getName();
+        }
+        return className + "." + memberName;
     }
 
     @Override

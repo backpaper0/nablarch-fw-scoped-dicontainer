@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
@@ -60,9 +61,6 @@ public final class DefaultInjectionComponentResolverFactory
         return new InjectionComponentResolvers(resolvers);
     }
 
-    /**
-     * コンポーネント
-     */
     private abstract class Source {
 
         protected abstract Annotation[] getAnnotations();
@@ -70,6 +68,12 @@ public final class DefaultInjectionComponentResolverFactory
         protected abstract Class<?> getComponentType();
 
         protected abstract ParameterizedType getGenericComponentType();
+
+        private final Member member;
+
+        Source(final Member member) {
+            this.member = member;
+        }
 
         public InjectionComponentResolver create() {
             final Set<Annotation> qualifiers = Arrays.stream(getAnnotations())
@@ -85,7 +89,7 @@ public final class DefaultInjectionComponentResolverFactory
             }
 
             final ComponentKey<?> key = new ComponentKey<>(componentType, qualifiers);
-            return new DefaultInjectionComponentResolver(key, provider);
+            return new DefaultInjectionComponentResolver(member, key, provider);
         }
     }
 
@@ -93,7 +97,8 @@ public final class DefaultInjectionComponentResolverFactory
 
         private final Field field;
 
-        public FieldSource(final Field field) {
+        FieldSource(final Field field) {
+            super(field);
             this.field = Objects.requireNonNull(field);
         }
 
@@ -118,7 +123,8 @@ public final class DefaultInjectionComponentResolverFactory
         private final Executable executable;
         private final int index;
 
-        public ExecutableSource(final Executable executable, final int index) {
+        ExecutableSource(final Executable executable, final int index) {
+            super(executable);
             this.executable = Objects.requireNonNull(executable);
             this.index = index;
         }

@@ -8,31 +8,23 @@ import java.util.Scanner;
 
 public class ComponentGenerator {
 
-    public static void main(String[] args) throws IOException {
-        final ComponentGenerator me = new ComponentGenerator();
-        me.generateComponents();
-    }
-
     private final String template;
 
     private final String dir;
 
     private final int numberOfComponents;
 
-    ComponentGenerator(String dir, String template, int numberOfComponent) {
-        this.template = template;
+    ComponentGenerator(String dir, String templateName, int numberOfComponent) throws IOException {
+        this.template = loadTemplate(templateName);
         this.dir = dir;
         this.numberOfComponents = numberOfComponent;
     }
 
-    ComponentGenerator() throws IOException {
-        this("src/main/java/" + "com/nablarch/framework/initialize/component",
-                loadTemplate(),
-                1000);
-    }
-
-    private static String loadTemplate() throws IOException {
-        try (InputStream in = ComponentGenerator.class.getResourceAsStream("template.txt")) {
+    private static String loadTemplate(String templateName) throws IOException {
+        try (InputStream in = ComponentGenerator.class.getResourceAsStream(templateName)) {
+            if (in == null) {
+                throw new IllegalArgumentException(templateName);
+            }
             Scanner s = new Scanner(in).useDelimiter("\\A");
             return s.hasNext() ? s.next() : "";
         }

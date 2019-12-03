@@ -1,5 +1,10 @@
 import java.io.IOException;
 
+/**
+ * コンポーネントにインジェクションを行う設定で、ソースコードを出力するメインクラス。
+ *
+ * @see ComponentGenerator
+ */
 public class GeneratorInjectionMain {
 
     public static void main(String[] args) throws IOException {

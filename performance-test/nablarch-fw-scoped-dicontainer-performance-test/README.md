@@ -7,6 +7,16 @@
 
 大量のコンポーネントが存在するプロジェクトで、DIコンテナの初期化が実用的な時間で完了すること。
 
+### 使用クラス
+
+- com.nablarch.framework.initialize.InitializationTester
+
+#### コンポーネントを生成するクラス
+
+- GeneratorMain (src/test/java)
+- GeneratorInjectionMain (src/test/java)
+
+
 ### 結果
 
 #### ネストしないオブジェクト群の生成
@@ -41,6 +51,10 @@
 ## マルチスレッド
 
 マルチスレッド下で同時にDIコンテナにアクセスしても、極端な性能劣化が起こらないこと。
+
+### 使用クラス
+
+- com.nablarch.framework.multithread.MultiThreadTester
 
 ### テスト内容
 

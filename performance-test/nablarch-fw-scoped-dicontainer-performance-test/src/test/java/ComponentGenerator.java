@@ -6,7 +6,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.Scanner;
 
-public class ComponentGenerator {
+/**
+ * コンポーネントのソースコードを出力するクラス。
+ *
+ * 本クラスでコンポーネントを生成し、その状態でDIコンテナの初期化時間を計測する。
+ * 必要な設定については、{@link #ComponentGenerator(String, String, int)}を参照。
+ */
+class ComponentGenerator {
 
     private final String template;
 
@@ -14,6 +20,13 @@ public class ComponentGenerator {
 
     private final int numberOfComponents;
 
+    /**
+     * コンストラクタ。
+     * @param dir ファイル出力先ディレクトリ
+     * @param templateName テンプレート名（クラスパスからロードする）
+     * @param numberOfComponent 出力するコンポーネント数
+     * @throws IOException 予期しない入出力例外
+     */
     ComponentGenerator(String dir, String templateName, int numberOfComponent) throws IOException {
         this.template = loadTemplate(templateName);
         this.dir = dir;

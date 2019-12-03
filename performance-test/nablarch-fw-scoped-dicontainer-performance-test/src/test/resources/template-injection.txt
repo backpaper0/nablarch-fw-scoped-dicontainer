@@ -1,0 +1,21 @@
+package com.nablarch.framework.initialize.component;
+
+import nablarch.fw.dicontainer.Prototype;
+
+import javax.inject.Inject;
+import com.nablarch.framework.initialize.*;
+
+
+@Prototype
+public class $CLASS_NAME$ {
+
+    @Inject
+    private Aaa aaa;
+
+    @Inject
+    private Bbb bbb;
+
+    @Inject
+    private Ccc ccc;
+
+}

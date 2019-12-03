@@ -1,0 +1,7 @@
+package com.nablarch.framework.initialize.component;
+
+import nablarch.fw.dicontainer.Prototype;
+
+@Prototype
+public class $CLASS_NAME$ {
+}

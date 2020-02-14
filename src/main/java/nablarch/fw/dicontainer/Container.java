@@ -3,16 +3,12 @@ package nablarch.fw.dicontainer;
 import java.lang.annotation.Annotation;
 import java.util.Set;
 
-import nablarch.core.util.annotation.Published;
-import nablarch.fw.dicontainer.component.ComponentDefinition;
-import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 
 /**
  * DIコンテナのインターフェース。
  *
  */
-@Published(tag = "architect")
 public interface Container {
 
     /**

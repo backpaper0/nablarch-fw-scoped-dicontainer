@@ -6,13 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Scope;
 
-import nablarch.core.util.annotation.Published;
 
 /**
  * コンポーネントがセッションスコープであることを表すアノテーション。
  * 
  */
-@Published
 @Scope
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

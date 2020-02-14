@@ -10,7 +10,6 @@ import javax.inject.Provider;
 
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
-import nablarch.core.util.annotation.Published;
 import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
@@ -29,7 +28,6 @@ import nablarch.fw.dicontainer.scope.Scope;
  *
  * @param <BUILDER> このビルダーのサブクラス
  */
-@Published(tag = "architect")
 public class ContainerBuilder<BUILDER extends ContainerBuilder<BUILDER>> {
 
     /**

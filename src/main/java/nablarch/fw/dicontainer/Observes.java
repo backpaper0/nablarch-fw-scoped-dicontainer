@@ -6,8 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import nablarch.core.util.annotation.Published;
-
 /**
  * 発火されたイベントをハンドリングするメソッドであることを表すアノテーション。
  * 発火されたイベントの型をもとにしてハンドリングするメソッドが決定される。
@@ -19,7 +17,6 @@ import nablarch.core.util.annotation.Published;
  * </ul>
  *
  */
-@Published
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

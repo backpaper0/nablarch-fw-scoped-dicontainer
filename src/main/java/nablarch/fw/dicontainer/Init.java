@@ -6,8 +6,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import nablarch.core.util.annotation.Published;
-
 /**
  * コンポーネントの初期化を行うライフサイクルメソッドであることを表すアノテーション。
  * 
@@ -20,7 +18,6 @@ import nablarch.core.util.annotation.Published;
  * <p>また、1つのコンポーネント内で{@code @Init}を付与できるメソッドは1つだけに限られる。</p>
  *
  */
-@Published
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -236,6 +236,7 @@ com.nablarch.example.app.DIConfig
 
 ハンドラキュー構成に`nablarchWebContextHandler`を追加する。
 `nablarchWebContextHandler`がリクエストスコープ、セッションスコープを使用するために`ExecutionContext`からコンテキストを構築してスレッドローカルに保存する。
+JSPフォワード時にDIコンテナを参照する場合は、HttpResponseHandlerより上に配置する。
 
 ```xml
 <component name="webFrontController"
@@ -244,7 +245,10 @@ com.nablarch.example.app.DIConfig
     <list>
       (中略)
 
+      <!-- JSPフォワード時にDIコンテナを参照する場合は、HttpResponseHandlerより上に配置する -->
       <component-ref name="nablarchWebContextHandler"/>
+
+      <component class="nablarch.fw.web.handler.HttpResponseHandler"/>
 
       (中略)
     </list>

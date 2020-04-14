@@ -1,4 +1,4 @@
-# nablarch-scoped-container
+# nablarch-fw-scoped-container
 
 
 ## 仕様
@@ -312,7 +312,6 @@ com.nablarch.example.app.DIConfig
 | `nablarch.fw.dicontainer.event`                  | DIコンテナが発火させるイベントが含まれる                                                    |
 | `nablarch.fw.dicontainer.web`                    | リクエストスコープ、セッションスコープのアノテーションが含まれる                            |
 | `nablarch.fw.dicontainer.web.exception`          | Webに関する例外クラスが含まれる                                                             |
-| `nablarch.fw.dicontainer.web.servlet`            | Servlet APIを使用してリクエストスコープ、セッションスコープを実現するためのクラスが含まれる |
 | `nablarch.fw.dicontainer.web.context`            | リクエストスコープ、セッションスコープを実現するためのクラスが含まれる                      |
 | `nablarch.fw.dicontainer.web.scope`              | リクエストスコープ、セッションスコープの実装クラスが含まれる                                |
 | `nablarch.fw.dicontainer.nablarch`               | NablarchでDIコンテナを使用するためのクラスが含まれる                                        |

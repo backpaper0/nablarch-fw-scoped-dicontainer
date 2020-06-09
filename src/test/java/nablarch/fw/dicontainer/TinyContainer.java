@@ -47,6 +47,21 @@ public final class TinyContainer implements Container {
     }
 
     @Override
+    public <T> T removeComponent(Class<T> key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T removeComponent(Class<T> key, Annotation... qualifiers) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T removeComponent(ComponentKey<T> key) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public <T> T getComponent(final Class<T> key) {
         return getComponent(componentKeyFactory.fromComponentClass(key));
     }

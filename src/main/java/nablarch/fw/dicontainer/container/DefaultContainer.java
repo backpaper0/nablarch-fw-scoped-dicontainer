@@ -65,6 +65,29 @@ public final class DefaultContainer implements Container, EventTrigger {
     }
 
     @Override
+    public <T> T removeComponent(Class<T> key) {
+        return removeComponent(new ComponentKey<>(key));
+    }
+
+    @Override
+    public <T> T removeComponent(Class<T> key, Annotation... qualifiers) {
+        return removeComponent(new ComponentKey<T>(key, qualifiers));
+    }
+
+    @Override
+    public <T> T removeComponent(ComponentKey<T> key) {
+        ComponentDefinition<T> definition = definitions.find(key);
+        if (definition == null) {
+            final Set<ComponentKey<?>> alterKeys = aliasMapping.find(key.asAliasKey());
+            if (!alterKeys.isEmpty()) {
+                final ComponentKey<T> alterKey = (ComponentKey<T>) alterKeys.iterator().next();
+                definition = definitions.find(alterKey);
+            }
+        }
+        return definition != null ? definition.removeComponent() : null;
+    }
+
+    @Override
     public <T> T getComponent(final Class<T> key) {
         return getComponent(new ComponentKey<>(key));
     }

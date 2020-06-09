@@ -33,11 +33,15 @@ public final class SessionScope extends AbstractScope {
 
     @Override
     public <T> T getComponent(final ComponentId id, final Provider<T> provider) {
+        return getSessionContext().getSessionComponent(id, provider);
+    }
+
+    private SessionContext getSessionContext() {
         final SessionContext context = supplier.getSessionContext();
         if (context == null) {
             throw new WebContextException("SessionContext is not found.");
         }
-        return context.getSessionComponent(id, provider);
+        return context;
     }
 
     @Override
@@ -45,4 +49,13 @@ public final class SessionScope extends AbstractScope {
         return 200;
     }
 
+    /**
+     * コンポーネントを削除する。
+     *
+     * @param id ID
+     * @param <T> コンポーネント
+     */
+    public <T> T removeComponent(final ComponentId id) {
+        return getSessionContext().removeSessionComponent(id);
+    }
 }

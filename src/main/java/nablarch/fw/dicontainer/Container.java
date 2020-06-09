@@ -54,4 +54,31 @@ public interface Container {
      */
     <T> T getComponent(ComponentKey<T> key);
 
+    /**
+     * コンポーネントを削除する。
+     *
+     * @param <T> コンポーネントの型
+     * @param key 検索キーとなるクラス
+     * @return コンポーネント
+     */
+    <T> T removeComponent(Class<T> key);
+
+    /**
+     * コンポーネントを削除する。
+     *
+     * @param <T> コンポーネントの型
+     * @param key 検索キーとなるクラス
+     * @param qualifiers 限定子
+     * @return コンポーネント
+     */
+    <T> T removeComponent(Class<T> key, Annotation... qualifiers);
+
+    /**
+     * コンポーネントを削除する。
+     *
+     * @param <T> コンポーネントの型
+     * @param key 検索キー
+     * @return コンポーネント
+     */
+    <T> T removeComponent(ComponentKey<T> key);
 }

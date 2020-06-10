@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Named;
 
 import nablarch.fw.dicontainer.Prototype;
+import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -168,20 +169,17 @@ public class SessionComponentTest {
         assertFalse(components[1] == components[2]);
     }
 
-    @Test
+    @Test(expected = ComponentNotFoundException.class)
     public void removeComponentNotFound() throws Exception {
         final Container container = builder
                 .register(Aaa.class)
                 .build();
 
-        final Ccc1[] components = new Ccc1[1];
         supplier.handle(null, new ExecutionContext()
                 .addHandler((data, context) -> {
-                    components[0] = container.removeComponent(Ccc1.class);
+                    container.removeComponent(Ccc1.class);
                     return null;
                 }));
-
-        assertNull(components[0]);
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import nablarch.core.log.Logger;
@@ -12,7 +13,6 @@ import nablarch.fw.dicontainer.Container;
 import nablarch.fw.dicontainer.component.AliasMapping;
 import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentDefinitionRepository;
-import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.component.ComponentKey;
 import nablarch.fw.dicontainer.event.ContainerDestroy;
 import nablarch.fw.dicontainer.event.EventTrigger;
@@ -43,13 +43,15 @@ public final class DefaultContainer implements Container, EventTrigger {
         this.aliasMapping = Objects.requireNonNull(aliasesMap);
     }
 
-
-
     @Override
     public <T> T getComponent(final ComponentKey<T> key) {
+        return doAction(key, definition -> definition.getComponent(this));
+    }
+
+    private <T> T doAction(final ComponentKey<T> key, Function<ComponentDefinition<T>, T> action) {
         ComponentDefinition<T> definition = definitions.find(key);
         if (definition != null) {
-            return definition.getComponent(this);
+            return action.apply(definition);
         }
         final Set<ComponentKey<?>> alterKeys = aliasMapping.find(key.asAliasKey());
         if (alterKeys.isEmpty()) {
@@ -61,7 +63,22 @@ public final class DefaultContainer implements Container, EventTrigger {
         }
         final ComponentKey<T> alterKey = (ComponentKey<T>) alterKeys.iterator().next();
         definition = definitions.find(alterKey);
-        return definition.getComponent(this);
+        return action.apply(definition);
+    }
+
+    @Override
+    public <T> T removeComponent(Class<T> key) {
+        return removeComponent(new ComponentKey<>(key));
+    }
+
+    @Override
+    public <T> T removeComponent(Class<T> key, Annotation... qualifiers) {
+        return removeComponent(new ComponentKey<>(key, qualifiers));
+    }
+
+    @Override
+    public <T> T removeComponent(ComponentKey<T> key) {
+        return doAction(key, definition -> definition.removeComponent());
     }
 
     @Override

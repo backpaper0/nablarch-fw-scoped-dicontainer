@@ -20,4 +20,12 @@ public interface SessionContext {
      * @return コンポーネント
      */
     <T> T getSessionComponent(final ComponentId id, final Provider<T> provider);
+
+    /**
+     * コンテキストが持つコンポーネントを削除する。
+     *
+     * @param id ID
+     * @return コンポーネント
+     */
+    <T> T removeSessionComponent(final ComponentId id);
 }

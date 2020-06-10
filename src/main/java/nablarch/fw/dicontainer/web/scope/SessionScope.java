@@ -4,9 +4,9 @@ import java.util.Objects;
 
 import javax.inject.Provider;
 
-import nablarch.fw.dicontainer.component.ComponentDefinition;
 import nablarch.fw.dicontainer.component.ComponentId;
 import nablarch.fw.dicontainer.scope.AbstractScope;
+import nablarch.fw.dicontainer.scope.ComponentRemoveableScope;
 import nablarch.fw.dicontainer.web.context.SessionContext;
 import nablarch.fw.dicontainer.web.context.SessionContextSupplier;
 import nablarch.fw.dicontainer.web.exception.WebContextException;
@@ -15,7 +15,7 @@ import nablarch.fw.dicontainer.web.exception.WebContextException;
  * セッションスコープ。
  *
  */
-public final class SessionScope extends AbstractScope {
+public final class SessionScope extends AbstractScope implements ComponentRemoveableScope {
 
     /**
      * セッションコンテキストを取得するクラス
@@ -55,6 +55,7 @@ public final class SessionScope extends AbstractScope {
      * @param id ID
      * @param <T> コンポーネント
      */
+    @Override
     public <T> T removeComponent(final ComponentId id) {
         return getSessionContext().removeSessionComponent(id);
     }

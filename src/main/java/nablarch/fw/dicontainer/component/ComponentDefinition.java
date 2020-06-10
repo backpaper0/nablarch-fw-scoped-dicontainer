@@ -12,8 +12,8 @@ import nablarch.fw.dicontainer.component.impl.NoopDestroyMethod;
 import nablarch.fw.dicontainer.component.impl.NoopInitMethod;
 import nablarch.fw.dicontainer.container.ContainerBuilder;
 import nablarch.fw.dicontainer.container.CycleDependencyValidationContext;
+import nablarch.fw.dicontainer.scope.ComponentRemoveableScope;
 import nablarch.fw.dicontainer.scope.Scope;
-import nablarch.fw.dicontainer.web.scope.SessionScope;
 
 /**
  * コンポーネント定義
@@ -160,15 +160,15 @@ public final class ComponentDefinition<T> {
     /**
      * コンポーネントを削除する。
      *
-     * コンポーネントの削除はセッションスコープのみ使用できる。
+     * コンポーネントの削除は{@link ComponentRemoveableScope}を実装したスコープのみ使用できる。
      *
      * @return コンポーネント
      */
     public T removeComponent() {
-        if (!(scope instanceof SessionScope)) {
-            throw new UnsupportedOperationException("Removing of component is supported in session scope only.");
+        if (!(scope instanceof ComponentRemoveableScope)) {
+            throw new UnsupportedOperationException("Removing of component is supported in scope that implements ComponentRemoveableScope.");
         }
-        return ((SessionScope) scope).removeComponent(id);
+        return ((ComponentRemoveableScope) scope).removeComponent(id);
     }
 
     /**

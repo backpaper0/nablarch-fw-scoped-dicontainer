@@ -49,4 +49,10 @@ public final class NablarchWebContext implements RequestContext, SessionContext 
         }
         return (T) component;
     }
+
+    @Override
+    public <T> T removeSessionComponent(ComponentId id) {
+        final String name = NAME_PREFIX + id;
+        return SessionUtil.delete(ctx, name);
+    }
 }

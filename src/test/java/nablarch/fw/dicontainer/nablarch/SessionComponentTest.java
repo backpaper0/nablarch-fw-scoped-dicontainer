@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import nablarch.fw.dicontainer.Prototype;
+import nablarch.fw.dicontainer.exception.ComponentNotFoundException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,6 +103,98 @@ public class SessionComponentTest {
         }
     }
 
+    @Test
+    public void removeComponent() throws Exception {
+        final Container container = builder
+                .register(Aaa.class)
+                .build();
+
+        final Aaa[] components = new Aaa[3];
+        supplier.handle(null, new ExecutionContext()
+                .addHandler((data, context) -> {
+                    components[0] = container.getComponent(Aaa.class);
+                    components[1] = container.removeComponent(Aaa.class);
+                    components[2] = container.getComponent(Aaa.class);
+                    return null;
+                }));
+
+        assertNotNull(components[0]);
+        assertNotNull(components[1]);
+        assertNotNull(components[2]);
+        assertTrue(components[0] == components[1]);
+        assertFalse(components[1] == components[2]);
+    }
+
+    @Test
+    public void removeComponentByAlias() throws Exception {
+        final Container container = builder
+                .register(Aaa.class)
+                .build();
+
+        final Aaa[] components = new Aaa[3];
+        supplier.handle(null, new ExecutionContext()
+                .addHandler((data, context) -> {
+                    components[0] = container.getComponent(Aaa.class);
+                    components[1] = (Aaa) container.removeComponent(Serializable.class);
+                    components[2] = container.getComponent(Aaa.class);
+                    return null;
+                }));
+
+        assertNotNull(components[0]);
+        assertNotNull(components[1]);
+        assertNotNull(components[2]);
+        assertTrue(components[0] == components[1]);
+        assertFalse(components[1] == components[2]);
+    }
+
+    @Test
+    public void removeComponentWithQualifiers() throws Exception {
+        final Container container = builder
+                .register(Ccc2.class)
+                .build();
+
+        final Ccc1[] components = new Ccc1[3];
+        supplier.handle(null, new ExecutionContext()
+                .addHandler((data, context) -> {
+                    components[0] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
+                    components[1] = container.removeComponent(Ccc1.class, new NamedImpl("foo"));
+                    components[2] = container.getComponent(Ccc1.class, new NamedImpl("foo"));
+                    return null;
+                }));
+
+        assertNotNull(components[0]);
+        assertNotNull(components[1]);
+        assertNotNull(components[2]);
+        assertTrue(components[0] == components[1]);
+        assertFalse(components[1] == components[2]);
+    }
+
+    @Test(expected = ComponentNotFoundException.class)
+    public void removeComponentNotFound() throws Exception {
+        final Container container = builder
+                .register(Aaa.class)
+                .build();
+
+        supplier.handle(null, new ExecutionContext()
+                .addHandler((data, context) -> {
+                    container.removeComponent(Ccc1.class);
+                    return null;
+                }));
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void removeComponentForPrototypeScope() throws Exception {
+        final Container container = builder
+                .register(Ddd.class)
+                .build();
+
+        supplier.handle(null, new ExecutionContext()
+                .addHandler((data, context) -> {
+                    container.removeComponent(Ddd.class);
+                    return null;
+                }));
+    }
+
     @SessionScoped
     private static class Aaa implements Serializable {
     }
@@ -116,6 +210,10 @@ public class SessionComponentTest {
     @SessionScoped
     @Named("bar")
     private static class Ccc3 extends Ccc1 {
+    }
+
+    @Prototype
+    private static class Ddd {
     }
 
     private static class TestSessionStore extends SessionStore {
